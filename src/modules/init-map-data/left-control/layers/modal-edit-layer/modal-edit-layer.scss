@@ -1,0 +1,18 @@
+.layer-edited-container {
+    .limited-big-container {
+        height: calc(100vh - 280px);
+        overflow: auto;
+    }
+}
+
+@media (max-width: 1224px) and (orientation: portrait) {
+    .layer-edited-container {
+        .limited-big-container {
+            height: auto;
+            overflow: unset;
+        }
+    }
+    #content-custom-container-setting-layer {
+        overflow-x: hidden;
+    }
+}

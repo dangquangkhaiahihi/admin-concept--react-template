@@ -1,0 +1,19 @@
+.content {
+  position: relative;
+  .right-content {
+    margin-left: 120px !important;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    overflow-y: hidden;
+    &.center {
+      margin-left: 15% !important;
+    }
+    .child {
+      margin-top: 68px;
+    }
+  }
+  .child {
+    margin-top: 10px;
+  }
+}

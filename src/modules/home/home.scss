@@ -1,0 +1,20 @@
+.wrapper {
+  height: 100vh;
+  padding-top: 100px;
+}
+.custom-title {
+  font-weight: 500;
+}
+.module-box {
+  cursor: pointer;
+  a {
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+  }
+}
+
+@media (max-width: 1224px) and (orientation: portrait) {
+  .wrapper {
+    height: auto;
+    padding-top: 5%;
+  }
+}

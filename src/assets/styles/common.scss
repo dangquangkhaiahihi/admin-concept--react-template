@@ -1,0 +1,237 @@
+.sidebar {
+    background-color: #fff;
+    background-image: none;
+
+    .nav-item {
+        .nav-link[data-toggle="collapse"] {
+            &::after {
+                content: none !important;
+            }
+        }
+    }
+}
+
+button {
+    &:focus {
+        outline: none;
+    }
+}
+
+:focus {
+    outline: none;
+}
+
+.error {
+    font-size: .8rem;
+    margin-top: 5px;
+    color: red;
+}
+
+.required {
+    display: inline-block;
+
+    &::before {
+        content: "*";
+        color: #dc3545;
+        margin-left: 5px;
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-move {
+    cursor: move;
+}
+
+.drag-state-custom-ddb {
+    background-color: rgba(10, 206, 10, 0.623);
+}
+
+.warning-validate-style-custom {
+    color: red;
+    font-size: 12px;
+}
+
+.badge-warning {
+    color: #212529;
+    background-color: #ffc107;
+}
+
+.alignItems-baseline {
+    align-items: baseline;
+}
+
+.map-link {
+    color: #4e73df;
+    cursor: pointer;
+
+    &:hover {
+        color: #0a32ac;
+    }
+}
+
+.w-10 {
+    width: 10% !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+}
+
+.btn-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+
+    &:hover {
+        color: #fff;
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+}
+
+//--- Material table
+.MuiTable-root {
+    .MuiTableHead-root {
+        .MuiTableRow-root {
+            .MuiTableCell-root {
+                background-color: #ffffff;
+
+                &.MuiTableCell-freeze {
+                    z-index: 3;
+                    box-shadow: 0 0 0.25rem 0 rgba(58, 59, 69, 0.2) !important;
+                }
+            }
+        }
+    }
+
+    .MuiTableBody-root {
+        .MuiTableRow-root {
+            .MuiTableCell-root {
+                font-size: 14px !important;
+
+                &.MuiTableCell-freeze {
+                    position: sticky;
+                    left: 0;
+                    z-index: 1;
+                    background-color: #ffffff;
+                    max-width: 300px;
+                    min-width: 300px;
+                }
+            }
+        }
+    }
+}
+
+//--- Scrollbar
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #eeeeee;
+    // border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #cccccc;
+    // border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6d6e70;
+}
+
+.MuiPopover-root {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.wrap__content-page {
+    // display: none;
+    border-radius: 3px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    background-color: #fff;
+    width: 100%;
+    padding: 30px;
+    border: 1px solid #EAEAEA;
+    .form__save {
+        margin-top: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+.btn-ct {
+    min-width: 138px;
+    margin: 0px 15px;
+    border-radius: 3px;
+    font-size: 16px;
+    font-weight: 500;
+    border: none;
+    transition: 0.2s;
+    min-height: 40px;
+    color: #fff;
+    padding: 6px 22px;
+}
+
+.btn-default-ct {
+    background-color: #DDDDDD;
+    color: var(--text-color);
+}
+
+.btn-primary-ct {
+    background-color: var(--btn-primary-ct);
+}
+
+
+.btn-danger-ct {
+    background-color: var(--btn-danger-ct);
+}
+
+.btn-success-ct {
+    background-color: var(--btn--success-ct);
+}
+
+.popover-admin-search {
+    width: 30rem;
+}
+:root {
+    --title-color: #0055AB;
+    --btn-primary-ct:#003F8E;
+    --btn-danger-ct: #F24A4A;
+    --btn--success-ct: #1BA466;
+    --text-color: #383838;
+    --text-color-second: #5F5F5F;
+}
+
+@media (max-width: 1224px) and (orientation: portrait) {
+    .btn-ct {
+        margin: 10px 0 0 0;
+        padding: 0;
+    }
+    .text-dark-for-long-label {
+        min-height: 48px;
+    }
+    .text-dark-for-longer-label {
+        min-height: 72px;
+    }
+    .popover-admin-search {
+        width: auto;
+    }
+    .negate-text-truncate-mobile {
+        white-space: unset;
+        max-width: unset;
+    }
+}

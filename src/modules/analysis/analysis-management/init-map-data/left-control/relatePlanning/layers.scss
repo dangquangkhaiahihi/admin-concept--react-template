@@ -1,0 +1,72 @@
+.left-menu-layer-control-container {
+    details {
+        summary {
+            background-color: black;
+        }
+    }
+
+    .base-map-header-summary {
+
+        .MuiAccordionSummary-expandIcon {
+            position: absolute;
+            left: 0px
+        }
+
+        .add-button-icon {
+            right: 14px;
+        }
+    }
+
+    .smooth-dnd-container.vertical {
+        width: 100%;
+        min-height: auto;
+        min-width: auto;
+    }
+
+    .icon-layer {
+        color: green;
+    }
+
+    .icon-layers-custom {
+        left: 0px;
+    }
+
+    input[type=checkbox] {
+        cursor: pointer;
+    }
+
+    .MuiAccordionSummary-root {
+        &.Mui-expanded {
+            min-height: 40px;
+        }
+    }
+
+    .MuiAccordionSummary-content {
+        margin: 0;
+
+        &.Mui-expanded {
+            margin: 10px 0 0 0;
+        }
+    }
+}
+.group-name {
+    margin-bottom: 1rem !important;
+}
+.font-layer-title {
+    font-size: 18px ;
+    font-weight: 600;
+}
+.font-layer-category {
+    font-weight: 600;
+    width: 3rem !important;
+}
+.validate-category {
+    color: red !important;
+    margin-left: 1rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 400 !important;
+    line-height: 1.66 !important;
+}
+// .pb-2, .py-2{
+//     padding: 0!important;
+// }

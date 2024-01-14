@@ -1,0 +1,58 @@
+.container-bottom {
+  width: 75%;
+  height: 144px;
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  background-color: white;
+  padding: 10px 20px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  overflow-y: scroll;
+  &-hide {
+    height: 50px;
+    width: 75%;
+    background-color: unset;
+    box-shadow: unset;
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    display: flex;
+    justify-content: end;
+    .hide-button {
+        background: none;
+        border: none;
+        margin-right: 30px;
+        background-color: white;
+        height: 30px;
+        width: 40px;
+        border-radius: 8px;
+      }
+  }
+  .card {
+    padding: 20px;
+  }
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &__title {
+      font-weight: 600;
+      padding: 0;
+      margin: 0;
+    }
+    &__button {
+      &-hide {
+        background: none;
+        border: none;
+      }
+    }
+  }
+}
+.margin-10{
+  margin-top: 10px;
+}
+.mgl-20 {
+  margin-left: 12px;
+}
+

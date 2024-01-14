@@ -1,0 +1,27 @@
+.left-control-container {
+    overflow-y: hidden;
+
+    .left-control-map-title-container {
+        color: white;
+        background-color: #00923F;
+
+        img {
+            width: 20px;
+        }
+
+        .setting {
+            cursor: pointer;
+        }
+    }
+
+    .MuiPaper-root.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm.MuiPaper-elevation24.MuiPaper-rounded {
+        background-color: red;
+        width: 600px;
+        display: none !important;
+    }
+    .position-absolute{
+        top:180px;
+        right:15px;
+    }
+
+}

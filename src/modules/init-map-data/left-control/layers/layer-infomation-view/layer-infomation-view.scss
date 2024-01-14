@@ -1,0 +1,10 @@
+.setting-infomation-view-layer-container {
+    .container-body-limited-height {
+        height: calc(100vh - 250px);
+
+        .limited-view-height {
+            height: calc(100% - 50px);
+            overflow-y: auto;
+        }
+    }
+}

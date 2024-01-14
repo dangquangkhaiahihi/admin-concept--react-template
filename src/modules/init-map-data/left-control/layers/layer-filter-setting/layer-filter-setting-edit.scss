@@ -1,0 +1,9 @@
+.select-main-keyword-container {
+    position: absolute !important;
+}
+
+@media (max-width: 1224px) {
+    .select-main-keyword-container {
+        position: static !important;
+    }
+}
