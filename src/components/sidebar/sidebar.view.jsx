@@ -296,7 +296,7 @@ function Sidebar(props) {
                 style={{ width: '50%' }}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = require('../../assets/icon/logo.png');
+                  e.target.src = require('../../assets/images/logo.png');
                 }}
               />
             </a>

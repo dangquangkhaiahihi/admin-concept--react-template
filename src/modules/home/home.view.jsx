@@ -112,7 +112,7 @@ class HomePage extends React.Component {
                 }
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = require('../../assets/icon/logo.png');
+                  e.target.src = require('../../assets/images/logo.png');
                 }}
               />
               <div class="admin__text d-flex align-items-center">

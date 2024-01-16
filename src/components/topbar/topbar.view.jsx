@@ -82,8 +82,9 @@ class TopBar extends Component {
   render() {
     const { user, screenAllow } = this.state;
     const { settings, setToggle, expandSidebar, collapseSidebar, isCollapsed, reactMediaQuery } = this.props;
-    console.log("TOPBAR : ", user, screenAllow);
+
     return (
+      <div class="dashboard-header">
       <nav className="navbar navbar-expand navbar-light topbar static-top row" style={{ margin: 'auto' }}>
         <div className="col-6">
           <a
@@ -154,7 +155,7 @@ class TopBar extends Component {
                       alt="avatar-img"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = require('../../assets/icon/logo.png');
+                        e.target.src = require('../../assets/images/logo.png');
                       }}
                     />
                     <div class="admin__text d-flex align-items-center">
@@ -211,6 +212,7 @@ class TopBar extends Component {
 
         </div>
       </nav>
+      </div>
     );
   }
 }

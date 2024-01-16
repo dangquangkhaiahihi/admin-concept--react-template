@@ -109,7 +109,7 @@ const LockScreen = () => {
               alt=""
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = require('../../assets/icon/logo.png');
+                e.target.src = require('../../assets/images/logo.png');
               }}
               style={{
                 display:'flex',
