@@ -29,6 +29,7 @@ export const FILE_EXTENSION = [
   "xls",
   "pptx",
   "txt",
+  'gif', 'cad', 'mdb', 'shp'
 ];
 
 export const FILE_EXTENSION_ICON = {
@@ -287,13 +288,13 @@ export const isValidFile = (_file = null, _acceptedFiles = []) => {
 
 export const isValidFileSelect = (_file = null, _acceptedFiles = []) => {
   if (!_file || !_acceptedFiles || _acceptedFiles.length === 0) return false;
-
+  console.log("_file",_file)
   if (
     _file.typeName === DOCUMENT_TYPE.FILE &&
-    _file.extension &&
+    _file.fileExtension &&
     _acceptedFiles.some(
       (fileType) =>
-        fileType.toLowerCase() === _file.extension.toLowerCase()
+        fileType.toLowerCase() === _file.fileExtension.name.toLowerCase()
     )
   )
     return true;

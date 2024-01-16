@@ -13,11 +13,18 @@ namespace ModalEditLayerModels {
     inputSetting: ConfigModels.ObjectOfArray[];
     outputSetting: ConfigModels.ObjectOfArray[];
     sortWidth: string;
+    isLayerRela?: boolean;
+    year?: any;
+    contentChange?: any;
+    layerRelaIndex?: number;
+    layerParents?: any;
   }
   export interface ModalEditLayerProps {
     layerData: LayerSettingsModels.LayerSettingsModel;
     setLayerData: Function;
     closeModal: Function;
+    isLayerRela?: boolean;
+    layerRelaIndex?: number;
   }
 }
 

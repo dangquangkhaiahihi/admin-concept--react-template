@@ -51,6 +51,7 @@ function PlanningRelatedPage(props) {
   const { showLoading, isQHHTKT, isQHCC } = props;
 
   const history = useHistory();
+  const location = useLocation();
   const { id } = useParams();
   const planningId = id;
   const { name } = history.location.state || "";
@@ -79,7 +80,19 @@ function PlanningRelatedPage(props) {
 
   const onCloseDialog = () => {
     history.push({
-      pathname: pushToListPlanningRelated(isQHHTKT, isQHCC)
+      pathname: pushToListPlanningRelated(isQHHTKT, isQHCC),
+      state: {
+        currentPage: location.state?.currentPage,
+        pageSizeDefault: location.state?.pageSizeDefault,
+        title: location.state?.title,
+        typeSelected: location.state?.typeSelected,
+        levelSelected: location.state?.levelSelected,
+        statusIdSelected: location.state?.statusIdSelected,
+        planningUnitSelected: location.state?.planningUnitSelected,
+        investorSelected: location.state?.investorSelected,
+        approvalAgencySelected: location.state?.approvalAgencySelected,
+        districtSelected: location.state?.districtSelected
+      }
     });
   };
 
@@ -596,19 +609,19 @@ function PlanningRelatedPage(props) {
           </div>
         )}
 
-        <DialogActions className='row'>
+        <DialogActions className='mobile-buttons-wrapper'>
           {!isLock && (
             <Button
               onClick={handleAddClick}
               variant='contained'
               startIcon={<AddBoxIcon />}
-              className='bg-success text-white col-lg-2 m-0 mr-2 mb-2'
+              className='bg-success text-white mobile-button'
               hidden={projectList && projectList.length > 0}>
               Thêm quy hoạch
             </Button>
           )}
           <Button
-            className='col-lg-2  m-0 mr-2 mb-2'
+            className='mobile-button'
             onClick={onCloseDialog}
             variant='contained'
             startIcon={<CloseIcon />}>
@@ -616,7 +629,7 @@ function PlanningRelatedPage(props) {
           </Button>
           {!isLock && (
             <Button
-              className='col-lg-2  m-0 mr-2 mb-2'
+              className='mobile-button'
               type='submit'
               color='primary'
               variant='contained'

@@ -30,7 +30,7 @@ import AddDistrictManagement from "./add-district-management/add-district-manage
 import * as appActions from "../../core/app.store";
 
 function DistrictManagement(props) {
-  const { isLoading, showLoading } = props;
+  const { isLoading, showLoading, isSyncSetting } = props;
   const [districtModels, setDistrictModels] = useState();
   const [totalItemCount, setTotalItemCount] = useState();
   const [name, setName] = useState();
@@ -145,7 +145,7 @@ function DistrictManagement(props) {
       (res) => {
         districtAction.DeleteDistrictPaht(districtId)
         if (res && res.content && res.content.status) {
-          GetListDistrict(1, rowsPerPage, orderBy ? orderBy + " " + order : "", name);
+          GetListDistrict(page + 1, rowsPerPage, orderBy ? orderBy + " " + order : "", name);
           handleCloseDeleteDialog();
           ShowNotification(viVN.Success.DeleteDistrict, NotificationMessageType.Success);
         }
@@ -221,9 +221,13 @@ function DistrictManagement(props) {
             </div>
           </Popover>
         </h1>
-        <Button variant="contained" color="primary" onClick={handleOpenAddDialog} startIcon={<AddCircle />}>
-          Thêm quận/huyện
-        </Button>
+        {
+          !isSyncSetting &&
+          <Button variant="contained" color="primary" onClick={handleOpenAddDialog} startIcon={<AddCircle />}>
+            Thêm quận/huyện
+          </Button>
+        }
+        
       </div>
 
       {districtModels ? (
@@ -243,6 +247,7 @@ function DistrictManagement(props) {
           page={page}
           rowsPerPage={rowsPerPage}
           restAction={handleOpenRestPasswordDialog}
+          isSyncSetting={isSyncSetting}
         />
       ) : (
         ""
@@ -274,11 +279,20 @@ function DistrictManagement(props) {
           setOrder={setOrder}
           setOrderBy={setOrderBy}
           showLoading={showLoading}
+          orderBy={orderBy}
+          order={order}
+          searchCriteria={{'page':page,'name':name}}
+          isSyncSetting={isSyncSetting}
         />
       )}
 
       {openDeleteDialog ? (
-        <DeleteDialog isOpen={openDeleteDialog} rowsPerPageCommon={rowsPerPage} onClose={handleCloseDeleteDialog} onSuccess={handleDelete} />
+        <DeleteDialog
+          isOpen={openDeleteDialog}
+          rowsPerPageCommon={rowsPerPage}
+          onClose={handleCloseDeleteDialog}
+          onSuccess={handleDelete}
+        />
       ) : (
         ""
       )}

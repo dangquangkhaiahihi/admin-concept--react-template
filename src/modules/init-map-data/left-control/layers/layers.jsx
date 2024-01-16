@@ -36,7 +36,8 @@ import TuneIcon from "@material-ui/icons/Tune";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import CloseIcon from "@material-ui/icons/Close";
-
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 class RenderLayerControlView extends React.Component {
   constructor(props) {
     super(props);
@@ -52,9 +53,11 @@ class RenderLayerControlView extends React.Component {
       isCreateNewLayer: false,
       groupIndexSelected: null,
       layerIndexSelected: null,
+      layerRelaIndexSelect: null,
       groupLayersName: "",
       groupLayersLv: null,
       idGroupLayerSelected: null,
+      idLayerSelect: null,
       indexGroupSelected: null,
       hasShowWarningGroupLayerSetting: false,
       layerSettingViewType: 0, // view - 3, filter - 2, setting - 1, data source -0
@@ -67,6 +70,11 @@ class RenderLayerControlView extends React.Component {
       newValueCategory: null,
       display: 'none',
       isOpenAlert: false,
+      isLayerRela: false,
+      isOpenMenuCategory: false,
+      isOpenMenuCategoryIndex: null,
+      isOpenMenuLayer: false,
+      isOpenMenuLayerIndex: [-1, -1],
     };
   }
 
@@ -240,19 +248,48 @@ class RenderLayerControlView extends React.Component {
     this.setState({
       isOpenSettingLayer: true,
       isCreateNewLayer: true,
+      isLayerRela: false,
       groupIndexSelected: groupLayerIndex,
       idGroupLayerSelected:
         this.getLayerData.getLayerGroupByIndex(groupLayerIndex)["id"],
     });
   };
 
-  onClickEditLayer = (event, groupLayerIndex, layerIndex) => {
+  onClickOpenAddNewLayerRela = (event, groupLayerIndex, layerIndex) => {
     event.stopPropagation();
     this.setState({
       isOpenSettingLayer: true,
-      isCreateNewLayer: false,
+      isCreateNewLayer: true,
+      isLayerRela: true,
       groupIndexSelected: groupLayerIndex,
       layerIndexSelected: layerIndex,
+      idGroupLayerSelected:
+        this.getLayerData.getLayerGroupByIndex(groupLayerIndex)["id"],
+      idLayerSelect:
+        this.getLayerData.getLayerByIndexGroupAndIndexLayer(groupLayerIndex, layerIndex)["id"],
+    });
+  };
+
+  onClickEditLayer = (event, groupLayerIndex, layerIndex, index) => {
+    event.stopPropagation();
+    if (index || index == 0) {
+      this.setState({
+        layerRelaIndexSelect: index,
+        isLayerRela: true,
+      });
+    } else {
+      this.setState({
+        isLayerRela: false,
+      });
+    }
+    // console.log('onClickEditLayer',this.getLayerData.getLayerRelaByIndexGroupIndexLayerIndexLayerRela(
+    //   groupLayerIndex, layerIndex, index)
+    // )
+    this.setState({
+      groupIndexSelected: groupLayerIndex,
+      layerIndexSelected: layerIndex,
+      isOpenSettingLayer: true,
+      isCreateNewLayer: false,
     });
   };
 
@@ -267,6 +304,31 @@ class RenderLayerControlView extends React.Component {
       indexGroup,
       indexLayer
     );
+    console.log(layerClicked)
+    let layerChecked = layerClicked;
+    if (!layerClicked.is_check) {
+      layerClicked.is_check = true;
+      layerChecked.isChecked = true;
+    } else {
+      layerChecked.isChecked = false;
+      layerClicked.is_check = false;
+    }
+    console.log(layerChecked);
+
+
+    !this.props.isLock && LayerAction.UpdateLayer(layerChecked)
+    this.autoUpdateLayerData();
+    this.toggleDisplayLayerAction(layerObject);
+  };
+
+  onClickCheckBoxLayerRela = (layerObject, index, indexLayer, indexGroup) => {
+    const layerClicked = this.getLayerData.getLayerRelaByIndexGroupIndexLayerIndexLayerRela(
+      indexGroup,
+      indexLayer,
+      index,
+    );
+    console.log(layerClicked)
+
     let layerChecked = layerClicked;
     if (!layerClicked.is_check) {
       layerClicked.is_check = true;
@@ -292,17 +354,31 @@ class RenderLayerControlView extends React.Component {
     );
   };
 
+  handleCreateBaseOnExistLayer = (newLayer) => {
+    newLayer.layerCategoryId = this.state.idGroupLayerSelected;
+    newLayer.layerRealationshipId = this.state.idLayerSelect
+    this.autoUpdateLayerData(newLayer);
+    console.log(newLayer);
+  }
+
   handleAddNewLayer = (newLayer) => {
+    console.log(newLayer)
+    console.log(this.state.isLayerRela)
     if (newLayer.is_check) this.toggleDisplayLayerAction(newLayer);
 
     //newLayer.layerCategoryId = this.state.idGroupLayerSelected;
     console.log(newLayer);
     LayerAction.CreateLayer(newLayer).then((res) => {
       newLayer.id = res.content.id
-      this.getLayerData
+      
+      if (this.state.isLayerRela) {
+        this.autoUpdateLayerData(newLayer);
+      } else {
+        this.getLayerData
         .getLayerGroupArrayLayerByIndex(this.state.groupIndexSelected)
         .push(newLayer);
-      this.autoUpdateLayerData()
+        this.autoUpdateLayerData()
+      }
       !this.props.isLock && LayerAction.autoCuPlanning(newLayer.layerCategoryId, this.props.planningId);
     }).catch((err) => { return err })
   };
@@ -360,39 +436,94 @@ class RenderLayerControlView extends React.Component {
     });
   };
 
-  autoUpdateLayerData = () => {
-    this.props.UpdateLayers({ ...this.getLayerData.getLayerData() });
+  autoUpdateLayerData = (LayerRela) => {
+    if (LayerRela) {
+      console.log('okkk', LayerRela)
+      this.props.UpdateLayers({ ...this.addLayerRela(LayerRela) });
+    } else {
+      this.props.UpdateLayers({ ...this.getLayerData.getLayerData() });
+    }
   };
 
-  handleDeleteLayer = (event, layerSelectedIndex, groupLayerSelectedIndex) => {
+  addLayerRela = (LayerRela) => {
+    let data = this.getLayerData.getLayerData();
+    let layer = this.getLayerData.getLayerByIndexGroupAndIndexLayer(
+      this.state.groupIndexSelected, this.state.layerIndexSelected
+    )
+    if (layer && layer.layerRealationships) {
+      layer.layerRealationships = [...layer.layerRealationships, LayerRela];
+    } else {
+      layer.layerRealationships = [LayerRela]
+    }
+    data.layer_categories[this.state.groupIndexSelected]
+      .layer_settings[this.state.layerIndexSelected] = layer;
+    return data;
+    // let data = this.getLayerData.getLayerData();
+    // data.layer_categories.map(item => {
+    //   if (item.id == this.state.idGroupLayerSelected) {
+    //     let layerRela = {};
+    //     // let layerRelaParentId = 0;
+    //     item.layer_settings.map(layer => {
+    //       if (layer.layerRealationshipId && layer.layerRealationshipId != 0) {
+    //         layerRela = { ...layer };
+    //         // layerRelaParentId = layer.layerRealationshipId;
+    //       } else return layer;
+    //     })
+    //     item.layer_settings.map(layer => {
+    //       if (layer.id == this.state.idLayerSelect) {
+    //         layer.layerRealationships = [...layer.layerRealationships, layerRela]
+    //       }
+    //     })
+    //     item.layer_settings.pop();
+    //   }
+    //   return item
+    // })
+    // console.log('1234', data)
+    // return data
+  }
+
+  handleDeleteLayer = (event, layerSelectedIndex, groupLayerSelectedIndex, index) => {
     event.preventDefault();
-    console.log(
-      this.getLayerData.getLayerByIndexGroupAndIndexLayer(
+
+    let layerSelected = (index || index == 0) ?
+      this.getLayerData.getLayerRelaByIndexGroupIndexLayerIndexLayerRela(
         groupLayerSelectedIndex,
-        layerSelectedIndex
-      )
-    );
-    let layerSelected = this.getLayerData.getLayerByIndexGroupAndIndexLayer(
-      groupLayerSelectedIndex,
-      layerSelectedIndex
-    );
+        layerSelectedIndex,
+        index
+      ) : this.getLayerData.getLayerByIndexGroupAndIndexLayer(
+        groupLayerSelectedIndex,
+        layerSelectedIndex,
+      );
     layerSelected.is_checked = false;
     layerSelected.isChecked = false;
-    let id = this.getLayerData.getLayerIdByIndex(
-      groupLayerSelectedIndex,
-      layerSelectedIndex
-    );
+    // let id = this.getLayerData.getLayerIdByIndex(
+    //   groupLayerSelectedIndex,
+    //   layerSelectedIndex
+    // );
+    let id = layerSelected.id
     LayerAction.DeleteLayer(id).then((res) => {
       console.log(this.getLayerData.getListGroupLayers());
-      this.props.controlOpenlayer({
-        type: OpenlayerCommand.ToggleDisplayLayer,
-        option: {
-          layer: this.getLayerData
-            .getLayerGroupArrayLayerByIndex(groupLayerSelectedIndex)
-            .splice(layerSelectedIndex, 1),
-        },
-      });
-      this.toggleDisplayLayerAction(layerSelected);
+      if (index || index == 0) {
+        this.props.controlOpenlayer({
+          type: OpenlayerCommand.ToggleDisplayLayer,
+          option: {
+            layer: this.getLayerData
+              .getLayerArrayLayerRelaByIndexGroupAndIndexLayer(groupLayerSelectedIndex, layerSelectedIndex)
+              .splice(index, 1),
+          },
+        });
+      } else {
+        this.props.controlOpenlayer({
+          type: OpenlayerCommand.ToggleDisplayLayer,
+          option: {
+            layer: this.getLayerData
+              .getLayerGroupArrayLayerByIndex(groupLayerSelectedIndex)
+              .splice(layerSelectedIndex, 1),
+          },
+        });
+      }
+
+      //this.toggleDisplayLayerAction(layerSelected);
       this.autoUpdateLayerData();
     }).catch(err => {
       err.errorMessage && NotificationService.error(err.errorMessage)
@@ -416,25 +547,31 @@ class RenderLayerControlView extends React.Component {
       this.props.layerData.layer_categories[indexGroup].layer_settings[
       indexLayer
       ],
+    getLayerRelaByIndexGroupIndexLayerIndexLayerRela: (indexGroup, indexLayer, index) =>
+      this.props.layerData.layer_categories[indexGroup].layer_settings[indexLayer].layerRealationships[index],
+    getLayerArrayLayerRelaByIndexGroupAndIndexLayer: (indexGroup, indexLayer) =>
+      this.props.layerData.layer_categories[indexGroup].layer_settings[indexLayer].layerRealationships
   };
 
   handleSaveEditLayer = (dataLayerEdited) => {
-    if (
-      dataLayerEdited.is_check !=
-      this.getLayerData.getLayerGroupArrayLayerByIndex(
-        this.state.groupIndexSelected
-      )[this.state.layerIndexSelected].is_check
-    )
-      this.toggleDisplayLayerAction(dataLayerEdited);
-    this.getLayerData.getLayerGroupArrayLayerByIndex(
-      this.state.groupIndexSelected
-    )[this.state.layerIndexSelected] = dataLayerEdited;
-    this.autoUpdateLayerData();
-    console.log(dataLayerEdited)
-    !this.props.isLock && LayerAction.UpdateLayer(dataLayerEdited).then((res) => {
+    //console.log(this.state.isLayerRela)
+    let dataLayerRelaEdited = null;
+    if (this.state.isLayerRela) {
+      let data = dataLayerEdited.layerRealationships[this.state.layerRelaIndexSelect];
+      dataLayerRelaEdited = { ...data, planningId: this.props.planningId, isChecked: data.is_check }
+    } else {
+      dataLayerRelaEdited = { ...dataLayerEdited, planningId: this.props.planningId, isChecked: dataLayerEdited.is_check };
+    }
+    !this.props.isLock && LayerAction.UpdateLayer(dataLayerRelaEdited).then((res) => {
       NotificationService.success("Cập nhật thành công");
+      if (dataLayerEdited.is_check != 
+        this.getLayerData.getLayerGroupArrayLayerByIndex(this.state.groupIndexSelected)[this.state.layerIndexSelected].is_check
+      )
+        this.toggleDisplayLayerAction(dataLayerEdited);
+      this.getLayerData.getLayerGroupArrayLayerByIndex(this.state.groupIndexSelected)[this.state.layerIndexSelected] = dataLayerEdited;
+      this.autoUpdateLayerData();
       LayerAction.autoCuPlanning(dataLayerEdited.layerCategoryId, this.props.planningId)
-    }).catch((err) => {err.errorMessage &&  NotificationService.error(err.errorMessage)})
+    }).catch((err) => { err.errorMessage && NotificationService.error(err.errorMessage) })
   };
 
   openConfirmDeleteGroupLayer = () => {
@@ -446,13 +583,28 @@ class RenderLayerControlView extends React.Component {
     console.log(this.state.idGroupLayerSelected);
   };
 
-  openConfirmDeleteLayer = (event, indexLayer, indexGroup) => {
+  openConfirmDeleteLayer = (event, indexLayer, indexGroup, index) => {
     this.setState({
       openConfirmModal: true,
       confirmModalTitle: "Xóa layer",
-      confirmModalHandleAccept: () =>
-        this.handleDeleteLayer(event, indexLayer, indexGroup),
     });
+
+    if (index || index == 0) {
+      console.log(
+        this.getLayerData.getLayerRelaByIndexGroupIndexLayerIndexLayerRela(
+          indexGroup, indexLayer, index
+        )
+      );
+      this.setState({
+        confirmModalHandleAccept: () =>
+          this.handleDeleteLayer(event, indexLayer, indexGroup, index),
+      });
+    } else {
+      this.setState({
+        confirmModalHandleAccept: () =>
+          this.handleDeleteLayer(event, indexLayer, indexGroup),
+      });
+    }
   };
 
   closeDialogAlert = () => {
@@ -461,6 +613,37 @@ class RenderLayerControlView extends React.Component {
 
   componentDidMount() {
     this.GetLookupLayerCategoryType();
+    console.log(this.props)
+
+  }
+
+  handleOpenMenuLayer = (indexLayer, indexGroup) => {
+    if (
+      indexLayer != this.state.isOpenMenuLayerIndex[0]
+      || indexGroup != this.state.isOpenMenuLayerIndex[1]
+    ) {
+      this.setState({
+        isOpenMenuLayer: true,
+        isOpenMenuLayerIndex: [indexLayer, indexGroup]
+      })
+    } else {
+      this.setState({
+        isOpenMenuLayer: !this.state.isOpenMenuLayer,
+      })
+    }
+  }
+
+  handleOpenMenuCategory = (indexGroup) => {
+    if (indexGroup != this.state.isOpenMenuCategoryIndex) {
+      this.setState({
+        isOpenMenuCategory: true,
+        isOpenMenuCategoryIndex: indexGroup
+      })
+    } else {
+      this.setState({
+        isOpenMenuCategory: !this.state.isOpenMenuCategory,
+      })
+    }
   }
   render() {
     return (
@@ -662,41 +845,158 @@ class RenderLayerControlView extends React.Component {
                                       </div>
                                       {!this.props.isLock && (
                                         <div className="col-4 text-right">
-                                          <Tooltip title="Chỉnh sửa">
-                                            <IconButton
-                                              onClick={(event) =>
-                                                this.onClickEditLayer(
-                                                  event,
-                                                  indexGroup,
-                                                  indexLayer
-                                                )
-                                              }
-                                            >
-                                              <EditIcon
-                                                color="primary"
-                                                fontSize="small"
-                                              />
-                                            </IconButton>
-                                          </Tooltip>
-                                          <Tooltip title="Xóa layer">
-                                            <IconButton
-                                              onClick={(event) =>
-                                                this.openConfirmDeleteLayer(
-                                                  event,
-                                                  indexLayer,
-                                                  indexGroup
-                                                )
-                                              }
-                                            >
-                                              <DeleteIcon
-                                                fontSize="small"
-                                                className="text-danger"
-                                              />
+
+                                          <div className={`
+                                              popup_category_menu ${(this.state.isOpenMenuLayer
+                                              && indexLayer == this.state.isOpenMenuLayerIndex[0]
+                                              && indexGroup == this.state.isOpenMenuLayerIndex[1]
+                                            ) ? "menu_open" : "menu_close"
+                                            }
+                                              `}>
+                                            <Tooltip title="Quy hoạch điều chỉnh">
+                                              <IconButton
+                                                onClick={(event) => {
+                                                  this.onClickOpenAddNewLayerRela(
+                                                    event,
+                                                    indexGroup,
+                                                    indexLayer
+                                                  )
+                                                }}
+                                              >
+                                                <AddCircleIcon
+                                                  color="primary"
+                                                  fontSize="small"
+                                                />
+                                              </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Chỉnh sửa">
+                                              <IconButton
+                                                onClick={(event) =>
+                                                  this.onClickEditLayer(
+                                                    event,
+                                                    indexGroup,
+                                                    indexLayer
+                                                  )
+                                                }
+                                              >
+                                                <EditIcon
+                                                  color="primary"
+                                                  fontSize="small"
+                                                />
+                                              </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Xóa layer">
+                                              <IconButton
+                                                onClick={(event) =>
+                                                  this.openConfirmDeleteLayer(
+                                                    event,
+                                                    indexLayer,
+                                                    indexGroup
+                                                  )
+                                                }
+                                              >
+                                                <DeleteIcon
+                                                  fontSize="small"
+                                                  className="text-danger"
+                                                />
+                                              </IconButton>
+                                            </Tooltip>
+                                          </div>
+
+                                          <Tooltip title="Mở menu Layer">
+                                            <IconButton onClick={() => {
+                                              this.handleOpenMenuLayer(indexLayer, indexGroup)
+                                            }}>
+                                              {(this.state.isOpenMenuLayer
+                                                && indexLayer == this.state.isOpenMenuLayerIndex[0]
+                                                && indexGroup == this.state.isOpenMenuLayerIndex[1]
+                                              ) ? (
+                                                <KeyboardArrowRightIcon
+                                                  color="primary"
+                                                  fontSize="small"
+                                                />
+                                              ) : (
+                                                <KeyboardArrowLeftIcon
+                                                  color="primary"
+                                                  fontSize="small"
+                                                />
+                                              )}
                                             </IconButton>
                                           </Tooltip>
                                         </div>
                                       )}
                                     </div>
+                                    {layer.layerRealationships
+                                      && layer.layerRealationships.length > 0
+                                      && layer.layerRealationships.map((item, index) => (
+                                        <div className="row alignItems-baseline no-gutters ml-3 pt-2 pb-2">
+                                          <div className="col-1">
+                                            <input
+                                              type="checkbox"
+                                              id={`checkbox-layer-index-${index}`}
+                                              checked={item.is_check}
+                                              onChange={() => { }}
+                                              onClick={() =>
+                                                this.onClickCheckBoxLayerRela(
+                                                  item,
+                                                  index,
+                                                  indexLayer,
+                                                  indexGroup
+                                                )
+                                              }
+                                              className="mr-2"
+                                            />
+                                          </div>
+                                          <div className="col-7">
+                                            <Tooltip title={item.name}>
+                                              <label
+                                                //htmlFor={`checkbox-layer-index-${indexLayer}`}
+                                                className="d-block text-truncate cursor-move"
+                                              >
+                                                {item.name}
+                                              </label>
+                                            </Tooltip>
+                                          </div>
+                                          {!this.props.isLock && (
+                                            <div className="col-4 text-right">
+                                              <Tooltip title="Chỉnh sửa">
+                                                <IconButton
+                                                  onClick={(event) =>
+                                                    this.onClickEditLayer(
+                                                      event,
+                                                      indexGroup,
+                                                      indexLayer,
+                                                      index
+                                                    )
+                                                  }
+                                                >
+                                                  <EditIcon
+                                                    color="primary"
+                                                    fontSize="small"
+                                                  />
+                                                </IconButton>
+                                              </Tooltip>
+                                              <Tooltip title="Xóa layer">
+                                                <IconButton
+                                                  onClick={(event) =>
+                                                    this.openConfirmDeleteLayer(
+                                                      event,
+                                                      indexLayer,
+                                                      indexGroup,
+                                                      index,
+                                                    )
+                                                  }
+                                                >
+                                                  <DeleteIcon
+                                                    fontSize="small"
+                                                    className="text-danger"
+                                                  />
+                                                </IconButton>
+                                              </Tooltip>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
                                   </Draggable>
                                 )
                               )}
@@ -717,7 +1017,7 @@ class RenderLayerControlView extends React.Component {
         {/* setting group layer */}
 
         <Dialog
-          style={{overflow:'hidden'}}
+          style={{ overflow: 'hidden' }}
           maxWidth="sm"
           fullWidth={true}
           onClose={() =>
@@ -877,41 +1177,50 @@ class RenderLayerControlView extends React.Component {
             dividers
           >
             {this.state.isCreateNewLayer
-              ? 
-                (this.state.isOpenSettingLayer && (
+              ?
+              (this.state.isOpenSettingLayer && (
                 (this.props.isDesktopOrLaptop ? (
                   <ModalLayerSetting
-                  planningId={this.props.planningId}
-                  handleAddNewLayer={(newLayer) =>
-                    this.handleAddNewLayer(newLayer)
-                  }
-                  layerCategoryId={this.state.idGroupLayerSelected}
-                  closeModal={() =>
-                    this.setState({ isOpenSettingLayer: false })
-                  }
-                />
-                ) : ( <DialogContent
+                    planningId={this.props.planningId}
+                    handleAddNewLayer={(newLayer) =>
+                      this.handleAddNewLayer(newLayer)
+                    }
+                    handleCreateBaseOnExistLayer={(newLayer) =>
+                      this.handleCreateBaseOnExistLayer(newLayer)
+                    }
+                    layerCategoryId={this.state.idGroupLayerSelected}
+                    closeModal={() =>
+                      this.setState({ isOpenSettingLayer: false })
+                    }
+                    isLayerRela={this.state.isLayerRela}
+                    layerId={this.state.idLayerSelect}
+                  />
+                ) : (<DialogContent
                   className="content-custom-container"
                   id="content-custom-container-setting-layer"
                   dividers
                 >
                   Chức năng này chỉ hỗ trợ trên máy tính.
                 </DialogContent>)))
-                
-              ):
+
+              ) :
               (
                 this.state.isOpenSettingLayer && (
-                <ModalEditSettingLayer
-                  setLayerData={(data) => this.handleSaveEditLayer(data)}
-                  layerData={this.getLayerData.getLayerByIndexGroupAndIndexLayer(
-                    this.state.groupIndexSelected,
-                    this.state.layerIndexSelected
-                  )}
-                  closeModal={() =>
-                    this.setState({ isOpenSettingLayer: false })
-                  }
-              />)
-            )}
+                  <ModalEditSettingLayer
+                    setLayerData={(data) => this.handleSaveEditLayer(data)}
+                    layerData={
+                      this.getLayerData.getLayerByIndexGroupAndIndexLayer(
+                        this.state.groupIndexSelected,
+                        this.state.layerIndexSelected
+                      )
+                    }
+                    closeModal={() =>
+                      this.setState({ isOpenSettingLayer: false })
+                    }
+                    isLayerRela={this.state.isLayerRela}
+                    layerRelaIndex={this.state.layerRelaIndexSelect}
+                  />)
+              )}
           </DialogContent>
         </Dialog>
 

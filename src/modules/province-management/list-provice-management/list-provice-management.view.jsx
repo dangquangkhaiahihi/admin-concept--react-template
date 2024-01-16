@@ -230,6 +230,7 @@ export default function ListProviceManagement(props) {
 
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={page + 1}
             rowsPerPage={rowsPerPage}
             handleChangeRowsPerPage={handleChangeRowsPerPage}

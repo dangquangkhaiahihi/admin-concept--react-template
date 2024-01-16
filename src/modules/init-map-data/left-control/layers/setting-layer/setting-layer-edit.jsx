@@ -9,22 +9,43 @@ export default class EditLayerSettingView extends React.Component {
       maxZoom: this.props.data.maxZoom,
       minZoom: this.props.data.minZoom,
       zindex: this.props.data.zindex,
+      year: this.props.data?.year,
+      contentChange: this.props.data?.contentChange,
+      isLayerRela: this.props?.isLayerRela,
     };
   }
   componentDidMount() {
     console.log(this.props)
   }
   componentWillUnmount() {
-    this.props.setData({
-      ...this.props.data,
-      is_check: this.state.is_check,
-      name: this.state.layerName,
-      maxZoom: this.state.maxZoom,
-      minZoom: this.state.minZoom,
-      zindex: this.state.zindex,
-    });
+    if (!this.state.isLayerRela) {
+      this.props.setData({
+        ...this.props.data,
+        is_check: this.state.is_check,
+        isChecked: this.state.is_check,
+        name: this.state.layerName,
+        maxZoom: this.state.maxZoom,
+        minZoom: this.state.minZoom,
+        zindex: this.state.zindex,
+        year: this.state?.year,
+        contentChange: this.state?.contentChange,
+      });
+    } else {
+      this.props.setData({
+        ...this.props.data,
+        is_check: this.state.is_check,
+        isChecked: this.state.is_check,
+        name: this.state.layerName,
+        maxZoom: this.state.maxZoom,
+        minZoom: this.state.minZoom,
+        zindex: this.state.zindex,
+        year: this.state?.year,
+        contentChange: this.state?.contentChange,
+      });
+    }
+
   }
-  
+
   render() {
     return (
       <div>
@@ -90,6 +111,38 @@ export default class EditLayerSettingView extends React.Component {
             </div>
           </div>
         </div>
+        {this.state.isLayerRela && (
+          <div className="mt-3">
+            <div className="form-group">
+              <label for="layerYear">Năm điều chỉnh</label>
+              <input
+                type="number"
+                className="form-control"
+                value={this.state.year}
+                onChange={(event) => {
+                  this.setState({ year: event.target.value });
+                }}
+                id="layerYear"
+                placeholder="Nhập năm điều chỉnh"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="inputLayerContent">Nội dung điều chỉnh</label>
+              <textarea
+                rows="3" 
+                cols="50"
+                type="text"
+                className="form-control"
+                value={this.state.contentChange}
+                onChange={(event) => {
+                  this.setState({ contentChange: event.target.value });
+                }}
+                id="inputLayerContent"
+                placeholder="Nhập nội dung"
+              />
+            </div>
+          </div>
+        )}
         <div className="form-check">
           <input
             className="form-check-input"

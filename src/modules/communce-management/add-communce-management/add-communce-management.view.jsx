@@ -130,7 +130,7 @@ export default function AddCommuneManagement(props) {
         communeAction.CreateCommunePaht(data);
         if (result) {
           setOrder("desc");
-          setOrderBy("defaultProvince");
+          setOrderBy("modifiedDate");
           GetListCommuneManagement(1, rowsPerPage);
           showLoading(false);
           onSuccess();
@@ -158,6 +158,10 @@ export default function AddCommuneManagement(props) {
   const handleChooseDistrict = (event) => {
     setValue("districtId", event.target.value);
     setDistrictId(event.target.value);
+  };
+  
+  const isNumber = (value) => {
+    return !isNaN(value) && !isNaN(parseFloat(value));
   };
 
   return (
@@ -303,8 +307,13 @@ export default function AddCommuneManagement(props) {
                   <TextField
                     disabled={provinceId && districtId ? false : true}
                     fullWidth
-                    inputRef={register({ required: true })}
-                    type="number"
+                    inputRef={register({
+                      required: true,
+                      validate: {
+                        isNumber: (value) => isNumber(value) || 'Trường này chỉ được nhập số',
+                      },
+                    })}
+                    type="text"
                     min={0}
                     step={"any"}
                     name="longitude"
@@ -312,8 +321,11 @@ export default function AddCommuneManagement(props) {
                       errors.longitude && errors.longitude.type === "required"
                     }
                   />
-                  {errors.longitude && errors.longitude.type === "required" && (
+                  {errors.longitude && (errors.longitude.type === "required") && (
                     <span className="error">Trường này là bắt buộc</span>
+                  )}
+                  {errors.longitude && (errors.longitude.type === "isNumber") && (
+                    <span className="error">{errors.longitude.message}</span>
                   )}
                 </div>
                 <div className="col-12 col-md-6 col-lg-6 mb-3">
@@ -324,8 +336,13 @@ export default function AddCommuneManagement(props) {
                   <TextField
                     disabled={provinceId && districtId ? false : true}
                     fullWidth
-                    inputRef={register({ required: true })}
-                    type="number"
+                    inputRef={register({
+                      required: true,
+                      validate: {
+                        isNumber: (value) => isNumber(value) || 'Trường này chỉ được nhập số',
+                      },
+                    })}
+                    type="text"
                     min={0}
                     step={"any"}
                     name="latitude"
@@ -335,6 +352,9 @@ export default function AddCommuneManagement(props) {
                   />
                   {errors.latitude && errors.latitude.type === "required" && (
                     <span className="error">Trường này là bắt buộc</span>
+                  )}
+                  {errors.latitude && (errors.latitude.type === "isNumber") && (
+                    <span className="error">{errors.latitude.message}</span>
                   )}
                 </div>
               </div>

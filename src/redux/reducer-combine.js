@@ -17,6 +17,6 @@ export default combineReducers({
   loadingState: LoadingReducer,
   documentRepository: DocumentRepositoryReducer,
   documentManagement: DocumentManagementReducer,
-    InitDocument: InitDocumentReducer,
+  InitDocument: InitDocumentReducer,
   clientSetting: ClientSettingReducer,
 });

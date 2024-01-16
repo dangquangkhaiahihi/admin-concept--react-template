@@ -54,6 +54,7 @@ function FormTemplateView(props) {
     isShowActionAddEdit,
     setFormTitle,
     refreshForm,
+    isAddForm
   } = props;
   const isCreateForm = props.isCreateForm || false;
   const classes = useStyles();
@@ -265,14 +266,17 @@ function FormTemplateView(props) {
         {isPreviewForm ? (
           <Typography variant="h6">
             Preview form ({(data && data.title) || ""})
-            <Button
-              variant="contained"
-              className="ml-2 bg-success text-white"
-              startIcon={<EditIcon />}
-              onClick={handleClickHiddenPreviewForm}
-            >
-              Sửa form
-            </Button>
+            {
+              isAddForm &&
+              <Button
+                variant="contained"
+                className="ml-2 bg-success text-white"
+                startIcon={<EditIcon />}
+                onClick={handleClickHiddenPreviewForm}
+              >
+                Sửa form
+              </Button>
+            }
           </Typography>
         ) : (
             <Typography variant="h6">

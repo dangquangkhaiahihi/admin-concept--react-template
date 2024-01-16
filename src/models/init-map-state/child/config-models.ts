@@ -30,6 +30,9 @@ namespace ConfigModels {
     maxZoom: number;
     zIndex: number;
     defaultTurnOn: boolean;
+    year?: any;
+    contentChange?: any;
+    layerRealationshipId?: number;
   }
   export interface DisplayInformationSettingObject {
     viewDetail: ObjectOfArray[];

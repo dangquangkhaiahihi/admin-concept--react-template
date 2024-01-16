@@ -40,6 +40,9 @@ function EditRoleManagement(props) {
     roleId,
     getListRoleManagement,
     rowsPerPageCommon,
+    orderBy,
+    order,
+    searchCriteria
   } = props;
 
   const { register, handleSubmit, errors } = useForm({
@@ -66,7 +69,8 @@ function EditRoleManagement(props) {
     roleManagementAction.UpdateRoleManagement(body).then(
       (res) => {
         if (res && res.content) {
-          getListRoleManagement(1, rowsPerPageCommon);
+          // getListRoleManagement(1, rowsPerPageCommon);
+          getListRoleManagement(searchCriteria.page + 1, rowsPerPageCommon, orderBy + " " + order, searchCriteria.code, searchCriteria.name);
           onHideModal();
           ShowNotification(
             viVN.Success.RoleEditSuccess,

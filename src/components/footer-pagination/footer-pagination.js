@@ -8,7 +8,7 @@ import { useMediaQuery } from "react-responsive";
 import './style.scss';
 
 const FooterPagination = (props) => {
-  const { handleChangeRowsPerPage, handleChangePage, totalPage, rowsPerPage, currentPage } =
+  const { handleChangeRowsPerPage, handleChangePage, totalPage, rowsPerPage, currentPage, totalItemCount } =
     props;
   
   const isDesktopOrLaptop = useMediaQuery({
@@ -21,32 +21,39 @@ const FooterPagination = (props) => {
   
   return (
     <div className='div-pagination'>
-      <div className={`row ${!isTabletOrMobile ? 'justify-content-end' : 'justify-content-center'}`}>
-        <div className='select-page'>
-          <div>Số bản ghi mỗi trang :</div>
-          <div className='rowPerPage'>
-            <Select value={rowsPerPage} onChange={handleChangeRowsPerPage}>
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={20}>20</MenuItem>
-              <MenuItem value={30}>30</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-            </Select>
-          </div>
+      {/* <div className='row'> */}
+        <div className={`col-lg-6 col-12 row ${!isTabletOrMobile ? 'justify-content-start' : 'justify-content-center'}`}>
+            Tổng số bản ghi : <b>{totalItemCount}</b>
         </div>
+        <div className={`col-lg-6 col-12 row ${!isTabletOrMobile ? 'justify-content-end' : 'justify-content-center'}`}>
+          <div className='select-page'>
+            <div>Số bản ghi mỗi trang :</div>
+            <div className='rowPerPage'>
+              <Select value={rowsPerPage} onChange={handleChangeRowsPerPage}>
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={20}>20</MenuItem>
+                <MenuItem value={30}>30</MenuItem>
+                <MenuItem value={50}>50</MenuItem>
+              </Select>
+            </div>
+          </div>
 
-        <Pagination
-          showFirstButton
-          showLastButton
-          page={currentPage}
-          count={totalPage}
-          siblingCount={1}
-          boundaryCount={1}
-          color='primary'
-          onChange={handleChangePage}
-          size={isTabletOrMobile ? 'small' : 'medium'}
-        />
+          <Pagination
+            showFirstButton
+            showLastButton
+            page={currentPage}
+            count={totalPage}
+            siblingCount={1}
+            boundaryCount={1}
+            color='primary'
+            onChange={handleChangePage}
+            size={isTabletOrMobile ? 'small' : 'medium'}
+          />
+        {/* </div> */}
       </div>
-    </div>
+      
+        
+      </div> 
   );
 };
 

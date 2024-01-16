@@ -50,7 +50,7 @@ function EmailTemplate(props) {
     title = ""
   ) => {
     showLoading(true);
-    setPage(pageIndex - 1);
+    // setPage(pageIndex - 1);
     emailTemplateAction
       .GetListEmailTemplates(pageIndex, pageSize, sortExpression, code.trim(), title.trim())
       .then(
@@ -105,7 +105,7 @@ function EmailTemplate(props) {
     emailTemplateAction.DeleteEmailTemplate({ code: emailDel }).then(
       (res) => {
         if (res && res.content && res.content.status) {
-          getListEmailModels(1, rowsPerPageCommon, orderBy ? (orderBy + " " + order) : "", code, title);
+          getListEmailModels(page + 1, rowsPerPageCommon, orderBy ? (orderBy + " " + order) : "", code, title);
           handleCloseDeleteDialog();
           ShowNotification(
             viVN.Success.EmailDeleteSuccess,
@@ -176,7 +176,8 @@ function EmailTemplate(props) {
             getListEmailModels={getListEmailModels}
             setOrder={setOrder}
             setOrderBy={setOrderBy}
-          ></EmailAddDiaLog>
+            setPage={setPage}
+          />
         ) : (
             <EmailEditDiaLog
               rowsPerPageCommon={rowsPerPageCommon}
@@ -186,7 +187,10 @@ function EmailTemplate(props) {
               getListEmailModels={getListEmailModels}
               setOrder={setOrder}
               setOrderBy={setOrderBy}
-            ></EmailEditDiaLog>
+              orderBy={orderBy}
+              order={order}
+              searchCriteria={{'page':page,'code':code, 'title':title}}
+            />
           )
       ) : (
           ""

@@ -95,9 +95,11 @@ function FileManagement(props) {
       }
 
       !filesTemp && setFilesTemp(files);
+      console.log("selectedItems",selectedItems)
       let _selectedItems = selectedItems.filter(
         (item) => isValidFileSelect(item, props.acceptedFiles) === true
       );
+      console.log("_selectedItems",_selectedItems)
       if (_selectedItems.length > 0) {
         let _file = {
           fileId: _selectedItems[0].id,

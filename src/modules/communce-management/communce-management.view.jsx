@@ -139,7 +139,7 @@ function CommuneManagement(props) {
       (res) => {
         communeAction.DeleteCommunePaht(communeId);
         if (res && res.content && res.content.status) {
-          GetListCommuneManagement(1, rowsPerPage, orderBy ? orderBy + " " + order : "", name);
+          GetListCommuneManagement(page + 1, rowsPerPage, orderBy ? orderBy + " " + order : "", name);
           handleCloseDeleteDialog();
           ShowNotification(viVN.Success.DeleteCommune, NotificationMessageType.Success);
         }
@@ -268,11 +268,19 @@ function CommuneManagement(props) {
           setOrder={setOrder}
           setOrderBy={setOrderBy}
           showLoading={showLoading}
+          orderBy={orderBy}
+          order={order}
+          searchCriteria={{'page':page,'name':name}}
         />
       )}
 
       {openDeleteDialog ? (
-        <DeleteDialog isOpen={openDeleteDialog} rowsPerPageCommon={rowsPerPage} onClose={handleCloseDeleteDialog} onSuccess={handleDelete} />
+        <DeleteDialog
+          isOpen={openDeleteDialog}
+          rowsPerPageCommon={rowsPerPage}
+          onClose={handleCloseDeleteDialog}
+          onSuccess={handleDelete}
+        />
       ) : (
         ""
       )}

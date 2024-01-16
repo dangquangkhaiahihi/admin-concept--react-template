@@ -39,15 +39,17 @@ class TopBar extends Component {
   }
 
   componentDidMount() {
-      this.GetScreenAllow();
+    this.GetScreenAllow();
   }
 
   GetScreenAllow() {
     accAction.GetScreenAllow().then(res => {
-      this.setState({screenAllow: modules.filter(item => {
-        if(res.content.some(x => x.code === item.code))
-        return item
-      })})
+      this.setState({
+        screenAllow: modules.filter(item => {
+          if (res.content.some(x => x.code === item.code))
+            return item
+        })
+      })
     }).catch(error => console.log(error))
   }
 
@@ -76,13 +78,13 @@ class TopBar extends Component {
     removeCookies(TokenKey.returnUrl);
     window.location.replace(DomainAdminSide);
   }
-  
+
   render() {
     const { user, screenAllow } = this.state;
     const { settings, setToggle, expandSidebar, collapseSidebar, isCollapsed, reactMediaQuery } = this.props;
     console.log("TOPBAR : ", user, screenAllow);
     return (
-      <nav className="navbar navbar-expand navbar-light topbar static-top row" style={{margin : 'auto'}}>
+      <nav className="navbar navbar-expand navbar-light topbar static-top row" style={{ margin: 'auto' }}>
         <div className="col-6">
           <a
             className="top-bar-brand d-flex align-items-center justify-content-start  "
@@ -112,7 +114,7 @@ class TopBar extends Component {
                   setToggle();
                 }}
               >
-                <FontAwesomeIcon icon={faBars} style={{color : '#fff'}}/>
+                <FontAwesomeIcon icon={faBars} style={{ color: '#fff' }} />
               </button>
               <button
                 className={"btn btn-link rounded-circle mr-3" + (!isCollapsed ? " d-none" : "")}
@@ -122,9 +124,9 @@ class TopBar extends Component {
                   expandSidebar();
                   setToggle();
                 }}
-                style={{backgroundColor : '#fff'}}
+                style={{ backgroundColor: '#fff' }}
               >
-                <FontAwesomeIcon icon={faBars}/>
+                <FontAwesomeIcon icon={faBars} />
               </button>
             </div>
           ) : null}
@@ -150,6 +152,10 @@ class TopBar extends Component {
                           : process.env.PUBLIC_URL + "/user-default.png"
                       }
                       alt="avatar-img"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = require('../../assets/icon/logo.png');
+                      }}
                     />
                     <div class="admin__text d-flex align-items-center">
                       <span className="mr-2 d-none d-lg-inline name">
@@ -162,7 +168,7 @@ class TopBar extends Component {
                   <div
                     className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                     aria-labelledby="userDropdown"
-                    style={{width:'auto'}}
+                    style={{ width: 'auto' }}
                   >
                     {/* <a className="dropdown-item" href="#">
                       <FontAwesomeIcon icon={faUser} className="fa-sm fa-fw mr-2 text-gray-400" />Profile
@@ -175,7 +181,7 @@ class TopBar extends Component {
                       />
                       <span>Thông tin tài khoản</span>
                     </Link>
-                    {this.state.screenAllow.map((x,index) => (
+                    {this.state.screenAllow.map((x, index) => (
                       <a key={index} className="dropdown-item" href={x.url} target={x.url === UrlCollection.PAHT ? "_blank" : ""} >
                         <img
                           className="mr-2"
@@ -202,7 +208,7 @@ class TopBar extends Component {
               </ul>
             ) : null
           }
-          
+
         </div>
       </nav>
     );

@@ -61,3 +61,17 @@ export const autoCuPlanning = async (layerCategoryId, planningId) => {
         return false;
     }
 }
+
+export const CreateBaseOnExistLayer = (data) => {
+
+    return service
+        .post(ApiUrl.CreateBaseOnExistLayer, data)
+        .then((res) => {
+            NotificationService.success("Cập nhật thành công");
+            return res
+        })
+        .catch((err) => {
+            NotificationService.error(err.errorMessage);
+            return false;
+        });
+};

@@ -26,10 +26,16 @@ class FileViewer extends Component {
   }
 
   componentDidMount() {
-    const container = document.getElementById('pg-viewer');
-    const height = container ? container.clientHeight : 0;
-    const width = container ? container.clientWidth : 0;
-    this.setState({ height, width });
+    if(!this.props.isShowMobile) {
+      const container = document.getElementById('pg-viewer');
+      const width = container ? container.clientWidth : 0;
+      const height = container ? container.clientHeight : 0;
+      this.setState({ height, width });
+    } else {
+      const width = window.innerWidth || document.documentElement.clientWidth;
+      const height = window.innerHeight || document.documentElement.clientHeight;
+      this.setState({ height, width });
+    }
   }
 
   getDriver() {
@@ -73,7 +79,7 @@ class FileViewer extends Component {
   render() {
     const Driver = this.getDriver(this.props);
     return (
-      <div className="pg-viewer-wrapper">
+      <div className="pg-viewer-wrapper" style={this.props.style || {}}>
         <div className="pg-viewer" id="pg-viewer">
           <Driver {...this.props} width={this.state.width} height={this.state.height} />
         </div>

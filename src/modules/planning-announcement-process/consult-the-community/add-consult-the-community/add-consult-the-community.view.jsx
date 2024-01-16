@@ -413,7 +413,7 @@ function AddConsultTheCommunity(props) {
               <div className="form-group">
                 <div className="row">
                   <div className="col-lg-4">
-                    <label className="text-dark">Chọn form xin ý kiến</label>
+                    <label className="text-dark">Chọn form xin ý kiến<span className="required"></span></label>
                     <div className="mb-1">
                       <Autocomplete
                         options={formTemplateLookUpModel}
@@ -656,7 +656,7 @@ function AddConsultTheCommunity(props) {
               </div>
 
               <div className="form-group">
-                <label className="text-dark">Nội dung</label>
+                <label className="text-dark">Nội dung<span className="required"></span></label>
                 <SunEditor
                   enableToolbar={true}
                   showToolbar={true}
@@ -895,6 +895,7 @@ function AddConsultTheCommunity(props) {
           isCreateForm={isCreateForm}
           setFormTitle={setFormTitle}
           refreshForm={GetLookupFormTemplate}
+          isAddForm
         />
       )}
     </div>

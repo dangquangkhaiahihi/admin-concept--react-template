@@ -41,6 +41,8 @@ function CreatMapView(props) {
 
   const { settings } = props;
 
+  const [isActive, setIsActive] = useState(false);
+
   useEffect(() => {
     setClientSetting(settings);
   }, [settings]);
@@ -62,7 +64,10 @@ function CreatMapView(props) {
                                 </Typography>
                             </Tooltip>
                             {!props.isLock && (
-                                <ShowHideMap mapId={props.mapId} />
+                                <ShowHideMap mapId={props.mapId} isMapActive={props.isMapActive}
+                                  isActive={isActive}
+                                  setIsActive={setIsActive}
+                                />
                             )}
                         </Toolbar>
                     </AppBar>
@@ -70,7 +75,12 @@ function CreatMapView(props) {
             }
 
             <div className="h-100">
-                <InitMapDataView isLock={props.isLock} mapId={props.mapId} planningId={props.planningId} />
+                <InitMapDataView
+                  isLock={props.isLock}
+                  mapId={props.mapId}
+                  planningId={props.planningId}
+                  setIsActive={setIsActive}
+                />
             </div>
         </Dialog>
     )

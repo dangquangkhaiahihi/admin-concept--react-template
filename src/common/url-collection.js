@@ -1,3 +1,5 @@
+import * as ApiConfig from "../api/api-config";
+
 export const UrlCollection = {
   Home: "/",
   Dashboard: "/qhdt/dashboard",
@@ -16,6 +18,12 @@ export const UrlCollection = {
   PlanningRelateId: '/qhdt/quy-trinh-cong-bo-quy-hoach/quy-hoach-lien-quan/:id',
   DocumentSetting: '/qhdt/quy-trinh-cong-bo-quy-hoach/thiet-lap-ho-so',
   DocumentSettingId: '/qhdt/quy-trinh-cong-bo-quy-hoach/thiet-lap-ho-so/:id',
+
+  //Planning Types
+  QHTPlanningTypes: '/qhdt/quy-trinh-cong-bo-quy-hoach/chuyen-muc',
+  QHCCPlanningTypes: '/qhdt/qh-cac-cap/chuyen-muc',
+  QHHTKTPlanningTypes: '/qhdt/noi-dung-ha-tang-ky-thuat/chuyen-muc',
+
   //News
   News: '/qhdt/tin-tuc',
   QHTNews: '/qhdt/quy-trinh-cong-bo-quy-hoach/tin-tuc',
@@ -23,8 +31,14 @@ export const UrlCollection = {
   QHHTKTNews: '/qhdt/noi-dung-ha-tang-ky-thuat/tin-tuc',
   
   Analysis: '/ptqd',
-  PAHT: 'https://admin.pahtsonla.cgis.asia',
-  // PAHT: 'https://paht-admin.tracuuquyhoachsonla.vn',
+  StatisticsOfObjects: '/ptqd/phan-tich-giua-cac-doi-tuong-lien-quan',
+  SearchObjectsOnMap: '/ptqd/tim-kiem-tren-ban-do',
+
+  SyncUpData:'/qhdt/dong-bo-du-lieu-len-he-thong',
+  SyncDownData:'/qhdt/dong-bo-du-lieu-tu-he-thong',
+  SyncSetting_PlanningType:'/qhdt/cai-dat-nguyen-tac-dong-bo-chuyen-muc',
+  SyncSetting_District:'/qhdt/cai-dat-nguyen-tac-dong-bo-quan-huyen',
+  PAHT: ApiConfig.paht_url,
 
   // Kĩ thuật hạ tầng
   QH_HTKT: '/qhdt/noi-dung-ha-tang-ky-thuat',

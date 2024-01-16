@@ -42,11 +42,15 @@ const useStyles = makeStyles((theme) => ({
   btnAdd: {
     display: "flex",
     position: "absolute",
-    top: -52,
+    top: '38px',
     zIndex: 10,
-    right: 0,
+    right: '28px',
     color: "#3f51b5",
     cursor: "pointer",
+    '@media (max-width: 1224px)': {
+      top: '8px',
+      right: '20px',
+    }
   },
   btnAddContent : {
     borderBottom: "2px solid #3f51b5",

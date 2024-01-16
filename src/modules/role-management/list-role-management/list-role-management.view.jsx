@@ -302,6 +302,7 @@ function ListRoleManagement(props) {
         </TableContainer>
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={page + 1}
             rowsPerPage={rowsPerPage}
             handleChangeRowsPerPage={handleChangeRowsPerPage}

@@ -1,5 +1,6 @@
 .div-pagination {
   padding: 15px;
+  display: flex;
   .rowPerPage {
     margin-left: 10px;
     .MuiInputBase-root {
@@ -26,5 +27,11 @@
     display: inline-flex;
     position: relative;
     bottom: -3px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .div-pagination {
+    display: block;
   }
 }

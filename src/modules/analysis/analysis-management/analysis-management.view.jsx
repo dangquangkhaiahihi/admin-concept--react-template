@@ -19,8 +19,52 @@ import * as appActions from "../../../core/app.store";
 import * as analysisAction from "../../../redux/store/analysis/analysis.store";
 import * as planningAction from "../../../redux/store/planning/planning.store";
 import SearchAnalysis from "./search-analysis/search-analysis";
+import { makeStyles } from "@material-ui/core/styles";
+import ModalReportAnalysis from "./analysis-planning-statistic/document-planning-statistic.view";
+
+const useStyles = makeStyles((theme) => ({
+  popover: {
+    maxHeight: "300px",
+  },
+  box: {
+    minWidth: "15rem",
+  },
+  positionRelative: {
+    position: "relative",
+    '@media (max-width: 1224px)': {
+      top:'-15px',
+    }
+  },
+  btnAdd: {
+    display: "flex",
+    position: "absolute",
+    top: '38px',
+    zIndex: 10,
+    right: '28px',
+    color: "#3f51b5",
+    cursor: "pointer",
+    '@media (max-width: 1224px)': {
+      top: '8px',
+      right: '20px',
+    }
+  },
+  btnAddContent : {
+    borderBottom: "2px solid #3f51b5",
+    '@media (max-width: 1224px)': {
+      fontSize : '14px',
+    }
+  },
+  mr05: {
+    marginRight: 5,
+  },
+  disNone: {
+    display: "none",
+  },
+}));
 
 const Analysis = (props) => {
+  const classes = useStyles();
+
   const { showLoading } = props;
   const [mapIdSelected, setMapIdSelected] = useState(null);
   const [planningIdSelected, setPlanningIdSelected] = useState(null);
@@ -28,6 +72,7 @@ const Analysis = (props) => {
   const [key, setKeyWord] = useState();
   const [page, setPage] = useState(0);
   const [data, setData] = useState();
+  const [dataStatistic, setDataStatistic] = useState([]);
   const [order, setOrder] = useState("desc");
   const [orderBy, setOrderBy] = useState("modifiedDate");
   const [totalItemCount, setTotalItemCount] = useState();
@@ -37,6 +82,20 @@ const Analysis = (props) => {
   const [analysisId, setAnalysisId] = useState();
   const [openCreatMapModal, setOpenCreatMapModal] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(Configs.DefaultPageSize);
+
+  const [isOpenReportDialog, setIsOpenReportDialog] = useState(false);
+
+  const groupParentList = [
+    {
+      id: 123,
+      name: 'Quy hoạch xây dựng'
+    },
+    {
+      id: 456,
+      name: 'Hạ tầng kỹ thuật'
+    }
+  ]
+
   const getData = useCallback(async () => {
     showLoading(true);
     try {
@@ -75,11 +134,39 @@ const Analysis = (props) => {
       if (res && res.content) {
         setData(res.content.items);
         setTotalItemCount(res.content.totalItemCount);
+        const temp = countObjectsWithSamePlanningId(res.content.items);
+        console.log("sadasdasdasd",temp);
+        setDataStatistic(temp);
       }
     } catch (err) {
       console.log(err);
     }
   };
+
+  function countObjectsWithSamePlanningId(data) {
+    const planningIdCountMap = {};
+  
+    // Iterate through the input data and count objects with the same planningId
+    data.forEach((item) => {
+      const planningId = item.planningId;
+  
+      if (planningIdCountMap[planningId]) {
+        planningIdCountMap[planningId].count++;
+      } else {
+        planningIdCountMap[planningId] = {
+          planningId: planningId,
+          planningName: item.planningName,
+          count: 1,
+        };
+      }
+    });
+  
+    // Convert the count map into an array of objects
+    const result = Object.values(planningIdCountMap);
+  
+    return result;
+  }
+  
 
   const handleDelete = () => {
     analysisAction.DeleteAnalysis(analysisId).then(
@@ -134,15 +221,25 @@ const Analysis = (props) => {
   };
   return (
     <div className="slider">
-     <div></div>
-        <SearchAnalysis
-          onGetList={GetListAll}
-          pageSize={rowsPerPage}
-          refresh={refresh}
-          keywword ={key}
-        />
-      <div className="d-sm-flex align-items-center justify-content-between mb-3">
-        <div></div>
+      <div
+        className={`${classes.btnAdd} ${
+          props?.hiddenAddButton ? classes.disNone : ''
+        }`}
+        onClick={handleOpenAddDialog}
+      >
+        <span className={`${classes.btnAddContent}`}>
+          <AddCircle className={classes.mr05} />
+          Thêm mới
+        </span>
+      </div>
+
+      <SearchAnalysis
+        onGetList={GetListAll}
+        pageSize={rowsPerPage}
+        refresh={refresh}
+        keywword ={key}
+      />
+      {/* <div className="d-sm-flex align-items-center justify-content-between mb-3">
         <Button
           variant="contained"
           color="primary"
@@ -151,7 +248,25 @@ const Analysis = (props) => {
         >
           Thêm Phân tích
         </Button>
+      </div> */}
+      
+      <div className="form-row">
+        <div
+          class={`form-group col-12 col-lg-12 'd-flex flex-column'}`}
+          style={{ display: "flex" }}
+        >
+          <div style={{ paddingLeft: "0px" }}>
+            <button
+              class="btn btn-ct btn-primary-ct"
+              onClick={() => {setIsOpenReportDialog(true)}}
+              style={{ color: "white", margin: "0px 0px" }}
+            >
+              Bảng thống kê
+            </button>
+          </div>
+        </div>
       </div>
+
       {data && (
         <ListAnalysis
           totalItemCount={totalItemCount}
@@ -181,6 +296,10 @@ const Analysis = (props) => {
           rowsPerPage={rowsPerPage}
           setOrder={setOrder}
           setOrderBy={setOrderBy}
+          setOpenEditDialog={setOpenEditDialog}
+          setAnalysisId={setAnalysisId}
+          openCreatMapModal = {handleOpenCreatMapModal}
+          groupParentList= {groupParentList}
         />
       )}
       {openEditDialog && (
@@ -193,6 +312,7 @@ const Analysis = (props) => {
           rowsPerPage={rowsPerPage}
           setOrder={setOrder}
           setOrderBy={setOrderBy}
+          groupParentList= {groupParentList}
         />
       )}
 
@@ -205,7 +325,17 @@ const Analysis = (props) => {
           content={"Bạn có chắc chắn muốn xóa?"}
         />
       )}
-            <CreatMapView
+
+      {
+        isOpenReportDialog && 
+        <ModalReportAnalysis
+          isOpen={isOpenReportDialog}
+          onClose={() => setIsOpenReportDialog(false)}
+          data={dataStatistic}
+        />
+      }
+
+      <CreatMapView
         open={openCreatMapModal}
         isLock={false}
         analysisId={analysisId}

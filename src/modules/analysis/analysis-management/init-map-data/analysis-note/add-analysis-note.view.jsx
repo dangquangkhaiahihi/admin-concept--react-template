@@ -18,6 +18,7 @@ import { NotificationMessageType } from "../../../../../utils/configuration";
 import * as analysisNoteAction from "../../../../../redux/store/analysis-note/analysis-note.store";
 import "suneditor/dist/css/suneditor.min.css";
 import * as viVN from "../../../../../language/vi-VN.json";
+import File_management from "../../../../../components/file_management/file_management";
 
 const useStyles = makeStyles((theme) => ({
   closeButton: {
@@ -47,8 +48,25 @@ const AddAnalysisNote = ({
     mode: "all",
     reValidateMode: "onBlur",
   });
-  useEffect(() => {
-  }, []);
+
+  const [isShow, setShow] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [filesTemp, setFilesTemp] = useState([]);
+  
+  const onOpenSelectFile = () => {
+    setShow(true);
+    setFilesTemp(files);
+  };
+
+  const onCloseSelectFile = () => {
+    setShow(false);
+    setFiles(filesTemp);
+  };
+
+  const onSaveSelectFile = () => {
+    setShow(false);
+  };
+
   const onSubmit = (data) => {
     if (!data) {
       return;
@@ -58,6 +76,8 @@ const AddAnalysisNote = ({
     formData.append("Gid", 0);
     formData.append("analynisId", analysisId);
     data.note && formData.append("note", data.note);
+    files.length > 0 && formData.append("documentUploadId", files[0].fileId);
+
     analysisNoteAction
       .CreateAnalysisNote(formData)
       .then((result) => {
@@ -82,7 +102,7 @@ const AddAnalysisNote = ({
     <div>
       <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth="md">
         <DialogTitle disableTypography className="border-bottom">
-          <Typography variant="h6">Thêm ghi chú</Typography>
+          <Typography variant="h6">Thêm thuyết minh</Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -96,7 +116,7 @@ const AddAnalysisNote = ({
           <DialogContent className="pt-4 pb-2">
             <div className="form-group">
               <label className="text-dark">
-                Ghi chú
+                Nội dung thuyết minh
               </label>
               <TextField
                 inputRef={register({ required: true })}
@@ -110,6 +130,53 @@ const AddAnalysisNote = ({
               {errors.note && errors.note.type === "required" && (
                 <span className="error">Trường này là bắt buộc</span>
               )}
+            </div>
+
+            <div className="form-group row">
+              <div className="col-12">
+                <label className="text-dark text-dark-for-long-label">
+                  Văn bản pháp lý kèm theo
+                </label>
+                
+                <div>
+                  {/* <TextField
+                    inputRef={register({ required: true })}
+                    type="hidden"
+                    name="image"
+                    value={(files && files.length > 0 && files[0].fileName) || ""}
+                  />
+                  {errors.image && errors.image.type === "required" && (
+                    <p className="error">Trường này là bắt buộc</p>
+                  )} */}
+                  {!isShow &&
+                    files &&
+                    files.length > 0 &&
+                    files.map((item) => (
+                      <div key={item.fileName} style={{ width: '150px' }}>
+                        <img
+                          src={require('../../../../../assets/icon/default.svg')}
+                          alt={item.fileName}
+                          title={item.fileName}
+                          className='img-fluid mb-2'
+                          style={{
+                            width: 'auto',
+                            height: 'auto',
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                          }}
+                        />
+                      </div>
+                  ))}
+                  
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={onOpenSelectFile}
+                  >
+                    Chọn file
+                  </Button>
+                </div>
+              </div>
             </div>
 
           </DialogContent>
@@ -134,6 +201,56 @@ const AddAnalysisNote = ({
           </DialogActions>
         </form>
       </Dialog>
+
+      {isShow && (
+        <Dialog
+          onClose={onCloseSelectFile}
+          open={isShow}
+          fullWidth={true}
+          maxWidth="md"
+          className="dialog-preview-form"
+        >
+          <DialogTitle disableTypography>
+            <Typography variant="h6">Quản lý file</Typography>
+            <IconButton
+              aria-label="close"
+              className={classes.closeButton}
+              onClick={onCloseSelectFile}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            <File_management
+              files={files}
+              setFiles={setFiles}
+              acceptedFiles={["doc", "docx", "txt", "pdf", "png", "jpg"]}
+            />
+          </DialogContent>
+
+          <DialogActions>
+            <Button
+              type="button"
+              onClick={onCloseSelectFile}
+              variant="contained"
+              startIcon={<CloseIcon />}
+            >
+              Thoát
+            </Button>
+            {files && files.length > 0 && (
+              <Button
+                type="button"
+                color="primary"
+                variant="contained"
+                startIcon={<SaveIcon />}
+                onClick={onSaveSelectFile}
+              >
+                Lưu
+              </Button>
+            )}
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 };

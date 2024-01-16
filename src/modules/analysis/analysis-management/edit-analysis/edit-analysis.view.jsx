@@ -11,6 +11,10 @@ import {
   makeStyles,
   Typography,
   IconButton,
+  Select,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
 } from "@material-ui/core";
 
 import CloseIcon from "@material-ui/icons/Close";
@@ -23,6 +27,7 @@ import { NotificationMessageType } from "../../../../utils/configuration";
 import * as analysisAction from "../../../../redux/store/analysis/analysis.store";
 import "suneditor/dist/css/suneditor.min.css";
 import * as viVN from "../../../../language/vi-VN.json";
+import * as planningAction from "../../../../redux/store/planning/planning.store";
 
 const useStyles = makeStyles((theme) => ({
   closeButton: {
@@ -40,29 +45,25 @@ const EditAnalysis = ({
   analysisId,
   GetListAll,
   rowsPerPage,
-  analysisLevel,
+  groupParentList
 }) => {
   const classes = useStyles();
-
   const { register, handleSubmit, errors, setValue } = useForm({
     mode: "all",
     reValidateMode: "onBlur",
   });
 
+  const [planningLookUpModel, setPlanningLookUpModel] = useState(null);
+
   const [analysis, setAnalysis] = useState();
-  const [analysisLevelId, setAnalysisId] = useState();
+  const [planningId, setPlanningId] = useState();
+  const [parentId, setParentId] = useState();
+  const [isCheck, setIsCheck] = useState(false);
 
   useEffect(() => {
-    analysisAction
-      .GetDetail(analysisId)
-      .then((res) => {
-        if (res && res.content) {
-          setAnalysis(res.content);
-        }
-      })
-      .catch((err) => console.log(err));
-  }, [analysisId]);
-
+    onGetData();
+  }, []);
+  
   const onSubmit = (data) => {
     if (!data) {
       return;
@@ -71,10 +72,13 @@ const EditAnalysis = ({
     let formData = new FormData();
     formData.append("id", analysisId);
     data.name && formData.append("name", data.name);
-    analysisLevelId &&
-      formData.append("analysisLevelId", analysisLevelId?.id);
+    planningId &&
+      formData.append("planningId", planningId?.id);
     data.phone && formData.append("phone", data.phone);
     data.address && formData.append("address", data.address);
+    data.address && formData.append("address", data.address);
+    parentId && formData.append("parentId", parentId?.id);
+    formData.append("isCheck", isCheck);
 
     analysisAction
       .UpdateAnalysis(formData)
@@ -97,6 +101,55 @@ const EditAnalysis = ({
       });
   };
 
+  const onGetData = () => {
+    //showLoading(true);
+    Promise.all([
+      onGetLookUpPlanning(),
+      onGetDetail()
+    ])
+      .then((res) => {
+        const [ planningLookUp ] = res;
+        planningLookUp && planningLookUp.content &&
+          setPlanningLookUpModel(planningLookUp.content);
+      })
+      .catch((err) => {
+        //showLoading(false);
+      });
+  };
+
+  const onGetLookUpPlanning = () => {
+    return new Promise((resolve, reject) => {
+      planningAction.GetLookUpPlanning().then(
+        (res) => {
+          resolve(res);
+        },
+        (err) => {
+          reject(err);
+          err &&
+            err.errorType &&
+            ShowNotification(
+              viVN.Errors[err.errorType],
+              NotificationMessageType.Error
+            );
+        }
+      );
+    });
+  };
+
+  const onGetDetail = () => {
+    analysisAction
+      .GetDetail(analysisId)
+      .then(
+        (res) => {
+        if (res && res.content) {
+          setAnalysis(res.content);
+          setIsCheck(res.content.isCheck)
+        }
+      })
+      .catch((err) => console.log(err)
+      );
+  };
+
   return (
     <div>
       <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth="md">
@@ -116,7 +169,7 @@ const EditAnalysis = ({
             <DialogContent className="pt-4 pb-2">
               <div className="form-group">
                 <label className="text-dark">
-                  Tên đơn vị<span className="required"></span>
+                  Nội dung phân tích<span className="required"></span>
                 </label>
                 <TextField
                   inputRef={register({ required: true })}
@@ -125,7 +178,7 @@ const EditAnalysis = ({
                   fullWidth
                   type="text"
                   className="form-control"
-                  defaultValue={analysis?.name}
+                  value={analysis?.name}
                   onChange={(e) => setValue("name", e.target.value)}
                 />
                 {errors.name && errors.name.type === "required" && (
@@ -134,18 +187,18 @@ const EditAnalysis = ({
               </div>
               <div className="form-group">
                 <label className="text-dark">
-                  Cấp phê duyệt<span className="required"></span>
+                  Quy hoạch phân tích<span className="required"></span>
                 </label>
                 <Autocomplete
-                  options={analysisLevel}
+                  options={planningLookUpModel}
                   getOptionLabel={(option) =>
                     typeof option === "string" ? option : option.name
                   }
-                  defaultValue={analysisLevel.find(
-                    (item) => item.id === analysis?.analysisLevelId
+                  value={planningLookUpModel?.find(
+                    (item) => item.id === analysis?.planningId
                   )}
                   onChange={(event, newValue) => {
-                    setAnalysisId(newValue);
+                    setPlanningId(newValue);
                   }}
                   disableClearable={true}
                   renderInput={(params) => (
@@ -167,41 +220,54 @@ const EditAnalysis = ({
                     <span className="error">Trường này là bắt buộc</span>
                   )}
               </div>
+
               <div className="form-group">
                 <label className="text-dark">
-                  Địa chỉ<span className="required"></span>
+                  Nhóm chuyên mục<span className="required"></span>
                 </label>
-                <TextField
-                  inputRef={register({ required: true })}
-                  name="address"
-                  error={errors.address && errors.address.type === "required"}
-                  fullWidth
-                  type="text"
-                  className="form-control"
-                  defaultValue={analysis?.address}
-                  onChange={(e) => setValue("address", e.target.value)}
+                <Autocomplete
+                  options={groupParentList}
+                  getOptionLabel={(option) =>
+                    typeof option === "string" ? option : option.name
+                  }
+                  value={groupParentList?.find(
+                    (item) => item.id === analysis?.parentId
+                  )}
+                  onChange={(event, newValue) => {
+                    setParentId(newValue);
+                  }}
+                  disableClearable={true}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="parentId"
+                      inputRef={register({ required: true })}
+                      error={
+                        errors.parentId &&
+                        errors.parentId.type === "required"
+                      }
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
                 />
-                {errors.address && errors.address.type === "required" && (
-                  <span className="error">Trường này là bắt buộc</span>
+                {errors.parentId &&
+                  errors.parentId.type === "required" && (
+                    <span className="error">Trường này là bắt buộc</span>
                 )}
               </div>
               <div className="form-group">
-                <label className="text-dark">
-                  Số điện thoại<span className="required"></span>
-                </label>
-                <TextField
-                  inputRef={register({ required: true })}
-                  name="phone"
-                  error={errors.phone && errors.phone.type === "required"}
-                  fullWidth
-                  type="text"
-                  className="form-control"
-                  defaultValue={analysis?.phone}
-                  onChange={(e) => setValue("phone", e.target.value)}
+                <FormControlLabel
+                  control={<Checkbox/>}
+                  label="Kiểm tra"
+                  checked={isCheck}
+                  onChange={(e) =>
+                    {
+                      setIsCheck(e.target.checked);
+                    }
+                  }
+                  name="isCheck"
                 />
-                {errors.phone && errors.phone.type === "required" && (
-                  <span className="error">Trường này là bắt buộc</span>
-                )}
               </div>
             </DialogContent>
           )}

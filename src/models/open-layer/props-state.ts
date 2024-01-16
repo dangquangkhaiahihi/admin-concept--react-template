@@ -18,6 +18,7 @@ namespace OpenLayerComponent {
     setExtend: Function;
     setZoom: Function;
     setMapLayer: Function;
+    setIsDoneConstructMap?: (value : boolean) => void;
   }
 }
 

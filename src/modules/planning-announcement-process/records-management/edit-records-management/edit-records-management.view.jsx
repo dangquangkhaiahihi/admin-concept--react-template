@@ -16,12 +16,13 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Checkbox,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import SaveIcon from "@material-ui/icons/Save";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import ShowNotification from "../../../../components/react-notifications/react-notifications";
-import { NotificationMessageType } from "../../../../utils/configuration";
+import { NotificationMessageType, MaxSizeImageUpload } from "../../../../utils/configuration";
 import * as viVN from "../../../../language/vi-VN.json";
 import * as appActions from "../../../../core/app.store";
 import * as planningAction from "../../../../redux/store/planning/planning.store";
@@ -31,9 +32,10 @@ import * as Investor from "../../../../redux/store/investor/investor.store";
 import * as PlanningUnit from "../../../../redux/store/planning-unit/planning-unit.store";
 import * as config from "../../../../utils/configuration";
 import FileManagement from "../../../../components/file_management/file_management";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import { UrlCollection } from "../../../../common/url-collection";
 import { regexDecial } from "../../../../common/validateDecimal";
+import SunEditor from 'suneditor-react';
 
 const defaultPlace = "Sơn La";
 const consultingUnitDefault = "N/A";
@@ -46,6 +48,7 @@ function EditRecordsManagement(props) {
   const cgisId = localStorage.getItem("cgisId");
   const { showLoading, isOtherPlanning, isQHT, isQHCC, isQHHTKT } = props;
   const history = useHistory();
+  const location = useLocation();
 
   const [planningModel, setPlanningModel] = useState(null);
   const [planningLookUpModel, setPlanningLookUpModel] = useState([]);
@@ -82,6 +85,7 @@ function EditRecordsManagement(props) {
   const [isShowZip, setShowZip] = useState(false);
   const [tifName, setTifName] = useState(null);
   const [zipName, setZipName] = useState(null);
+  const [isCheck, setIsCheck] = useState(false);
 
   const { register, handleSubmit, errors, setValue, clearErrors, setError } =
     useForm({
@@ -154,6 +158,7 @@ function EditRecordsManagement(props) {
           setPlanningModel(res.content);
           setFiles(res.content.files ? [res.content.files] : []);
           setLookupCommune(res.content.communeIds || []);
+          res.content.isCheck && setIsCheck(res.content.isCheck);
           resolve(res);
         },
         (err) => {
@@ -389,6 +394,8 @@ function EditRecordsManagement(props) {
       LandForConstruction: data.landForConstruction || null,
       Report: data.report || null,
       Note: data.note || null,
+      Presentation: data.presentation || null,
+      Regulation: data.regulation || null,
       DocumentTypeId:
         (documentType && documentType.id) ||
         planningModel.documentTypeId ||
@@ -405,6 +412,10 @@ function EditRecordsManagement(props) {
         planningModel?.districtIds,
       isNew: !isOtherPlanning ? isNew : true,
       PlanningAdjustedId: !isNew ? planningAdjusted?.id : null,
+      Field: data?.field || null,
+      ConstructionGroup: data?.constructionGroup || null,
+      IsCheck: isCheck,
+      IsCheckDocument : planningModel.isCheckDocument || false,
     };
 
     if (files && files.length > 0) {
@@ -566,6 +577,16 @@ function EditRecordsManagement(props) {
       ))
     }
   }, [planningStatusModel, planningModel])
+
+  const [content, setContent] = useState();
+
+  const onChangeContent = (contentInput) => {
+    if (contentInput === '<p><br></p>') {
+      setContent('');
+    } else {
+      setContent(contentInput);
+    }
+  };
 
   return (
     <div>
@@ -2421,7 +2442,61 @@ function EditRecordsManagement(props) {
                     </div>
                   )}
 
-                  <div className="col-6"></div>
+                  <div className="col-6">
+                    <label className="text-dark text-dark-for-long-label">
+                      Lĩnh vực
+                    </label>
+
+                    <TextField
+                      fullWidth
+                      inputRef={register({
+                        maxLength: 300,
+                      })}
+                      type="text"
+                      name="field"
+                      error={
+                        errors.field &&
+                          errors.field.type === "maxLength"
+                      }
+                      variant="outlined"
+                      size="small"
+                      inputProps={{ maxLength: 300 }}
+                      defaultValue={planningModel.field}
+                    />
+                    {errors.field &&
+                      errors.field.type === "maxLength" && (
+                        <span className="error">Tối đa 300 ký tự</span>
+                      )}
+                  </div>
+                </div>
+
+                <div className="form-group row">
+                  <div className="col-lg-6 mb-3">
+                    <label className="text-dark text-dark-for-long-label">
+                      Nhóm công trình
+                    </label>
+
+                    <TextField
+                      fullWidth
+                      inputRef={register({
+                        maxLength: 300,
+                      })}
+                      type="text"
+                      name="constructionGroup"
+                      error={
+                        (errors.constructionGroup &&
+                          errors.constructionGroup.type === "maxLength")
+                      }
+                      variant="outlined"
+                      size="small"
+                      inputProps={{ maxLength: 300 }}
+                      defaultValue={planningModel.constructionGroup}
+                    />
+                    {errors.constructionGroup &&
+                      errors.constructionGroup.type === "maxLength" && (
+                        <span className="error">Tối đa 300 ký tự</span>
+                      )}
+                  </div>
                 </div>
 
                 <div className="form-group row">
@@ -2537,17 +2612,95 @@ function EditRecordsManagement(props) {
               </>
           }
           <div className="form-group">
+            <FormControlLabel 
+              control={<Checkbox/>}
+              label="Kiểm tra"
+              checked={isCheck}
+              onChange={(e) =>
+                setIsCheck(e.target.checked)
+              }
+              name="isCheck"
+            />
+          </div>
+          <div className="form-group">
             <label className="text-dark text-dark-for-long-label">Ghi chú</label>
 
-            <textarea
-              name="note"
-              rows="5"
-              className="form-control"
+            <SunEditor
+              enableToolbar={true}
+              showToolbar={true}
+              imageUploadSizeLimit={MaxSizeImageUpload}
+              videoFileInput={false}
+              setContents={planningModel.note}
+              setOptions={{
+                height: 500,
+                buttonList: [
+                  [
+                    'undo',
+                    'redo',
+                    'font',
+                    'fontSize',
+                    'formatBlock',
+                    'paragraphStyle',
+                    'blockquote',
+                    'bold',
+                    'underline',
+                    'italic',
+                    'strike',
+                    'subscript',
+                    'superscript',
+                    'fontColor',
+                    'hiliteColor',
+                    'textStyle',
+                    'removeFormat',
+                    'outdent',
+                    'indent',
+                    'align',
+                    'horizontalRule',
+                    'list',
+                    'lineHeight',
+                    'table',
+                    'link',
+                    'fullScreen',
+                  ],
+                ],
+              }}
+              onChange={onChangeContent}
+              onBlur={(event, editorContents) =>
+                onChangeContent(editorContents)
+              }
+            />
+
+            <TextField
+              type='text'
+              inputRef={register}
+              name='note'
               defaultValue={planningModel.note}
+              className='d-none'
+              value={content}
+            />
+          </div>
+          <div className="form-group">
+            <label className="text-dark text-dark-for-long-label">Thuyết minh</label>
+
+            <textarea
+              name="presentation"
+              rows="3"
+              className="form-control"
+              defaultValue={planningModel.presentation}
               ref={register}
             ></textarea>
           </div>
+          <div className="form-group">
+            <label className="text-dark text-dark-for-long-label">Quy định quản lý theo đồ án</label>
 
+            <textarea
+              name="regulation"
+              rows="3"
+              className="form-control"
+              defaultValue={planningModel.regulation}
+              ref={register}
+            ></textarea>
+          </div>
           <div className="form-group">
             <div className="row justify-content-between align-items-end">
               <div className="col-6 col-md-4">
@@ -2604,6 +2757,18 @@ function EditRecordsManagement(props) {
                     isQHCC ? UrlCollection.PlanningCC :
                       isQHHTKT ? UrlCollection.QH_HTKT :
                         UrlCollection.PlanningAnnouncementProcess,
+                  state: {
+                    currentPage: location.state?.currentPage,
+                    pageSizeDefault: location.state?.pageSizeDefault,
+                    title: location.state?.title,
+                    typeSelected: location.state?.typeSelected,
+                    levelSelected: location.state?.levelSelected,
+                    statusIdSelected: location.state?.statusIdSelected,
+                    planningUnitSelected: location.state?.planningUnitSelected,
+                    investorSelected: location.state?.investorSelected,
+                    approvalAgencySelected: location.state?.approvalAgencySelected,
+                    districtSelected: location.state?.districtSelected
+                  }
                 })
               }
               style={{ margin: "20px 10px 50px 10px" }}

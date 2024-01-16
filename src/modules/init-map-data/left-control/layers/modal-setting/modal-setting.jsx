@@ -24,7 +24,7 @@ import * as importTiffFileAction from "../../../../../redux/store/import-shape-t
 import * as layerAction from "../../../../../redux/store/init-map/map-layer.store";
 
 function ModalLayerSetting(props) {
-  const { showLoading } = props;
+  const { showLoading, layerId } = props;
   const [dataSource, setDataSource] = useState(
     InitmapConfig.CreateDataSourceObject()
   );
@@ -59,6 +59,10 @@ function ModalLayerSetting(props) {
     TableName: "",
     file: "",
   });
+
+  const [isCreateBaseOnExistLayer, setIsCreateBaseOnExistLayer] = useState(false);
+  const [layerSelected, setLayerSelected] = useState();
+
   const [valueShapeFileStep_2, setValueShapeFileStep_2] = useState({
     RootFolderName: "",
     ShpFileName: "",
@@ -114,7 +118,9 @@ function ModalLayerSetting(props) {
     }
   };
 
-
+  useEffect(() => {
+    console.log(layerSetting)
+  }, [layerSetting])
   //content step
   function getStepContentWms(step) {
     switch (step) {
@@ -138,6 +144,12 @@ function ModalLayerSetting(props) {
             setValueTiffFile2={setValueTiffFile}
             isCompleteImportShapeFile={isCompleteImportShapeFile}
             error={error}
+            isCreateBaseOnExistLayer={isCreateBaseOnExistLayer}
+            setIsCreateBaseOnExistLayer={setIsCreateBaseOnExistLayer}
+            layerSelected={layerSelected}
+            setLayerSelected={setLayerSelected}
+            isLayerRela={props.isLayerRela}
+            layerId={layerId}
           />
         ) : null;
       case 1:
@@ -148,6 +160,8 @@ function ModalLayerSetting(props) {
             isImportShapeFile={isImportShapeFile}
             valueShapeFileStep_2={valueShapeFileStep_2}
             setValueShapeFileStep_2={setValueShapeFileStep_2}
+            isLayerRela={props.isLayerRela}
+            layerId={layerId}
           />
         );
       case 2:
@@ -220,6 +234,16 @@ function ModalLayerSetting(props) {
           NotificationService.error("Trường tên layer không được để trống");
           return;
         }
+        if (props.isLayerRela) {
+          if (!layerSetting.year) {
+            NotificationService.error("Trường năm điều chỉnh không được để trống");
+            return;
+          }
+          if (!layerSetting.contentChange) {
+            NotificationService.error("Trường nội dung điều chỉnh không được để trống");
+            return;
+          }
+        }
         setActiveStepWms((prevActiveStep) => prevActiveStep + 1);
         break;
       }
@@ -245,19 +269,27 @@ function ModalLayerSetting(props) {
     _layerSetting = layerSetting,
     // _layerViewSetting = layerViewSetting,
     // _layerFilterSetting = layerFilterSetting
-    _layerViewSetting = {viewDetail,tooltip,popup},
-    _layerFilterSetting = {input,output}
+    _layerViewSetting = { viewDetail, tooltip, popup },
+    _layerFilterSetting = { input, output },
+    _planningId = props.planningId,
   ) => {
     const NewLayerCreated = InitmapConfig.MergeLayerPropertyToStandardObject(
       _layerCategoryId,
       _dataSource,
       _layerSetting,
       _layerViewSetting,
-      _layerFilterSetting
+      _layerFilterSetting,
+      _planningId,
     );
     props.handleAddNewLayer(NewLayerCreated);
     props.closeModal();
   };
+
+  const handleAcceptCreateBaseOnExistLayer = (layer) => {
+    const NewLayerCreated = InitmapConfig.FormatLayerSetting(layer);
+    props.handleCreateBaseOnExistLayer(NewLayerCreated);
+    props.closeModal();
+  }
 
   const handleAcceptTif = (
     _dataSource = dataSource,
@@ -456,6 +488,19 @@ function ModalLayerSetting(props) {
       );
     });
   };
+  //--- CreateBaseOnExistLayer
+  const handleCreateBaseOnExistLayer = (layerId, layerSelected) => {
+        if (layerId && layerSelected) {
+          showLoading(true);
+          layerAction.CreateBaseOnExistLayer({ id: layerSelected.id, parrentId: layerId })
+            .then((res) => {
+              console.log(res);
+              handleAcceptCreateBaseOnExistLayer(res.content)
+              showLoading(false);
+            })
+            .catch(err => { showLoading(false) });
+        } else return;
+  }
 
   //--- Tif file
   const handleNextTifFile = (step) => {
@@ -485,7 +530,10 @@ function ModalLayerSetting(props) {
                 0,
                 20,
                 1,
-                true
+                true,
+                valueTiffFile_2?.year,
+                valueTiffFile_2?.contentChange,
+                valueTiffFile_2?.layerRealationshipId
               );
               const _layerViewSetting = new InitmapConfig.CreateLayerDisplayInfomationSettingObjectDefault(
                 _dataSource
@@ -542,7 +590,7 @@ function ModalLayerSetting(props) {
   };
 
   const RenderStepper = () => {
-    if (isImportShapeFile) {
+    if (isImportShapeFile && !isCreateBaseOnExistLayer) {
       return (
         <Stepper activeStep={activeStepShapeFile}>
           {stepShp.map((label, index) => {
@@ -561,7 +609,7 @@ function ModalLayerSetting(props) {
       );
     }
 
-    if (!isImportTifFile) {
+    if (!isImportTifFile && !isCreateBaseOnExistLayer) {
       return (
         <Stepper activeStep={activeStepWms}>
           {stepWms.map((label, index) => {
@@ -627,6 +675,30 @@ function ModalLayerSetting(props) {
             className="action-button"
           >
             Publish
+          </Button>
+        </div>
+      );
+    }
+
+    if (isCreateBaseOnExistLayer) {
+      return (
+        <div className="mt-3">
+          {/* <Button
+            variant="contained"
+            disabled={activeStepTifFile === 0}
+            onClick={handleBackTifFile}
+            className="action-button mr-2"
+          >
+            Quay lại
+          </Button> */}
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!layerSelected ? true : false}
+            onClick={() => handleCreateBaseOnExistLayer(layerId, layerSelected)}
+            className="action-button"
+          >
+            PUBLISH
           </Button>
         </div>
       );

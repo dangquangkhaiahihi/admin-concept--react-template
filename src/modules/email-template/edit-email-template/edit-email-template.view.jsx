@@ -46,6 +46,9 @@ function EditEmailDialog(props) {
     getListEmailModels,
     rowsPerPageCommon,
     setOrder,
+    orderBy,
+    order,
+    searchCriteria
   } = props;
   const { register, handleSubmit, errors, setError, clearErrors } = useForm({
     mode: "all",
@@ -70,9 +73,10 @@ function EditEmailDialog(props) {
     emailTemplateAction.UpdateEmailTemplate(body).then(
       (res) => {
         if (res && res.content) {
-          setOrder("modifiedDate");
-          setOrder("desc");
-          getListEmailModels(1, rowsPerPageCommon);
+          // setOrder("modifiedDate");
+          // setOrder("desc");
+          // getListEmailModels(1, rowsPerPageCommon);
+          getListEmailModels(searchCriteria.page + 1, rowsPerPageCommon, orderBy + " " + order, searchCriteria.code, searchCriteria.title);
           onHideModal();
           ShowNotification(
             viVN.Success.EmailEditSuccess,

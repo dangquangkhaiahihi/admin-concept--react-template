@@ -598,7 +598,7 @@ function EditConsultTheCommunity(props) {
 
 
               <div className="form-group">
-                <label className="text-dark">Nội dung</label>
+                <label className="text-dark">Nội dung<span className="required"></span></label>
                 <SunEditor
                   enableToolbar={true}
                   showToolbar={true}

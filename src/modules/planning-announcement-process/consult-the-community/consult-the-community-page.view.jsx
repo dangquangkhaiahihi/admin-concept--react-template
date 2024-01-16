@@ -91,6 +91,7 @@ function ConsultTheCommunityPage(props) {
   } = props;
   const classes = useStyles();
   const history = useHistory();
+  const location = useLocation();
   const { id } = useParams();
   const {isLock} = history.location.state || false;
   const planningId = id;
@@ -214,7 +215,19 @@ function ConsultTheCommunityPage(props) {
 
   const handleCloseConsultTheCommunity = () => {
     history.push({
-      pathname: pushToListConsult(isQHHTKT, isQHCC)
+      pathname: pushToListConsult(isQHHTKT, isQHCC),
+      state: {
+        currentPage: location.state?.currentPage,
+        pageSizeDefault: location.state?.pageSizeDefault,
+        title: location.state?.title,
+        typeSelected: location.state?.typeSelected,
+        levelSelected: location.state?.levelSelected,
+        statusIdSelected: location.state?.statusIdSelected,
+        planningUnitSelected: location.state?.planningUnitSelected,
+        investorSelected: location.state?.investorSelected,
+        approvalAgencySelected: location.state?.approvalAgencySelected,
+        districtSelected: location.state?.districtSelected
+      }
     });
   };
 

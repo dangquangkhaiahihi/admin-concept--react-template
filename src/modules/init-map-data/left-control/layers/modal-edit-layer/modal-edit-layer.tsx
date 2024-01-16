@@ -25,15 +25,22 @@ import { Button, Tab, Tabs } from '@material-ui/core';
 export default class ModalEditSettingLayer extends React.Component<ModalEditLayerModels.ModalEditLayerProps, ModalEditLayerModels.ModalEditLayerState> {
     constructor(props: ModalEditLayerModels.ModalEditLayerProps) {
         super(props)
-        
-        const LayerData = this.props.layerData;
+
+        const Index = this.props?.layerRelaIndex;
+        const LayerData = (this.props.isLayerRela && (this.props.layerRelaIndex || this.props.layerRelaIndex == 0)) ?
+            this.props.layerData?.layerRealationships[this.props.layerRelaIndex]
+            : this.props.layerData;
+        const LayerParents = this.props.isLayerRela ? this.props.layerData : null;
         const LayerDisplay = LayerData.displayName;
         const LayerFilter = LayerData.filterName;
         const DisplayCols = LayerData.displayName.cols;
         const DataSource = ConvertStandardDataDisplayProperyToControlDataSource(LayerDisplay);
-
+        const Year = LayerData?.year;
+        const ContentChange = LayerData?.contentChange;
+        const IsLayerRela = this.props?.isLayerRela;
         this.state = {
             layerData: LayerData,
+            layerParents: LayerParents,
             value: 0,
             hasSave: false,
             dataSource: DataSource,
@@ -43,13 +50,18 @@ export default class ModalEditSettingLayer extends React.Component<ModalEditLaye
             sortWidth: LayerData.filterName.order,
             inputSetting: ConvertFilterStandardPropertyToControlForm(LayerFilter.in, DataSource.cols),
             outputSetting: ConvertFilterStandardPropertyToControlForm(LayerFilter.out, DataSource.cols),
+            year: Year,
+            contentChange: ContentChange,
+            isLayerRela: IsLayerRela,
+            layerRelaIndex: this.props.layerRelaIndex,
         }
     }
 
     componentDidMount() {
         console.log(this.state.viewDetail)
         console.log(this.state.inputSetting)
-        console.log(this.props.layerData);
+        console.log(this.props.isLayerRela);
+        console.log(this.props);
     }
 
     handleChange = (event: any, newValue: number) => {
@@ -57,7 +69,7 @@ export default class ModalEditSettingLayer extends React.Component<ModalEditLaye
     };
 
     componentWillUnmount() {
-        if (this.state.hasSave) {
+        if (this.state.hasSave && !this.state.isLayerRela) {
             this.props.setLayerData({
                 ...this.state.layerData,
                 displayName: MergeLayerDisplayStandardData(this.state.dataSource,
@@ -65,6 +77,16 @@ export default class ModalEditSettingLayer extends React.Component<ModalEditLaye
                 ),
                 filterName: MergeFilterStandardData(CreateUpdateLayerFilterObject(this.state.inputSetting, this.state.outputSetting, this.state.sortWidth))
             });
+        } else if(this.state.isLayerRela && (this.state.layerRelaIndex || this.state.layerRelaIndex == 0)) {
+            let data = this.state.layerParents.layerRealationships;
+            data[this.state.layerRelaIndex] = {
+                ...this.state.layerData,
+                displayName: MergeLayerDisplayStandardData(this.state.dataSource,
+                    CreateUpdateLayerDisplayInfomationSettingObject(this.state.viewDetail, this.state.tooltip, this.state.popup)
+                ),
+                filterName: MergeFilterStandardData(CreateUpdateLayerFilterObject(this.state.inputSetting, this.state.outputSetting, this.state.sortWidth))
+            }
+            this.props.setLayerData({ ...this.state.layerParents, layerRealationships: data});
         }
     }
 
@@ -102,7 +124,11 @@ export default class ModalEditSettingLayer extends React.Component<ModalEditLaye
                                 <GeneralInfomationView data={this.state.layerData} />
                             </TabPanel>
                             <TabPanel value={value} index={1}>
-                                <EditLayerSettingView data={this.state.layerData} setData={(data: LayerSettingsModels.LayerSettingsModel) => this.setState({ layerData: data })} />
+                                <EditLayerSettingView
+                                    data={this.state.layerData}
+                                    setData={(data: LayerSettingsModels.LayerSettingsModel) => this.setState({ layerData: data })}
+                                    isLayerRela={this.state.isLayerRela}
+                                />
                             </TabPanel>
                             <TabPanel value={value} index={2}>
                                 <ChangeLayerDataSource data={this.state.layerData} dataSource={this.props.layerData} setData={(data: LayerSettingsModels.LayerSettingsModel) => this.setState({ layerData: data })} />

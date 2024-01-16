@@ -233,6 +233,7 @@ function ListOpinionForm(props) {
         )} */}
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={pageIndex}
             rowsPerPage={pageSize}
             handleChangeRowsPerPage={handleChangeRowsPerPage}

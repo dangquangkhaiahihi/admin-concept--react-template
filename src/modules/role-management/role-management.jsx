@@ -44,7 +44,7 @@ function RoleManagement(props) {
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const getListRoleManagement = (pageIndex = 1, pageSize = config.Configs.DefaultPageSize, sortExpression = "modifiedDate desc", code="", name = "") => {
     showLoading(true);
-    setPage(pageIndex-1)
+    // setPage(pageIndex-1)
     roleManagementAction.GetListRoleManagement(pageIndex, pageSize, sortExpression, code.trim(), name.trim()).then(
       (res) => {
         if (res &&
@@ -108,7 +108,7 @@ function RoleManagement(props) {
   const handleDelete = () => {
     roleManagementAction.DeleteRoleManagement(roleId).then((res) => {
       if (res && res.content && res.content.status) {
-        getListRoleManagement(1, rowsPerPageCommon,orderBy ? (orderBy+ " "+order):"",code,name);
+        getListRoleManagement(page + 1, rowsPerPageCommon,orderBy ? (orderBy+ " "+order):"",code,name);
         handleCloseDeleteDialog();
         ShowNotification(
           viVN.Success.RoleDeleteSuccess,
@@ -163,12 +163,44 @@ function RoleManagement(props) {
       /> : ""}
 
       {openAddDialog ? isAddDialog ?
-        <AddRoleManagement rowsPerPageCommon={rowsPerPageCommon} openAddDialog={openAddDialog} onHideModal={onHideModal} getListRoleManagement={getListRoleManagement} setPage={setPage}></AddRoleManagement>
-        : <EditRoleManagement rowsPerPageCommon={rowsPerPageCommon} openAddDialog={openAddDialog} onHideModal={onHideModal} roleId={roleId} getListRoleManagement={getListRoleManagement }></EditRoleManagement>
+        <AddRoleManagement
+          rowsPerPageCommon={rowsPerPageCommon}
+          openAddDialog={openAddDialog}
+          onHideModal={onHideModal}
+          getListRoleManagement={getListRoleManagement}
+          setPage={setPage}
+        />
+        : <EditRoleManagement 
+            rowsPerPageCommon={rowsPerPageCommon}
+            openAddDialog={openAddDialog}
+            onHideModal={onHideModal}
+            roleId={roleId}
+            getListRoleManagement={getListRoleManagement}
+            orderBy={orderBy}
+            order={order}
+            searchCriteria={{'page':page,'code':code, 'name':name}}
+          />
         : ""}
 
-      {openDeleteDialog ? <DiaLogDelete isOpen={openDeleteDialog} rowsPerPageCommon={rowsPerPageCommon} onClose={handleCloseDeleteDialog} onSuccess={handleDelete} /> : ""}
-      {openScreenRoleDialog ? <ScreenRoleManagementView roleId ={roleId} rowsPerPageCommon={rowsPerPageCommon} openAddDialog={openScreenRoleDialog} onHideModal={handleCloseScreenRoleDialog} getListRoleManagement={getListRoleManagement} setPage={setPage} /> : ""}
+      { openDeleteDialog ? 
+        <DiaLogDelete
+          isOpen={openDeleteDialog}
+          rowsPerPageCommon={rowsPerPageCommon}
+          onClose={handleCloseDeleteDialog}
+          onSuccess={handleDelete}
+        /> : ""
+      }
+
+      { openScreenRoleDialog ? 
+        <ScreenRoleManagementView
+          roleId={roleId}
+          rowsPerPageCommon={rowsPerPageCommon}
+          openAddDialog={openScreenRoleDialog}
+          onHideModal={handleCloseScreenRoleDialog}
+          getListRoleManagement={getListRoleManagement}
+          setPage={setPage} 
+        /> : ""
+      }
     </div>
   )
 }

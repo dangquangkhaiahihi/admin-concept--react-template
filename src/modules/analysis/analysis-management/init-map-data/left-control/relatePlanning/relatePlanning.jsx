@@ -333,7 +333,7 @@ class RenderLayerControlView extends React.Component {
                                             <Tooltip title={layer.name}>
                                               <label
                                                 //htmlFor={`checkbox-layer-index-${indexLayer}`}
-                                                className="d-block text-truncate cursor-move"
+                                                className="d-block cursor-move"
                                               >
                                                 {layer.name}
                                               </label>

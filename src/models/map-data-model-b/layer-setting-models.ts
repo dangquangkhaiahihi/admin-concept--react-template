@@ -15,27 +15,30 @@ namespace LayerSettingsModels {
     zindex: number;
     displayName: LayerSettingsDisplayModel;
     filterName: LayerSettingsFilterModel;
-      documentUploadId: number | undefined;
-      filesName: Files;
+    documentUploadId: number | undefined;
+    filesName: Files;
+    layerRealationships?: any;
+    year?: any;
+    contentChange?: any;
   }
 
-    export interface Files {
-        fileName: string;
-        fileType: string;
-        filePreview: string;
-        fileSize: number;
-        fileId: number;
-    }
+  export interface Files {
+    fileName: string;
+    fileType: string;
+    filePreview: string;
+    fileSize: number;
+    fileId: number;
+  }
 
   export interface LayerSettingsFilterModel {
-    order: string; 
+    order: string;
     in: LayerSettingsFilterInModel[];
     out: LayerSettingsFilterInModel[];
   }
 
   export interface LayerSettingsFilterInModel {
-    col: string; 
-    alias: string; 
+    col: string;
+    alias: string;
     kieu: string;
     type_display?: string;
   }
@@ -48,8 +51,8 @@ namespace LayerSettingsModels {
   }
 
   export interface LayerSettingsDisplayColModel {
-    col: string; 
-    alias: string; 
+    col: string;
+    alias: string;
     index: number;
     kieu: string;
   }

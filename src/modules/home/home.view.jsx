@@ -69,7 +69,6 @@ class HomePage extends React.Component {
       reactMediaQuery
     } = this.props
 
-    console.log("ahihihiihihi", reactMediaQuery);
     const renderLogo = () => {
       return (
         <img
@@ -111,6 +110,10 @@ class HomePage extends React.Component {
                     ? APIUrlDefault + user.avatar
                     : process.env.PUBLIC_URL + "/user-default.png"
                 }
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = require('../../assets/icon/logo.png');
+                }}
               />
               <div class="admin__text d-flex align-items-center">
                 <span className="mr-2 text-secondary font-weight-bold d-lg-inline name">
@@ -165,7 +168,7 @@ class HomePage extends React.Component {
       <div className="container bg-white wrapper">
         {
           //Desktop 
-          (reactMediaQuery.isDesktopOrLaptop) &&
+          (reactMediaQuery?.isDesktopOrLaptop) &&
           <div className="row">
             <div className="col-8 row">
               <div className="col-md-3 pb-3">
@@ -182,7 +185,7 @@ class HomePage extends React.Component {
         }
         {
           //Mobile/ Tablet
-          (reactMediaQuery.isTabletOrMobile) &&
+          (reactMediaQuery?.isTabletOrMobile) &&
           <div className="row">
             <div className="col-12 row">
               <div className="col-6 pb-3 d-flex justify-content-start">
@@ -202,9 +205,9 @@ class HomePage extends React.Component {
             <div 
               className={
                 `text-decoration-none align-items-center mb-3 
-                ${reactMediaQuery.isDesktopOrLaptop && 'col-3 w-25'} 
-                ${(reactMediaQuery.isTabletOrMobile && !reactMediaQuery.isPortrait) && 'col-6 w-50'} 
-                ${(reactMediaQuery.isTabletOrMobile && reactMediaQuery.isPortrait) && 'col-12'}`
+                ${reactMediaQuery?.isDesktopOrLaptop && 'col-3 w-25'} 
+                ${(reactMediaQuery?.isTabletOrMobile && !reactMediaQuery?.isPortrait) && 'col-6 w-50'} 
+                ${(reactMediaQuery?.isTabletOrMobile && reactMediaQuery?.isPortrait) && 'col-12'}`
               }
             >
             <a

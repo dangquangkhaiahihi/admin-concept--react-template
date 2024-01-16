@@ -34,7 +34,10 @@ export function CreateLayerSettingObject(
   minZoom: number = 0,
   maxZoom: number = 20,
   zIndex: number = 1,
-  defaultTurnOn: boolean = false
+  defaultTurnOn: boolean = false,
+  year: any,
+  contentChange: any,
+  layerRealationshipId: any,
 ): ConfigModels.LayerSettingObject {
   return {
     layerName: layerName,
@@ -42,7 +45,32 @@ export function CreateLayerSettingObject(
     maxZoom: maxZoom,
     zIndex: zIndex,
     defaultTurnOn: defaultTurnOn,
+    year: year,
+    contentChange: contentChange,
+    layerRealationshipId: layerRealationshipId,
   };
+}
+
+export function FormatLayerSetting(layer: any) {
+  return {
+    displayName: layer.display_name,
+    filterName: layer.filter_name,
+    geoLayerName: layer.geo_layer_name,
+    id: layer.id,
+    is_check: layer.is_check,
+    layerCategoryId: layer.layer_category_id,
+    layerType: layer.layer_type,
+    level: layer.level,
+    maxZoom: layer.max_zoom,
+    minZoom: layer.min_zoom,
+    name: layer.name,
+    table: layer.table,
+    wms: layer.wms,
+    wmsExternal: layer.wms_external,
+    zindex: layer.z_index,
+    documentUploadId: layer.document_upload_id,
+    files: layer.files,
+  }
 }
 
 export function CreateListPropertyFromDataSourec(
@@ -109,7 +137,8 @@ export function MergeLayerPropertyToStandardObject(
   dataSource: any,
   layerSetting: any,
   layerViewSetting: any,
-  layerFilterSetting: any
+  layerFilterSetting: any,
+  planningId: number
 ) {
   return {
     displayName: MergeLayerDisplayStandardData(dataSource, layerViewSetting),
@@ -127,6 +156,12 @@ export function MergeLayerPropertyToStandardObject(
     wms: dataSource.wms,
     wmsExternal: dataSource.wms_external,
     zindex: layerSetting.zIndex,
+    is_check: layerSetting.defaultTurnOn,
+    isChecked: layerSetting.defaultTurnOn,
+    year: layerSetting?.year,
+    contentChange: layerSetting?.contentChange,
+    layerRealationshipId: layerSetting?.layerRealationshipId,
+    planningId: planningId,
   };
 }
 
@@ -455,7 +490,7 @@ export const VectorImageLayerClassName = (layerId: number) =>
 
 export function AddLabelValueToListLayers(
   listLayer: LayerSettingsModels.LayerSettingsModel[]
-){
+) {
   const result: any = [];
   listLayer.map((layerObject) =>
     result.push({

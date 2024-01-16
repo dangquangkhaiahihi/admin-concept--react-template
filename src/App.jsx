@@ -6,6 +6,7 @@ import history from "./common/history";
 
 //--- Loading
 import AppLoading from "./components/loading/loading.view";
+import AppSyncLoading from "./components/loading/loading-sync.view";
 
 //--- Layout
 import LayoutView from "./components/layout/layout.view";
@@ -40,6 +41,8 @@ import Slider from "./modules/slider/slider.view.jsx";
 
 //--- News
 import News from "./modules/news/news.view.jsx";
+// --- PlanningSync
+import PlanningSync from "./modules/planning-sync/planning-sync.view.jsx";
 
 //--- Map
 import MapData from "./modules/map-data/map-data.view.jsx";
@@ -79,34 +82,39 @@ import PlanningUnit from "./modules/planning-unit/planning-unit.view.jsx";
 import HomePage from "./modules/home/home.view.jsx";
 import { QHDT } from "./modules/qhdt/qhdt.view.jsx";
 import Analysis from "./modules/analysis/analysis-management/analysis-management.view.jsx";
+import ObjectGeogises from "./modules/analysis/object-geogises-management/object-geogises-management.view.jsx";
 import DialogWarningExpired from "./components/dialog-warning-expired/dialog-warning-expired.view";
 import LockScreen from "./components/lock-screen/lock-screen.view.jsx";
-import { useMediaQuery } from "react-responsive";
+// import { useMediaQuery } from "react-responsive";
 import { useState, useEffect } from "react";
+import ObjectGeogiesSearchOnMapView from "./modules/analysis/object-geogies-search-on-map/object-geogies-search-on-map.view.js";
+import objectGeogiesSearchOnMapView from "./modules/analysis/object-geogies-search-on-map/object-geogies-search-on-map.view.js";
+import PlanningTypeManagementView from "./modules/planning-type-management/planning-type-management.view.jsx";
 
 function App() {
   //media query
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1224px)",
-  });
-  const isBigScreen = useMediaQuery({ query: "(min-width: 1824px)" });
-  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
-  const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
-  const isRetina = useMediaQuery({ query: "(min-resolution: 2dppx)" });
+  // const isDesktopOrLaptop = useMediaQuery({
+  //   query: "(min-width: 1224px)",
+  // });
+  // const isBigScreen = useMediaQuery({ query: "(min-width: 1824px)" });
+  // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  // const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
+  // const isRetina = useMediaQuery({ query: "(min-resolution: 2dppx)" });
 
-  const reactMediaQuery = {
-    isDesktopOrLaptop:isDesktopOrLaptop,
-    isBigScreen:isBigScreen,
-    isTabletOrMobile:isTabletOrMobile,
-    isPortrait:isPortrait,
-    isRetina:isRetina
-  }
+  // const reactMediaQuery = {
+  //   isDesktopOrLaptop:isDesktopOrLaptop,
+  //   isBigScreen:isBigScreen,
+  //   isTabletOrMobile:isTabletOrMobile,
+  //   isPortrait:isPortrait,
+  //   isRetina:isRetina
+  // }
 
   return (
     <div>
       <DialogWarningExpired />
       <Router history={history}>
         <AppLoading />
+        <AppSyncLoading />
         <LockScreen />
         <Switch>
           <RouteComponent
@@ -143,7 +151,10 @@ function App() {
 
           <RouteComponent
             exact
-            layout={() => (<HomePage reactMediaQuery={reactMediaQuery}/>)}
+            layout={() => (
+            // <HomePage reactMediaQuery={reactMediaQuery}/>
+              <LayoutViewWithHook isHome/>
+            )}
             component={HomePage}
             path={UrlCollection.Home}
           />
@@ -156,12 +167,72 @@ function App() {
           <RouteComponent
             exact
             layout={() => (
-              <LayoutViewWithHook title="Phân tích quyết định">
+              <LayoutViewWithHook title="Chuyên mục">
                 <Analysis />
               </LayoutViewWithHook>
             )}
             component={Analysis}
             path={UrlCollection.Analysis}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Phân tích các đối tượng liên quan">
+                <ObjectGeogises />
+              </LayoutViewWithHook>
+            )}
+            component={ObjectGeogises}
+            path={UrlCollection.StatisticsOfObjects}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Tìm kiếm đối tượng trên bản đồ">
+                <ObjectGeogiesSearchOnMapView />
+              </LayoutViewWithHook>
+            )}
+            component={objectGeogiesSearchOnMapView}
+            path={UrlCollection.SearchObjectsOnMap}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Đồng bộ dữ liệu lên hệ thống Bộ Xây Dựng">
+                <PlanningSync isSyncUp/>
+              </LayoutViewWithHook>
+            )}
+            component={Analysis}
+            path={UrlCollection.SyncUpData}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Đồng bộ dữ liệu từ hệ thống Bộ Xây Dựng">
+                <PlanningSync/>
+              </LayoutViewWithHook>
+            )}
+            component={Analysis}
+            path={UrlCollection.SyncDownData}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Cài đặt nguyên tắc đồng bộ dữ liệu - Chuyên mục">
+                <PlanningTypeManagementView isSyncSetting/>
+              </LayoutViewWithHook>
+            )}
+            component={PlanningTypeManagementView}
+            path={UrlCollection.SyncSetting_PlanningType}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Cài đặt nguyên tắc đồng bộ dữ liệu - Quận/ huyện">
+                <DistrictManagement isSyncSetting/>
+              </LayoutViewWithHook>
+            )}
+            component={DistrictManagement}
+            path={UrlCollection.SyncSetting_District}
           />
           <RouteComponent
             exact
@@ -220,7 +291,7 @@ function App() {
           <RouteComponent
             exact
             layout={() => (
-              <LayoutViewWithHook title="Thiết lập hồ sơ">
+              <LayoutViewWithHook title="Quản lý hồ sơ">
                 <DocumentSetting isQHHTKT />
               </LayoutViewWithHook>
             )}
@@ -229,11 +300,38 @@ function App() {
           <RouteComponent
             exact
             layout={() => (
-              <LayoutDetail title="Thiết lập hồ sơ">
+              <LayoutDetail title="Quản lý hồ sơ">
                 <DocumentSettingsPage isQHHTKT />
               </LayoutDetail>
             )}
             path={UrlCollection.QH_HTKT_SETUP_DOCUMENT_DETAIL}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Quản lý chuyên mục">
+                <PlanningTypeManagementView isQHHTKT />
+              </LayoutViewWithHook>
+            )}
+            path={UrlCollection.QHHTKTPlanningTypes}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Quản lý chuyên mục">
+                <PlanningTypeManagementView isQHCC />
+              </LayoutViewWithHook>
+            )}
+            path={UrlCollection.QHCCPlanningTypes}
+          />
+          <RouteComponent
+            exact
+            layout={() => (
+              <LayoutViewWithHook title="Quản lý chuyên mục">
+                <PlanningTypeManagementView isQHT />
+              </LayoutViewWithHook>
+            )}
+            path={UrlCollection.QHTPlanningTypes}
           />
           <RouteComponent
             exact
@@ -323,7 +421,7 @@ function App() {
           <RouteComponent
             exact
             layout={() => (
-              <LayoutViewWithHook title="Thiết lập hồ sơ">
+              <LayoutViewWithHook title="Quản lý hồ sơ">
                 <DocumentSetting isQHCC />
               </LayoutViewWithHook>
             )}
@@ -332,7 +430,7 @@ function App() {
           <RouteComponent
             exact
             layout={() => (
-              <LayoutDetail title="Thiết lập hồ sơ">
+              <LayoutDetail title="Quản lý hồ sơ">
                 <DocumentSettingsPage isQHCC />
               </LayoutDetail>
             )}
@@ -499,7 +597,7 @@ function App() {
           <RouteComponent
             exact
             layout={() => (
-              <LayoutDetail title="Thiết lập hồ sơ">
+              <LayoutDetail title="Quản lý hồ sơ">
                 <DocumentSettingsPage />
               </LayoutDetail>
             )}
@@ -509,7 +607,7 @@ function App() {
           <RouteComponent
             exact
             layout={() => (
-              <LayoutViewWithHook title="Thiết lập hồ sơ">
+              <LayoutViewWithHook title="Quản lý hồ sơ">
                 <DocumentSetting isQHT/>
               </LayoutViewWithHook>
             )}
@@ -763,7 +861,7 @@ function App() {
             exact
             layout={() => (
               <LayoutViewWithHook title="Quản lý tài khoản">
-                <MyAccount isTabletOrMobile={isTabletOrMobile}/>
+                <MyAccount/>
               </LayoutViewWithHook>
             )}
             path={UrlCollection.MyAccount}

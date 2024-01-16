@@ -225,6 +225,7 @@ function ListEmailTemplate(props) {
             handleChangeRowsPerPage={handleChangeRowsPerPage}
             handleChangePage={handleChangePage}
             totalPage={totalPage}
+            totalItemCount={contentModel.totalItemCount}
           />
         ) : (
           ''

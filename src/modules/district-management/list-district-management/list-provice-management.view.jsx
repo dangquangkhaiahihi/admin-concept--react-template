@@ -57,6 +57,7 @@ const headCells = [
   { id: 'longitude', hideSortIcon: false, label: 'Kinh độ' },
   { id: 'latitude', hideSortIcon: false, label: 'Vĩ độ' },
   { id: 'provinceName', hideSortIcon: false, label: 'Tỉnh thành' },
+  { id: 'CSDLQG_Id', hideSortIcon: true, label: 'ID tương ứng của CSDL Quốc Gia' },
   { id: 'createdBy', hideSortIcon: false, label: 'Người tạo' },
   { id: 'createdDate', hideSortIcon: false, label: 'Ngày tạo' },
   { id: 'modifiedBy', hideSortIcon: false, label: 'Người sửa' },
@@ -65,7 +66,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { classes, order, orderBy, onRequestSort } = props;
+  const { classes, order, orderBy, onRequestSort, isSyncSetting } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -73,8 +74,9 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        {headCells.map((headCell) => (
-          <TableCell
+        {headCells.map((headCell) => {
+          if(headCell.id == 'CSDLQG_Id' && !isSyncSetting) return null;
+          return <TableCell
             key={headCell.id}
             sortDirection={orderBy === headCell.id ? order : false}
             className='pt-3 pb-3 text-nowrap'>
@@ -91,7 +93,7 @@ function EnhancedTableHead(props) {
               ) : null}
             </TableSortLabel>
           </TableCell>
-        ))}
+        })}
       </TableRow>
     </TableHead>
   );
@@ -121,6 +123,7 @@ export default function ListDistrictManagement(props) {
     rowsPerPage,
     orderBy,
     deleteAction,
+    isSyncSetting
   } = props;
 
   //--- Config table
@@ -165,6 +168,7 @@ export default function ListDistrictManagement(props) {
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
               rowCount={districtModels.length}
+              isSyncSetting={isSyncSetting}
             />
             <TableBody>
               {districtModels && districtModels.length > 0 ? (
@@ -176,6 +180,7 @@ export default function ListDistrictManagement(props) {
                       <TableCell>{row.longitude}</TableCell>
                       <TableCell>{row.latitude}</TableCell>
                       <TableCell>{row.provinceName}</TableCell>
+                      { isSyncSetting && <TableCell> {row.csdlqG_Id} </TableCell> }
                       <TableCell>{row.createdBy}</TableCell>
                       <TableCell>
                         {row.createdDate
@@ -196,14 +201,17 @@ export default function ListDistrictManagement(props) {
                             <EditIcon className='text-primary' />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title='Xóa'>
-                          <IconButton
-                            aria-label='delete'
-                            onClick={() => deleteAction(row.id)}>
-                            <DeleteIcon className='text-danger' />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
+                        {
+                          !isSyncSetting && 
+                          <Tooltip title='Xóa'>
+                            <IconButton
+                              aria-label='delete'
+                              onClick={() => deleteAction(row.id)}>
+                              <DeleteIcon className='text-danger' />
+                            </IconButton>
+                          </Tooltip>
+                        }
+                        </TableCell>
                     </TableRow>
                   );
                 })
@@ -228,6 +236,7 @@ export default function ListDistrictManagement(props) {
 
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={page + 1}
             rowsPerPage={rowsPerPage}
             handleChangeRowsPerPage={handleChangeRowsPerPage}

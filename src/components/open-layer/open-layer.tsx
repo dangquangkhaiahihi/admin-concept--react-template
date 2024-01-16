@@ -16,6 +16,11 @@ import LayerModels from "../../models/init-map-state/layers";
 import ControlFunctionType from "./control-function-type/control-function-type";
 import TileWMS from "ol/source/TileWMS";
 import { TileLayerClassName } from "../../modules/init-map-data/config/config";
+import WKT from "ol/format/WKT";
+import VectorImageLayer from "ol/layer/VectorImage";
+import VectorSource from "ol/source/Vector";
+import { Fill, Stroke, Style } from "ol/style";
+
 class OpenlayerMapView extends React.Component<
   OpenlayerModelCollect.OpenlayerMapViewPropsModel,
   OpenlayerModelCollect.OpenlayerMapViewStateModel
@@ -26,6 +31,156 @@ class OpenlayerMapView extends React.Component<
       map: null,
       mapContainerStyle: null,
     };
+  }
+
+  functionHightLightPolygon = (listPolygon: any) => {
+    const mapObject: Map = this.state.map;
+    const listLayer = mapObject.getLayers();
+    let _isHaveHighlightVectorlayer = false;
+    const feature: any[] = [];
+
+    listPolygon.map((boundariesData: any) => {
+      const format = new WKT();
+
+      const featureObject = format.readFeature(boundariesData, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:4326',
+      });
+      feature.push(featureObject);
+    });
+
+    listLayer.forEach((_layer) => {
+      if ((_layer instanceof VectorImageLayer) && (_layer.getClassName() === "filter-vectorlayer")) {
+        _isHaveHighlightVectorlayer = true;
+        const _newVectorSource = new VectorSource({
+          features: feature,
+        })
+        _layer.setSource(_newVectorSource)
+      }
+    })
+
+    if (!_isHaveHighlightVectorlayer) {
+      listLayer.push(
+        new VectorImageLayer({
+          className: "filter-vectorlayer",
+          source: new VectorSource({
+            features: feature,
+          }),
+          zIndex: 9000,
+          style: new Style({
+            stroke: new Stroke({
+              color: 'rgba(0,230,241,1)',
+              width: 3,
+            }),
+            fill: new Fill({
+              color: 'rgba(223,16, 188,0.5)',
+            }),
+          }),
+        })
+      )
+    }
+  }
+
+  functionDeleteAllHightlightFilterLayer = () => {
+    const _mapObject: Map = this.state.map;
+    const _layers = _mapObject.getLayers();
+    let _removeIndex = -1;
+    const removeListIndexes :any[] = [];
+    _layers.forEach((_layer, _index) => {
+      if ((_layer instanceof VectorImageLayer) && _layer.getClassName().includes('filter-vectorlayer')) {
+        _removeIndex = _index;
+      }
+      if (_removeIndex !== -1) {
+        removeListIndexes.push(_removeIndex);
+      }
+    })
+    removeListIndexes.reverse(); // Reverse the array to start removing from the highest index
+    removeListIndexes.forEach((_index) => {
+      _layers.removeAt(_index);
+    });
+  }
+
+  functionAddSingleHightLightLayer = (listPolygon: any, index: number, coordinate? : any[]) => {
+    const mapObject: Map = this.state.map;
+    const listLayer = mapObject.getLayers();
+    const feature: any[] = [];
+
+    listPolygon.map((boundariesData: any) => {
+      const format = new WKT();
+
+      const featureObject = format.readFeature(boundariesData, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:4326',
+      });
+      feature.push(featureObject);
+    });
+    
+    listLayer.push(
+      new VectorImageLayer({
+        className: `filter-vectorlayer-${index}`,
+        source: new VectorSource({
+          features: feature,
+        }),
+        zIndex: 9000,
+        style: new Style({
+          stroke: new Stroke({
+            color: 'rgba(0,230,241,1)',
+            width: 3,
+          }),
+          fill: new Fill({
+            color: 'rgba(223,16, 188,0.5)',
+          }),
+        }),
+      })
+    )
+  }
+
+  functionDeleteSingleHightLightLayer = (index: number) => {
+    const _mapObject: Map = this.state.map;
+    const _layers = _mapObject.getLayers();
+    let _removeIndex = -1;
+    _layers.forEach((_layer, _index) => {
+      if ((_layer instanceof VectorImageLayer) && _layer.getClassName() === `filter-vectorlayer-${index}`) {
+        _removeIndex = _index;
+        return;
+      }
+    })
+
+    if (_removeIndex !== -1) {
+      _layers.removeAt(_removeIndex);
+      return;
+    }
+  }
+
+  functionCenterMapAndZoom = (coordinate : any[number], zoom: number) => {
+    const mapObject: Map = this.state.map;
+
+    if(coordinate) {
+      mapObject.getView().setCenter(coordinate);
+      mapObject.getView().setZoom(zoom);
+    }
+  }
+
+  addLayerManually = (tableName: string, isAddedLayer: boolean, zIndex: number) => {
+    const layerImage: any = new ImageLayer({
+      visible: true,
+      zIndex: zIndex,
+      minZoom: 0,
+      maxZoom: 20,
+      source: new ImageWMS({
+        url: 'https://geo.tracuuquyhoachsonla.vn/geoserver/sonla/wms/',
+        params: {
+          LAYERS: `${"sonladev_v2"}:${`${tableName}`}`,
+          LayerId: 100,
+          FORMAT: "image/png",
+          VERSION: "1.1.0",
+        },
+        crossOrigin: 'anonymous'
+      }),
+      className: `added_manually_image_layer_${tableName}`,
+    });
+    this.state.map?.addLayer(layerImage);
+    console.log("getLayers", this.state.map, this.state.map?.getLayers());
   }
 
   outSideHandleFunction = (type: string, option: any) => {
@@ -90,6 +245,43 @@ class OpenlayerMapView extends React.Component<
           }
         }
         break;
+
+      case ControlFunctionType.HightLightPolygon:
+        {
+          this.functionHightLightPolygon(option);
+        }
+        break;
+
+      case ControlFunctionType.Delete_All_HightLightedPolygon:
+        {
+          this.functionDeleteAllHightlightFilterLayer();
+        }
+        break;
+
+      case ControlFunctionType.Add_Single_HightLightedPolygon:
+        {
+          this.functionAddSingleHightLightLayer(option.geo, option.index);
+        }
+        break;
+
+      case ControlFunctionType.Delete_Single_HightLightedPolygon:
+        {
+          this.functionDeleteSingleHightLightLayer(option.index);
+        }
+        break;
+
+      case ControlFunctionType.CenterMapAndZoom:
+        {
+          this.functionCenterMapAndZoom(option.center, option.zoom);
+        }
+        break;
+
+      case ControlFunctionType.AddLayerManually:
+        {
+          this.addLayerManually(option.tableName, option.isAddedLayer, option.zIndex);
+        }
+        break;
+
       default: {
         // console.log('have un set type:' + type)
         // console.log(option)
@@ -111,7 +303,18 @@ class OpenlayerMapView extends React.Component<
         });
       });
     }
-
+    listBaseMap.base_maps.map((baseMap: any) => {
+      if (baseMap.view_default) {
+        DefaultGroupLayer.push(
+          new TileLayer({
+            source: new XYZ({
+              url: baseMap.url,
+              crossOrigin: "anonymous",
+            }),
+          })
+        );
+      }
+    });
     defaultListLayer.map((layerData: any, index: any) => {
       const layerImage: any = new TileLayer({
         visible: layerData.is_check,
@@ -133,18 +336,7 @@ class OpenlayerMapView extends React.Component<
       DefaultGroupLayer.push(layerImage);
     });
 
-    listBaseMap.base_maps.map((baseMap: any) => {
-      if (baseMap.view_default) {
-        DefaultGroupLayer.push(
-          new TileLayer({
-            source: new XYZ({
-              url: baseMap.url,
-              crossOrigin: "anonymous",
-            }),
-          })
-        );
-      }
-    });
+
 
     listLayerGroup.map((layerGroup: any) => {
       layerGroup.layer_settings.map((layer: any) => {
@@ -191,10 +383,11 @@ class OpenlayerMapView extends React.Component<
     });
     this.setState({
       map: mapOpenLayer,
+    }, () => {
+      this.props.setIsDoneConstructMap && this.props.setIsDoneConstructMap(true);
     });
 
     this.props.setMapLayer(mapOpenLayer);
-
     mapOpenLayer.on("moveend", this.onMoveEnd);
   }
 
@@ -203,7 +396,6 @@ class OpenlayerMapView extends React.Component<
     prevState: Readonly<OpenlayerModelCollect.OpenlayerMapViewStateModel>,
     snapshot?: any
   ): void {
-    console.log("sss", this.props.layers.layer_categories);
     let defaultListLayer: any = [];
     if (this.props.layers.haveData) {
       this.props.layers.layer_categories.map((item) => {

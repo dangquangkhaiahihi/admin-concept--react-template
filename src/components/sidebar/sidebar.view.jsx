@@ -12,7 +12,9 @@ import { useHistory } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import PostAddIcon from "@material-ui/icons/PostAdd";
 import AssignmentIcon from "@material-ui/icons/Assignment";
+import * as Icons from "@material-ui/icons";
 import SettingsIcon from "@material-ui/icons/Settings";
+import SyncIcon from '@material-ui/icons/Sync';
 //--- Font Awesome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faSignOutAlt, faChevronDown, faUser } from "@fortawesome/free-solid-svg-icons";
@@ -53,6 +55,7 @@ function Sidebar(props) {
   const [openQLQH, setOpenQLQH] = useState(false);
   const [openQHHTKT, setOpenQHHTKT] = useState(false);
   const [openQHCC, setOpenQHCC] = useState(false);
+  const [openSync, setOpenSync] = useState(false);
 
   useEffect(() => {
     getSettings();
@@ -90,6 +93,12 @@ function Sidebar(props) {
     currentLocation.pathname.includes(
       UrlCollection.PlanningCC
     );
+  const currenIsSyncPage =
+    currentLocation.pathname === UrlCollection.SyncUpData ||
+    currentLocation.pathname === UrlCollection.SyncDownData ||
+    currentLocation.pathname === UrlCollection.SyncSetting_PlanningType ||
+    currentLocation.pathname === UrlCollection.SyncSetting_District;
+    
   const currentIsSliderPage = currentLocation.pathname.includes(
     UrlCollection.Slider
   );
@@ -144,6 +153,10 @@ function Sidebar(props) {
     setOpenQHHTKT(currentIsQHHTKT);
   }, [currentIsQHHTKT]);
 
+  useEffect(() => {
+    setOpenSync(currenIsSyncPage);
+  }, [currenIsSyncPage]);
+
   //media query
   const isDesktopOrLaptop = useMediaQuery({
     query: "(min-width: 1224px)",
@@ -154,28 +167,28 @@ function Sidebar(props) {
   const isRetina = useMediaQuery({ query: "(min-resolution: 2dppx)" });
 
   const reactMediaQuery = {
-    isDesktopOrLaptop:isDesktopOrLaptop,
-    isBigScreen:isBigScreen,
-    isTabletOrMobile:isTabletOrMobile,
-    isPortrait:isPortrait,
-    isRetina:isRetina
+    isDesktopOrLaptop: isDesktopOrLaptop,
+    isBigScreen: isBigScreen,
+    isTabletOrMobile: isTabletOrMobile,
+    isPortrait: isPortrait,
+    isRetina: isRetina
   }
 
-  console.log('Sidebar reactMediaQuery :  ',reactMediaQuery);
+  console.log('Sidebar reactMediaQuery :  ', reactMediaQuery);
 
   const getSideBarClassName = () => {
     var className = "";
     // Class cho desktop
-    if(isDesktopOrLaptop){
+    if (isDesktopOrLaptop) {
       className += 'aside';
-      if(isCollapsed){
+      if (isCollapsed) {
         className += ' toggled';
       }
     }
 
-    if(isTabletOrMobile){
+    if (isTabletOrMobile) {
       className = 'overlay__wrapper';
-      if(!isCollapsed){
+      if (!isCollapsed) {
         className += '';
       }
     }
@@ -184,11 +197,11 @@ function Sidebar(props) {
 
   const getSideBarInlineStyle = () => {
     //style for tablet and mobile
-    if(isTabletOrMobile){ 
-      if(isCollapsed){
-        return {display:"none"}
+    if (isTabletOrMobile) {
+      if (isCollapsed) {
+        return { display: "none" }
       }
-      return {display: "block"}
+      return { display: "block" }
     }
   }
 
@@ -197,9 +210,9 @@ function Sidebar(props) {
     // if(isTabletOrMobile){
     //   return style;
     // }
-    if(isDesktopOrLaptop){
-      if(isCollapsed){
-        return {width:'100%'}
+    if (isDesktopOrLaptop) {
+      if (isCollapsed) {
+        return { width: '100%' }
       }
     }
   }
@@ -211,8 +224,8 @@ function Sidebar(props) {
   const getScreenAllow = () => {
     accAction.GetScreenAllow().then(res => {
       setScreenAllow(modules.filter(item => {
-        if(res.content.some(x => x.code === item.code))
-        return item
+        if (res.content.some(x => x.code === item.code))
+          return item
       }))
     }).catch(error => console.log(error))
   }
@@ -226,13 +239,13 @@ function Sidebar(props) {
     window.location.replace(DomainAdminSide);
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     if (isTabletOrMobile) {
       getScreenAllow();
     }
-  },[])
+  }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
     if (!isTabletOrMobile) return;
     if (isLogin && user && user.userRole) {
       if (user.email.toLowerCase() === "xinykien_sonla@gmail.com")
@@ -247,29 +260,30 @@ function Sidebar(props) {
       setCookies(TokenKey.returnUrl, window.location.href);
       window.location.replace(DomainAdminSide + "/dang-nhap");
     }
-  },[])
+  }, [])
 
   console.log("SIDEBAR : ", user, screenAllow);
 
   return clientSetting ? (
-    <div id="sidebar-custom" className={getSideBarClassName()}  
+    <div id="sidebar-custom" className={getSideBarClassName()}
       style={getSideBarInlineStyle()} >
       {
-        isTabletOrMobile && 
+        isTabletOrMobile &&
         <div className="d-flex justify-content-end close-btn">
-          <a href='#' onClick={() => {collapseSidebar();setToggle();}} >
-              &times;
+          <a href='#' onClick={() => { collapseSidebar(); setToggle(); }} >
+            &times;
           </a>
         </div>
       }
-      
+
       {
-        isTabletOrMobile && 
+        isTabletOrMobile &&
         <div className="d-flex flex-column overlay__avatar-section">
-          <div className="d-flex justify-content-center row overlay__avatar" style={{width:'100%'}}>
+          <div className="d-flex justify-content-center row overlay__avatar" style={{ width: '100%' }}>
             <a
               className="nav-link col-6"
               href="#"
+              style={{textAlign: 'center'}}
             >
               <img
                 className="img-profile rounded-circle"
@@ -277,16 +291,20 @@ function Sidebar(props) {
                   user && user.avatar && user.avatar !== "null"
                     ? APIUrlDefault + user.avatar
                     : process.env.PUBLIC_URL + "/user-default.png"
-                } 
+                }
                 alt="avatar-img"
-                style={{width:'100%'}}
+                style={{ width: '50%' }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = require('../../assets/icon/logo.png');
+                }}
               />
             </a>
           </div>
           <div className="row overlay__avatar-buttons">
-            <div className="col-1">{}</div>
-            <div className="col-5 d-flex flex-column justify-content-end overlay__avatar-button" 
-              style={{borderRight:'solid 1px'}}
+            <div className="col-1">{ }</div>
+            <div className="col-5 d-flex flex-column justify-content-end overlay__avatar-button"
+              style={{ borderRight: 'solid 1px' }}
             >
               <FontAwesomeIcon
                 icon={faUser}
@@ -297,7 +315,7 @@ function Sidebar(props) {
               </Link>
             </div>
             <div className="col-6 d-flex flex-column justify-content-start overlay__avatar-button"
-              onClick={onLogout} style={{borderLeft:'solid 1px'}}
+              onClick={onLogout} style={{ borderLeft: 'solid 1px' }}
             >
               <FontAwesomeIcon
                 icon={faSignOutAlt}
@@ -312,8 +330,8 @@ function Sidebar(props) {
       }
 
       <div
-        onMouseEnter={isDesktopOrLaptop ? onMouseEnter : ()=>{}}
-        onMouseLeave={isDesktopOrLaptop ? onMouseLeave : ()=>{}}
+        onMouseEnter={isDesktopOrLaptop ? onMouseEnter : () => { }}
+        onMouseLeave={isDesktopOrLaptop ? onMouseLeave : () => { }}
       >
         <ul
           className={
@@ -328,7 +346,7 @@ function Sidebar(props) {
           {isShowQHDT && (
             <>
               <li className="nav-item overlay__menu__item">
-                <div className={`nav-link overlay__menu-link__wrapper ${currentIsHomePage && "is-active"}`} style={!isCollapsed ? {display: 'flex',width: '100%'} : {}} 
+                <div className={`nav-link overlay__menu-link__wrapper ${currentIsHomePage && "is-active"}`} style={!isCollapsed ? { display: 'flex', width: '100%' } : {}}
                   onClick={() => {
                     setSubMenuOpen(false)
                   }}
@@ -354,24 +372,24 @@ function Sidebar(props) {
                       <AssignmentIcon fontSize="small" className="mr-2" />
                     </div>
                     <a to={UrlCollection.PlanningAnnouncementProcess}
-                      // style={isTabletOrMobile ? {display:'flex',justifyContent: 'start'} : {}}
+                    // style={isTabletOrMobile ? {display:'flex',justifyContent: 'start'} : {}}
                     >
                       {!isCollapsed && <span>Quản lý quy hoạch</span>}
                     </a>
                     {!isCollapsed ? (
-                        <span className="overlay__submenu-list__title-chevron aside__submenu-list__title-chevron">
-                          <FontAwesomeIcon
-                            icon={faChevronRight}
-                            className="float-right mt-1 chevron"
-                          />
-                          <FontAwesomeIcon
-                            icon={faChevronDown}
-                            className="float-right mt-1 chevron"
-                          />
-                        </span>
+                      <span className="overlay__submenu-list__title-chevron aside__submenu-list__title-chevron">
+                        <FontAwesomeIcon
+                          icon={faChevronRight}
+                          className="float-right mt-1 chevron"
+                        />
+                        <FontAwesomeIcon
+                          icon={faChevronDown}
+                          className="float-right mt-1 chevron"
+                        />
+                      </span>
                     ) : null}
                   </div>
-                
+
                   <div className="overlay__submenu-list__content-wrapper">
                     {/* {
                       isTabletOrMobile && <div className="overlay__submenu-list__content-blank-div"></div>
@@ -398,7 +416,7 @@ function Sidebar(props) {
                       <li>
                         <LinkSubMenu
                           pageLink={UrlCollection.DocumentSetting}
-                          title="Thiết lập hồ sơ"
+                          title="Quản lý hồ sơ"
                         />
                       </li>
                       <li>
@@ -407,13 +425,19 @@ function Sidebar(props) {
                           title="Tin tức"
                         />
                       </li>
+                      <li>
+                        <LinkSubMenu
+                          pageLink={UrlCollection.QHTPlanningTypes}
+                          title="Chuyên mục"
+                        />
+                      </li>
                     </ul>
                   </div>
                 </div>
               </li>
               <li className={`nav-item overlay__menu__item ${openQHCC && !isCollapsed ? "is-open" : ""}`}>
                 <div className="overlay__submenu-list__wrapper">
-                  <div className={`nav-link overlay__submenu-list__title-wrapper ${currentIsPlanningCCPage && "is-active"}`} 
+                  <div className={`nav-link overlay__submenu-list__title-wrapper ${currentIsPlanningCCPage && "is-active"}`}
                     onClick={() => {
                       history.push(UrlCollection.PlanningCC);
                       setOpenQHCC(!openQHCC);
@@ -464,13 +488,19 @@ function Sidebar(props) {
                       <li>
                         <LinkSubMenu
                           pageLink={UrlCollection.DocumentPlanningCC}
-                          title="Thiết lập hồ sơ"
+                          title="Quản lý hồ sơ"
                         />
                       </li>
                       <li>
                         <LinkSubMenu
                           pageLink={UrlCollection.QHCCNews}
                           title="Tin tức"
+                        />
+                      </li>
+                      <li>
+                        <LinkSubMenu
+                          pageLink={UrlCollection.QHCCPlanningTypes}
+                          title="Chuyên mục"
                         />
                       </li>
                     </ul>
@@ -480,29 +510,29 @@ function Sidebar(props) {
               <li className={`nav-item overlay__menu__item ${openQHHTKT && !isCollapsed ? "is-open" : ""}`}>
                 <div className="overlay__submenu-list__wrapper">
                   <div className={`nav-link overlay__submenu-list__title-wrapper ${currentIsQHHTKT && "is-active"}`}
-                      onClick={() => {
-                        history.push(UrlCollection.QH_HTKT);
-                        setOpenQHHTKT(!openQHHTKT);
-                      }}
+                    onClick={() => {
+                      history.push(UrlCollection.QH_HTKT);
+                      setOpenQHHTKT(!openQHHTKT);
+                    }}
                   >
-                      <div className="overlay__submenu-list__title-icon aside__submenu-list__title-icon">
-                        <AssignmentIcon fontSize="small" className="mr-2" />
-                      </div>
-                      <a to={UrlCollection.QH_HTKT}>
-                        {!isCollapsed && <span>Nội dung QH hạ tầng kỹ thuật</span>}
-                      </a>
-                      {!isCollapsed ? (
-                        <span className="overlay__submenu-list__title-chevron aside__submenu-list__title-chevron">
-                          <FontAwesomeIcon
-                            icon={faChevronRight}
-                            className="float-right mt-1 chevron"
-                          />
-                          <FontAwesomeIcon
-                            icon={faChevronDown}
-                            className="float-right mt-1 chevron"
-                          />
-                        </span>
-                      ) : null}
+                    <div className="overlay__submenu-list__title-icon aside__submenu-list__title-icon">
+                      <AssignmentIcon fontSize="small" className="mr-2" />
+                    </div>
+                    <a to={UrlCollection.QH_HTKT}>
+                      {!isCollapsed && <span>Nội dung QH hạ tầng kỹ thuật</span>}
+                    </a>
+                    {!isCollapsed ? (
+                      <span className="overlay__submenu-list__title-chevron aside__submenu-list__title-chevron">
+                        <FontAwesomeIcon
+                          icon={faChevronRight}
+                          className="float-right mt-1 chevron"
+                        />
+                        <FontAwesomeIcon
+                          icon={faChevronDown}
+                          className="float-right mt-1 chevron"
+                        />
+                      </span>
+                    ) : null}
                   </div>
                   <div className="overlay__submenu-list__content-wrapper">
                     {/* {
@@ -530,7 +560,7 @@ function Sidebar(props) {
                       <li>
                         <LinkSubMenu
                           pageLink={UrlCollection.QH_HTKT_SETUP_DOCUMENT}
-                          title="Thiết lập hồ sơ"
+                          title="Quản lý hồ sơ"
                         />
                       </li>
                       <li>
@@ -539,12 +569,18 @@ function Sidebar(props) {
                           title="Tin tức"
                         />
                       </li>
+                      <li>
+                        <LinkSubMenu
+                          pageLink={UrlCollection.QHHTKTPlanningTypes}
+                          title="Chuyên mục"
+                        />
+                      </li>
                     </ul>
                   </div>
                 </div>
               </li>
               <li className="nav-item overlay__menu__item">
-                <div className={`nav-link overlay__menu-link__wrapper ${currentIsOtherPlanningPage && "is-active"}`} style={!isCollapsed ? {display: 'flex',width: '100%',borderBottom:`${isDesktopOrLaptop ? '' : 'solid 1px'}`} : {}} 
+                <div className={`nav-link overlay__menu-link__wrapper ${currentIsOtherPlanningPage && "is-active"}`} style={!isCollapsed ? { display: 'flex', width: '100%', borderBottom: `${isDesktopOrLaptop ? '' : 'solid 1px'}` } : {}}
                   onClick={() => {
                     history.push(UrlCollection.OtherPlanning);
                   }}
@@ -552,9 +588,70 @@ function Sidebar(props) {
                   <div className="overlay__menu-link__icon" style={getIconMenuInlineStyle()}>
                     <AssignmentIcon fontSize="small" className="mr-2" />
                   </div>
-                  <a to={UrlCollection.OtherPlanning} style={isTabletOrMobile ? {fontSize:'0.85rem'} : {}}>
+                  <a to={UrlCollection.OtherPlanning} style={isTabletOrMobile ? { fontSize: '0.85rem' } : {}}>
                     {!isCollapsed && <span>Quy hoạch khác</span>}
                   </a>
+                </div>
+              </li>
+              <li className={`nav-item overlay__menu__item ${openSync && !isCollapsed ? "is-open" : ""}`}>
+                <div className="overlay__submenu-list__wrapper">
+                  <div className={`nav-link overlay__submenu-list__title-wrapper ${openSync && "is-active"}`}
+                    onClick={() => {
+                      //history.push(UrlCollection.SyncUpData);
+                      setOpenSync(!openSync);
+                    }}
+                  >
+                    <div className="overlay__submenu-list__title-icon aside__submenu-list__title-icon">
+                      <SyncIcon fontSize="small" className="mr-2" />
+                    </div>
+                    {/* <a to={UrlCollection.SyncUpData}>
+                        {!isCollapsed && <span>Đồng bộ dữ liệu</span>}
+                      </a> */}
+                    {!isCollapsed ? (
+                      <><span>Đồng bộ dữ liệu</span>
+                      <span className="overlay__submenu-list__title-chevron aside__submenu-list__title-chevron">
+                        <FontAwesomeIcon
+                          icon={faChevronRight}
+                          className="float-right mt-1 chevron"
+                        />
+                        <FontAwesomeIcon
+                          icon={faChevronDown}
+                          className="float-right mt-1 chevron"
+                        />
+                      </span></>
+                    ) : null}
+                  </div>
+                  <div className="overlay__submenu-list__content-wrapper">
+                    {/* {
+                      isTabletOrMobile && <div className="overlay__submenu-list__content-blank-div"></div>
+                    } */}
+                    <ul className="aside__menu-sub overlay__submenu-list__content">
+                      <li>
+                        <LinkSubMenu
+                          pageLink={UrlCollection.SyncUpData}
+                          title="Đồng bộ lên hệ thống"
+                        />
+                      </li>
+                      <li>
+                        <LinkSubMenu
+                          pageLink={UrlCollection.SyncDownData}
+                          title="Đồng bộ từ hệ thống"
+                        />
+                      </li>
+                      <li>
+                        <LinkSubMenu
+                          pageLink={UrlCollection.SyncSetting_PlanningType}
+                          title="Cài đặt nguyên tắc đồng bộ - Chuyên mục"
+                        />
+                      </li>
+                      <li>
+                        <LinkSubMenu
+                          pageLink={UrlCollection.SyncSetting_District}
+                          title="Cài đặt nguyên tắc đồng bộ - Quận/ huyện"
+                        />
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </li>
             </>
@@ -572,14 +669,34 @@ function Sidebar(props) {
           </li> */}
           {isShowPTQD && (
             <li className="nav-item overlay__menu__item">
-              <div className={`nav-link overlay__menu-link__wrapper ${currentIsPTQD && "is-active"}`} style={!isCollapsed ? {display: 'flex',width: '100%',borderBottom:`${isDesktopOrLaptop ? '' : 'solid 1px'}`} : {}} 
+              <div className={`nav-link overlay__menu-link__wrapper ${currentIsPTQD && "is-active"}`} style={!isCollapsed ? { display: 'flex', width: '100%'} : {}}
                 onClick={() => setSubMenuOpen(false)}
               >
                 <div className="overlay__menu-link__icon" style={getIconMenuInlineStyle()}>
                   <AssignmentIcon fontSize="small" className="mr-2" />
                 </div>
-                <Link to="/ptqd" style={isTabletOrMobile ? {fontSize:'0.85rem'} : {}}>
-                  {!isCollapsed && <span>Phân tích - quyết định</span>}
+                <Link to={UrlCollection.Analysis} style={isTabletOrMobile ? { fontSize: '0.85rem' } : {}}>
+                  {!isCollapsed && <span>Chuyên mục</span>}
+                </Link>
+              </div>
+              <div className={`nav-link overlay__menu-link__wrapper ${currentIsPTQD && "is-active"}`} style={!isCollapsed ? { display: 'flex', width: '100%', borderBottom: `${isDesktopOrLaptop ? '' : 'solid 1px'}`} : {}}
+                onClick={() => setSubMenuOpen(false)}
+              >
+                <div className="overlay__menu-link__icon" style={getIconMenuInlineStyle()}>
+                  <Icons.CompareArrowsRounded fontSize="small" className="mr-2" />
+                </div>
+                <Link to={UrlCollection.StatisticsOfObjects} style={isTabletOrMobile ? { fontSize: '0.85rem' } : {}}>
+                  {!isCollapsed && <span>Phân tích các đối tượng liên quan</span>}
+                </Link>
+              </div>
+              <div className={`nav-link overlay__menu-link__wrapper ${currentIsPTQD && "is-active"}`} style={!isCollapsed ? { display: 'flex', width: '100%', borderBottom: `${isDesktopOrLaptop ? '' : 'solid 1px'}`} : {}}
+                onClick={() => setSubMenuOpen(false)}
+              >
+                <div className="overlay__menu-link__icon" style={getIconMenuInlineStyle()}>
+                  <Icons.Map fontSize="small" className="mr-2" />
+                </div>
+                <Link to={UrlCollection.SearchObjectsOnMap} style={isTabletOrMobile ? { fontSize: '0.85rem' } : {}}>
+                  {!isCollapsed && <span>Tìm kiếm đối tượng trên bản đồ</span>}
                 </Link>
               </div>
             </li>
@@ -609,21 +726,21 @@ function Sidebar(props) {
                     <SettingsIcon fontSize="small" className="mr-2" />
                   </div>
                   <a to={'#'}
-                    // style={isTabletOrMobile ? {display:'flex',justifyContent: 'start'} : {}}
+                  // style={isTabletOrMobile ? {display:'flex',justifyContent: 'start'} : {}}
                   >
                     {!isCollapsed && <span>Administrator</span>}
                   </a>
                   {!isCollapsed ? (
-                      <span className="overlay__submenu-list__title-chevron aside__submenu-list__title-chevron">
-                        <FontAwesomeIcon
-                          icon={faChevronRight}
-                          className="float-right mt-1 chevron"
-                        />
-                        <FontAwesomeIcon
-                          icon={faChevronDown}
-                          className="float-right mt-1 chevron"
-                        />
-                      </span>
+                    <span className="overlay__submenu-list__title-chevron aside__submenu-list__title-chevron">
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        className="float-right mt-1 chevron"
+                      />
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        className="float-right mt-1 chevron"
+                      />
+                    </span>
                   ) : null}
                 </div>
                 <div className="overlay__submenu-list__content-wrapper">
@@ -770,7 +887,7 @@ function Sidebar(props) {
                   </ul>
                 </div>
               </div>
-              
+
               {/* <div className={`nav-link ${currentIsAdministratorPages && "is-active"}`} style={!isCollapsed ? {display: 'flex',width: '100%'} : {}} 
                 onClick={() => {
                   history.push(UrlCollection.EmailTemplate);
@@ -802,12 +919,12 @@ function Sidebar(props) {
           {isDesktopOrLaptop && <hr className="sidebar-divider d-none d-md-block" />}
 
           {isTabletOrMobile && (
-            screenAllow.map((x,index) => (
+            screenAllow.map((x, index) => (
               <li key={`nav-key-${index}`} className="nav-item overlay__menu__item">
-                <div className={`nav-link overlay__menu-link__wrapper ${currentIsPTQD && "is-active"}`} style={!isCollapsed ? {display: 'flex',width: '100%'} : {}} 
+                <div className={`nav-link overlay__menu-link__wrapper ${currentIsPTQD && "is-active"}`} style={!isCollapsed ? { display: 'flex', width: '100%' } : {}}
                   onClick={() => setSubMenuOpen(false)}
                 >
-                  <div style={isTabletOrMobile ? {alignSelf:'center', flex:'auto',display:'flex',justifyContent: 'center', flexGrow:0, flexShrink:0, flexBasis:'10%'} : {}}>
+                  <div style={isTabletOrMobile ? { alignSelf: 'center', flex: 'auto', display: 'flex', justifyContent: 'center', flexGrow: 0, flexShrink: 0, flexBasis: '10%' } : {}}>
                     {/* <AssignmentIcon fontSize="small" className="mr-2" /> */}
                     <img
                       src={x.logo}
@@ -815,7 +932,7 @@ function Sidebar(props) {
                       style={{ width: 15, height: 15 }}
                     />
                   </div>
-                  <a href={x.url} target={x.url === UrlCollection.PAHT ? "_blank" : ""} style={{fontSize:'0.85rem'}}>
+                  <a href={x.url} target={x.url === UrlCollection.PAHT ? "_blank" : ""} style={{ fontSize: '0.85rem' }}>
                     {x.title}
                   </a>
                 </div>
@@ -824,7 +941,7 @@ function Sidebar(props) {
           )}
         </ul>
       </div>
-      
+
       <div className={(isTabletOrMobile ? ' footer-menu-mobile' : ' d-flex flex-column sidebar sidebar-dark w-100')}>
         <div class="copyright">
           <p>{clientSetting?.copyright}</p>

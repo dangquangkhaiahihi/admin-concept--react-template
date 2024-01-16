@@ -85,7 +85,6 @@ function ProviceManagement(props) {
   };
 
   const handleCloseEditDialog = () => {
-    GetListProvince();
     setOpenEditDialog(false);
   };
 
@@ -143,7 +142,7 @@ function ProviceManagement(props) {
       (res) => {
         proviceAction.DeleteProvincePaht(proviceId)
         if (res && res.content && res.content.status) {
-          GetListProvince(1, rowsPerPage, orderBy ? orderBy + " " + order : "", name);
+          GetListProvince(page + 1, rowsPerPage, orderBy ? orderBy + " " + order : "", name);
           handleCloseDeleteDialog();
           ShowNotification(viVN.Success.DeleteProvince, NotificationMessageType.Success);
         }
@@ -270,32 +269,18 @@ function ProviceManagement(props) {
           setOrder={setOrder}
           setOrderBy={setOrderBy}
           showLoading={showLoading}
+          orderBy={orderBy}
+          order={order}
+          searchCriteria={{'page':page,'name':name}}
         />
       )}
       {openDeleteDialog ? (
-        <DeleteDialog isOpen={openDeleteDialog} rowsPerPageCommon={rowsPerPage} onClose={handleCloseDeleteDialog} onSuccess={handleDelete} />
-      ) : (
-        ""
-      )}
-      {/* {openDeleteDialog && (status ?
         <DeleteDialog
           isOpen={openDeleteDialog}
+          rowsPerPageCommon={rowsPerPage}
           onClose={handleCloseDeleteDialog}
-          onSuccess={}
-          header={"Tài khoản này sẽ đang bị khoá"}
-          content={"Bạn có muốn mở khoá tài khoản này không?"}
-          btnName={"Mở khoá tài khoản"}
-        />
-        :
-        <DeleteDialog
-          isOpen={openDeleteDialog}
-          onClose={handleCloseDeleteDialog}
-          onSuccess={}
-          header={"Tài khoản này đang được hoạt động"}
-          content={"Bạn có muốn khoá tài khoản này không?"}
-          btnName={"Khoá tài khoản"}
-        />)
-      } */}
+          onSuccess={handleDelete}
+        />) : ( "" )}
     </div>
   );
 }

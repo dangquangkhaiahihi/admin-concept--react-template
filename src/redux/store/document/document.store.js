@@ -37,3 +37,16 @@ export const DownloadFile = (id) => {
     params.set('id', id);
     return service.getBinary(ApiUrl.DownloadFile, params).then(response => { return response }).catch(error => { return error });
 }
+
+export const GetStatisticByPlanningId = (id) => {
+    const params = new URLSearchParams();
+    params.append("planningId", id);
+    return service
+      .get(ApiUrl.GetStatisticByPlanningId, params)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  };

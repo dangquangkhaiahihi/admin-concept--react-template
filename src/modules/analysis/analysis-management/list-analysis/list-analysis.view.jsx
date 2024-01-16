@@ -13,11 +13,13 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Paper from "@material-ui/core/Paper";
 
 import EditIcon from "@material-ui/icons/Edit";
+import MapIcon from "@material-ui/icons/Map";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import FooterPagination from "../../../../components/footer-pagination/footer-pagination";
+import { useMediaQuery } from "react-responsive";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,7 +31,10 @@ const useStyles = makeStyles((theme) => ({
   },
   tableContainer: {
     // maxHeight: window.outerHeight - 365,
-    overflow: "visible",
+    maxHeight: `calc(100vh - 450px)`,
+    '@media (max-width: 1224px)': {
+      maxHeight:'50vh',
+    }
   },
   table: {
     minWidth: 750,
@@ -52,10 +57,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const headCells = [
+  { id: "name", hideSortIcon: false, label: "Tên chuyên mục" },
   { id: "planning_id", hideSortIcon: false, label: "Quy hoạch" },
-  { id: "name", hideSortIcon: false, label: "Nội dung phân tích" },
   { id: "createdBy", hideSortIcon: false, label: "Người tạo" },
   { id: "modifiedDate", hideSortIcon: false, label: "Thời gian cập nhật" },
+  { id: "isCheck", hideSortIcon: false, label: "Kiểm tra" },
   { id: "actions", hideSortIcon: true, label: "" },
 ];
 
@@ -78,8 +84,8 @@ const ListAnalysis = ({
   const classes = useStyles();
 
   useEffect(() => {
-    document.querySelector(".right-content").style.removeProperty("overflow-y");
-    document.querySelector(".right-content").style.overflow = "visible";
+    // document.querySelector(".right-content").style.removeProperty("overflow-y");
+    // document.querySelector(".right-content").style.overflow = "visible";
   }, []);
 
   const handleRequestSort = (_event, property) => {
@@ -130,14 +136,26 @@ const ListAnalysis = ({
                         backgroundColor: index % 2 ? "#FFFFFF" : "#EEF0F2",
                       }}
                     >
-                      <TableCell id={`planning-id-${row.planningId}`}>{row.planningName}</TableCell>
                       <TableCell id={`name-${index}`}>{row.name}</TableCell>
-                
+                      <TableCell id={`planning-id-${row.planningId}`}>{row.planningName}</TableCell>
                       <TableCell id={`createdBy-${index}`}>
                         {row.createdBy}
                       </TableCell>
                       <TableCell id={`modifiedDate-${index}`}>
                         {dateformat(row.modifiedDate, "dd/mm/yyyy")}
+                      </TableCell>
+                      <TableCell id={`isCheck-${index}`}>
+                        <h6>
+                          {row.isCheck ? (
+                            <span className="badge badge-success p-2 text-uppercase">
+                              Đã kiểm tra
+                            </span>
+                          ) : (
+                            <span className="badge badge-warning p-2 text-uppercase">
+                              Chưa kiểm tra
+                            </span>
+                          )}
+                        </h6>
                       </TableCell>
                       <TableCell
                         id={`actions-${index}`}
@@ -145,6 +163,16 @@ const ListAnalysis = ({
                         className="text-nowrap"
                       >
                         <Tooltip title="Sửa">
+                          <IconButton
+                            aria-label="edit"
+                            onClick={
+                              () => editAction(row.id)
+                            }
+                          >
+                            <EditIcon className="text-primary" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Tạo bản đồ">
                           <IconButton
                             aria-label="edit"
                             onClick={
@@ -158,7 +186,7 @@ const ListAnalysis = ({
                                 )
                               }
                           >
-                            <EditIcon className="text-primary" />
+                            <MapIcon className="text-primary" />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Xóa">
@@ -194,6 +222,7 @@ const ListAnalysis = ({
 
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={page + 1}
             rowsPerPage={rowsPerPage}
             handleChangeRowsPerPage={handleChangeRowsPerPage}
@@ -212,6 +241,15 @@ const EnhancedTableHead = ({ classes, order, orderBy, onRequestSort }) => {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
+
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1224px)",
+  });
+  const isBigScreen = useMediaQuery({ query: "(min-width: 1824px)" });
+  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
+  const isRetina = useMediaQuery({ query: "(min-resolution: 2dppx)" });
+
   return (
     <TableHead>
       <TableRow>
@@ -219,7 +257,11 @@ const EnhancedTableHead = ({ classes, order, orderBy, onRequestSort }) => {
           <TableCell
             key={headCell.id}
             sortDirection={orderBy === headCell.id ? order : false}
-            className={`pt-3 pb-3 text-nowrap ${classes.stickyHeader}`}
+            // className={`pt-3 pb-3 text-nowrap`}
+            className={
+              "pt-3 pb-3 text-nowrap " +
+              ((headCell.id === "planningName" && isDesktopOrLaptop) ? "MuiTableCell-freeze" : "")
+            }
           >
             <TableSortLabel
               active={orderBy === headCell.id}

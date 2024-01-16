@@ -6,7 +6,7 @@ export const ApiUrl = {
   ResetPassword: "​api​/Account​/ResetPassword",
   GetUserAccountDetail: "api/Account/GetUserAccountDetail",
   UpdateUserAccountDetail: "api/admin/Account/UpdateUserAccount",
-  UpdateUserAccountPassword: "/api/Account/ChangePassword",
+  UpdateUserAccountPassword: "/api/Account/ChangeUserPassword",
   GetScreenAllow: "api/admin/Permission/GetScreenAlow",
 
   //--- Email Generated
@@ -61,6 +61,7 @@ export const ApiUrl = {
   UpdateLayerLevel: "/api/admin/Layer/UpdateLevel",
   GetDetailLayer: "api/admin/Layer/GetDetail",
   AutoCuPlanning: "api/admin/Planning/AutoCreateOrUpdatePlanning",
+  CreateBaseOnExistLayer: "api/admin/Layer/CreateBaseOnExistLayer",
 
   //LayerCategory
   CreateLayerCategory: "api/admin/LayerCategory/Create",
@@ -163,10 +164,10 @@ export const ApiUrl = {
   DownloadDocument: "api/admin/Document/DownloadDocument",
   GetAllFolder: "api/admin/Document/ListAllFolder",
   GetDocumentByFolder: "api/admin/Document/GetDocumentByFolder",
-
+  GetStatisticByPlanningId : "api/admin/Document/GetStatisticByPlanningId",
+  
   // CommuneManagement
   GetListCommune: "api/admin/Administrative/GetListCommune",
-  GetDetailCommune: "api/admin/Administrative/GetDetailCommune",
   GetDetailCommune: "api/admin/Administrative/GetDetailCommune",
   CreateCommune: "api/admin/Administrative/CreateCommune",
   UpdateCommune: "api/admin/Administrative/UpdateCommune",
@@ -188,6 +189,18 @@ export const ApiUrl = {
   UpdateDistrictPaht: 'api/admin/District/Update',
   DeleteDistrictPaht: 'api/admin/District/Delete',
 
+  // Planning Type Management
+  
+  GetListPlanningType: "/api/admin/PlanningType/GetListAll",
+  CreatePlanningType: "/api/admin/PlanningType/Create",
+  UpdatePlanningType: "/api/admin/PlanningType/Update",
+  DeletePlanningType: "/api/admin/PlanningType/Delete",
+  GetDetailPlanningType: "/api/admin/PlanningType/GetDetail",
+
+  //Year Statement
+  GetYearStatement: '/api/cms/Planning/get-all-year-statment',
+
+  GetLookUpObjectKind: '/api/cms/Common/GetLookUpObjectKind',
   // ProvinceManagement
   GetListProvince: "api/admin/Administrative/GetListProvince",
   GetDetailProvince: "api/admin/Administrative/GetDetailProvince",
@@ -356,6 +369,11 @@ export const ApiUrl = {
     AnalysisUpdate: "api/admin/Analysis/Update",
     AnalysisDelete: "api/admin/Analysis/Delete/{id}",
     AnalysisCreate: "api/admin/Analysis/Create",
+    
+    //Object Geogises
+    GetStatisticsOfObjects: "/api/admin/Dashboard/GetStatisticsOfObjects",
+    GetObjectGeogisOnMap: '/api/admin/Dashboard/GetObjectGeogis',
+
     //AnalysisNote
     AnalysisNoteGetListAll: "api/admin/AnalysisNote/GetListAll",
     AnalysisNoteGetDetail: "api/admin/AnalysisNote/GetDetail/{id}",
@@ -369,5 +387,17 @@ export const ApiUrl = {
     AnalysisSubUpdate: "api/admin/AnalysisSubmap/Update",
     AnalysisSubDelete: "api/admin/AnalysisSubmap/Delete",
     AnalysisSubCreate: "api/admin/AnalysisSubmap/Create",
-  
+    //PlanningSync
+    PlanningSyncCheckLogin: "api/admin/PlanningSync/CheckLogin",
+    PlanningSync: "api/admin/PlanningSync/Sync",
+    PlanningSyncUpdate: "api/admin/PlanningSync/Update",
+    PlanningSyncMany: "api/admin/PlanningSync/SyncMany",
+    PlanningSyncGetDetail: "api/admin/PlanningSync/GetDetail/{id}",
+    GetListPlanningSyncUp: "api/admin/PlanningSync/GetListPlanningSyncUp",
+    StatisticPlanningSyncUp : "api/admin/PlanningSync/StatisticPlanningSyncUp",
+    GetListPlanningSyncDown: "api/admin/PlanningCrawl/GetListPlanningSyncDown",
+    //PlanningCrawl
+    PlanningCrawlData: "api/admin/PlanningCrawl/CrawlData",
+    PlanningSyncDown: "api/admin/PlanningCrawl/Sync",
+    PlanningSyncRemoveConection: "api/admin/PlanningSync/RemoveConection",
 };

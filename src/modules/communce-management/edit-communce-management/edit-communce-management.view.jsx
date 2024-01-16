@@ -53,6 +53,9 @@ export default function EditCommuneManagement(props) {
     GetListCommuneManagement,
     rowsPerPage,
     showLoading,
+    orderBy,
+    order,
+    searchCriteria
   } = props;
 
   const [proviceSelect, setProviceSelect] = useState();
@@ -166,9 +169,10 @@ export default function EditCommuneManagement(props) {
       .then((res) => {
         communeAction.UpdateCommunePaht(communeModelInput);
         if (res) {
-          setOrder("desc");
-          setOrderBy("modifiedDate");
-          GetListCommuneManagement(1, rowsPerPage);
+          // setOrder("desc");
+          // setOrderBy("modifiedDate");
+          // GetListCommuneManagement(1, rowsPerPage);
+          GetListCommuneManagement(searchCriteria.page + 1, rowsPerPage, orderBy + " " + order, searchCriteria.name);
           onSuccess();
           ShowNotification(
             viVN.Success.EditCommune,
@@ -194,6 +198,10 @@ export default function EditCommuneManagement(props) {
   const handleChooseDistrict = (event) => {
     setDistrictId(event.target.value);
     setValue("districtId", event.target.value);
+  };
+
+  const isNumber = (value) => {
+    return !isNaN(value) && !isNaN(parseFloat(value));
   };
 
   return (
@@ -337,22 +345,29 @@ export default function EditCommuneManagement(props) {
                       type="text"
                       name="longitude"
                       className="w-100"
-                      inputRef={register({ required: true })}
+                      inputRef={register({
+                        required: true,
+                        validate: {
+                          isNumber: (value) => isNumber(value) || 'Trường này chỉ được nhập số',
+                        },
+                      })}
                       defaultValue={communeModel.longitude}
                       onChange={(e) =>
                         setValue(
                           "longitude",
-                          e.target.value.replace(/[^0-9]/g, "")
+                          e.target.value
                         )
                       }
                       error={
                         errors.longitude && errors.longitude.type === "required"
                       }
                     />
-                    {errors.longitude &&
-                      errors.longitude.type === "required" && (
-                        <span className="error">Trường này là bắt buộc</span>
-                      )}
+                    {errors.longitude && errors.longitude.type === "required" && (
+                      <span className="error">Trường này là bắt buộc</span>
+                    )}
+                    {errors.longitude && (errors.longitude.type === "isNumber") && (
+                      <span className="error">{errors.longitude.message}</span>
+                    )}
                   </div>
                   <div className="col-12 col-md-6 col-lg-6 mb-3">
                     <label className="text-dark">
@@ -362,12 +377,17 @@ export default function EditCommuneManagement(props) {
                       type="text"
                       name="latitude"
                       className="w-100"
-                      inputRef={register({ required: true })}
+                      inputRef={register({
+                        required: true,
+                        validate: {
+                          isNumber: (value) => isNumber(value) || 'Trường này chỉ được nhập số',
+                        },
+                      })}
                       defaultValue={communeModel.latitude}
                       onChange={(e) =>
                         setValue(
                           "latitude",
-                          e.target.value.replace(/[^0-9]/g, "")
+                          e.target.value
                         )
                       }
                       error={
@@ -376,6 +396,9 @@ export default function EditCommuneManagement(props) {
                     />
                     {errors.latitude && errors.latitude.type === "required" && (
                       <span className="error">Trường này là bắt buộc</span>
+                    )}
+                    {errors.latitude && (errors.latitude.type === "isNumber") && (
+                      <span className="error">{errors.latitude.message}</span>
                     )}
                   </div>
                 </div>

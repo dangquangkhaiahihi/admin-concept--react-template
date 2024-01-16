@@ -58,9 +58,12 @@ export default function EditProviceManagement(props) {
     proviceId,
     setOrder,
     setOrderBy,
-    GetListLandType,
+    GetListProvince,
     rowsPerPage,
     showLoading,
+    orderBy,
+    order,
+    searchCriteria
   } = props;
 
   const [proviceModel, setProviceModel] = useState();
@@ -104,14 +107,15 @@ export default function EditProviceManagement(props) {
       .then((result) => {
         proviceAction.UpdateProvincePaht({...data, id: proviceId})
         if (result) {
-          setOrder("desc");
-          setOrderBy("defaultProvince");
-          showLoading(false);
-          onSuccess();
+          // setOrder("desc");
+          // setOrderBy("modifiedDate");
+          // showLoading(false);
+          GetListProvince(searchCriteria.page + 1, rowsPerPage, orderBy + " " + order, searchCriteria.name);
           ShowNotification(
             viVN.Success.EditProvice,
             NotificationMessageType.Success
           );
+          onClose()
         }
       })
       .catch((err) => {

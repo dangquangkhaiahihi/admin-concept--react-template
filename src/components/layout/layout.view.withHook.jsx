@@ -1,6 +1,7 @@
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 import LayoutView from "./layout.view";
+import HomePage from "../../modules/home/home.view.jsx";
 
 const LayoutViewWithHook = (props) => {
   //media query
@@ -20,6 +21,14 @@ const LayoutViewWithHook = (props) => {
     isRetina:isRetina
   }
 
-  return <LayoutView reactMediaQuery={reactMediaQuery} title={props.title}>{props.children}</LayoutView>;
+  return <>
+  {
+    props.isHome ? <HomePage reactMediaQuery={reactMediaQuery}/> :
+    <LayoutView reactMediaQuery={reactMediaQuery} title={props.title}>
+      {props.children}
+    </LayoutView>
+  }
+  
+  </>
 };
 export default LayoutViewWithHook;

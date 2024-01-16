@@ -56,6 +56,7 @@ const ConsultTheCommunity = (props) => {
       isQHHTKT={isQHHTKT}
       headCell={!isQHHTKT ? headCell : headCell.filter((x) => x.id !== 'planningTypeName')}
       hiddenAddButton={true}
+      isHideButtonShowChart
     />
   );
 };

@@ -560,6 +560,18 @@ export default function ListRecordsManagement(props) {
                                   {dateformat(row.modified_date, "dd/mm/yyyy")}
                                 </TableCell>
                               );
+                            case "createdDate":
+                              return (
+                                <TableCell>
+                                  {dateformat(row.created_date, "dd/mm/yyyy")}
+                                </TableCell>
+                              );
+                            case "createdBy":
+                              return (
+                                <TableCell>
+                                  {row.created_by}
+                                </TableCell>
+                              );
                             case "consultTheCommunity":
                               return (
                                 <TableCell>
@@ -567,15 +579,18 @@ export default function ListRecordsManagement(props) {
                                     <IconButton
                                       aria-label="xin-y-kien"
                                       onClick={() =>
-                                        history.push({
-                                          pathname: pushToListConsultDetail(
-                                            isQHHTKT, isQHCC
-                                          ).replace(":id", row.id),
-                                          state: {
-                                            name: row.name,
-                                            isLock: row.isLock,
-                                          },
-                                        })
+                                        {
+                                          const locationState = props.getLocationState();
+                                          history.push({
+                                            pathname: pushToListConsultDetail(
+                                              isQHHTKT, isQHCC
+                                            ).replace(":id", row.id),
+                                            state: {...locationState,
+                                              name: row.name,
+                                              isLock: row.isLock,
+                                            },
+                                          })
+                                        }
                                       }
                                     >
                                       <Badge
@@ -634,18 +649,51 @@ export default function ListRecordsManagement(props) {
                                   )}
                                 </TableCell>
                               );
+                            case "isCheck":
+                              return (
+                                <TableCell className="text-nowrap">
+                                  <h6>
+                                    {row.isCheck ? (
+                                      <span className="badge badge-success p-2 text-uppercase">
+                                        Đã kiểm tra
+                                      </span>
+                                    ) : (
+                                      <span className="badge badge-warning p-2 text-uppercase">
+                                        Chưa kiểm tra
+                                      </span>
+                                    )}
+                                  </h6>
+                                </TableCell>
+                              );
+                            case "isCheckDocument":
+                              return (
+                                <TableCell className="text-nowrap">
+                                  <h6>
+                                    {row.isCheckDocument ? (
+                                      <span className="badge badge-success p-2 text-uppercase">
+                                        Đã kiểm tra
+                                      </span>
+                                    ) : (
+                                      <span className="badge badge-warning p-2 text-uppercase">
+                                        Chưa kiểm tra
+                                      </span>
+                                    )}
+                                  </h6>
+                                </TableCell>
+                              );
                             case "planningRelated":
                               return (
                                 <TableCell align="center">
                                   <Tooltip title="Quy hoạch liên quan" >
                                     <IconButton
                                       onClick={() => {
+                                        const locationState = props.getLocationState();
                                         history.push({
                                           pathname:
                                             pushToListPlanningRelatedDetail(
                                               isQHHTKT, isQHCC
                                             ).replace(":id", row.id),
-                                          state: {
+                                          state: {...locationState,
                                             name: row.name,
                                             isLock: row.isLock,
                                           },
@@ -668,15 +716,16 @@ export default function ListRecordsManagement(props) {
                             case "documentSettings":
                               return (
                                 <TableCell align="center">
-                                  <Tooltip title="Thiết lập hồ sơ">
+                                  <Tooltip title="Quản lý hồ sơ">
                                     <IconButton
                                       onClick={() => {
+                                        const locationState = props.getLocationState();
                                         history.push({
                                           pathname:
                                             pushToListSetupDocumentDetail(
                                               isQHHTKT, isQHCC
                                             ).replace(":id", row.id),
-                                          state: {
+                                          state: {...locationState,
                                             name: row.name,
                                             isLock: row.isLock,
                                           },
@@ -790,6 +839,7 @@ export default function ListRecordsManagement(props) {
 
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={page}
             rowsPerPage={pageSize}
             handleChangeRowsPerPage={onChangePageSize}

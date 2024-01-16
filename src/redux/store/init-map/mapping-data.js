@@ -112,6 +112,34 @@ function MappingLayerSettingArray(layer_settings) {
         zindex: layer.z_index,
         documentUploadId: layer.document_upload_id,
         files: layer.files,
+        layerRealationships:layer?.layerRealationships? MappingLayerRelaSettingArray(layer?.layerRealationships): null,
+    }))
+    return result;
+}
+
+function MappingLayerRelaSettingArray(layer_settings) {
+    const result = [];
+    layer_settings.map((layer) => result.push({
+        displayName: layer.display_name,
+        filterName: layer.filter_name,
+        geoLayerName: layer.geo_layer_name,
+        id: layer.id,
+        is_check: layer.is_check,
+        layerCategoryId: layer.layer_category_id,
+        layerType: layer.layer_type,
+        level: layer.level,
+        maxZoom: layer.max_zoom,
+        minZoom: layer.min_zoom,
+        name: layer.name,
+        table: layer.table,
+        wms: layer.wms,
+        wmsExternal: layer.wms_external,
+        zindex: layer.z_index,
+        documentUploadId: layer.document_upload_id,
+        files: layer.files,
+        contentChange: layer.contentChange,
+        layerRealationshipId: layer.layerRealationshipId,
+        year: layer.year,
     }))
     return result;
 }
@@ -142,7 +170,7 @@ function MappingBaseMapSettingModel(data) {
 }
 export const GetListPgTable = (table) => {
     let param = new URLSearchParams();
-    table && param.append("table", table);
+    table && param.append("tableName", table);
     return service.get(ApiUrl.GetPgTable, param).then((res) => { return res }).catch(err => { throw err })
 }
 

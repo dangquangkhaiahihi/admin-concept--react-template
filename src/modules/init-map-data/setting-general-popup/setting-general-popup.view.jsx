@@ -335,8 +335,8 @@ function RenderSettingGeneralPopup(props) {
             </div>
           </div>
         </DialogContent>
-        <DialogActions className="border-top row">
-          <div className="col-lg-4 pb-2">
+        <DialogActions className="border-top mobile-buttons-wrapper">
+          <div className="mobile-button">
             <Button
               className="w-100"
               onClick={onClose}
@@ -346,7 +346,7 @@ function RenderSettingGeneralPopup(props) {
               Hủy
             </Button>
           </div>
-          <div className="col-lg-4 pb-2 m-0">
+          <div className="mobile-button">
             <Button
               className="w-100"
               color="success"
@@ -357,7 +357,7 @@ function RenderSettingGeneralPopup(props) {
               Đặt mặc định
             </Button>
           </div>
-          <div className="col-lg-4 pb-2 m-0">
+          <div className="mobile-button">
             <Button
               className="w-100"
               type="submit"

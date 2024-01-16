@@ -9,25 +9,31 @@ const useUpdateAccountPassword = ({ resetScreen = () => {} }) => {
 
   const handleUpdateAccountPassword = async (data) => {
     if (!data) return
-    const payload = {
-      currentPassword: data.currentPassword,
-      newPassword: data.newPassword,
-    }
+    
+    const formData = generateFormData(data);
     setIsLoading(true)
 
     try {
       const response = await service.post(
         ApiUrl.UpdateUserAccountPassword,
-        payload,
+        formData,
       )
       response.content.status &&
         NotificationService.success('Đổi mật khẩu thành công')
       resetScreen()
     } catch (error) {
-      NotificationService.error(error?.errorMessage ?? '')
+      NotificationService.error(error?.errorMessage ?? 'Đổi mật khẩu thất bại, vui lòng thử lại')
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const generateFormData = (data, files) => {
+    let formData = new FormData()
+    formData.append('Id', data.id)
+    formData.append('CurrentPassword', data.currentPassword)
+    formData.append('NewPassword', data.newPassword)
+    return formData
   }
 
   return {

@@ -6,6 +6,7 @@ import dateformat from "dateformat";
 import dateFormat from 'dateformat';
 
 export const formFields = {
+  id: 'id',
   fullName: 'fullName',
   email: 'email',
   gender: 'gender',
@@ -14,6 +15,7 @@ export const formFields = {
   address: 'address',
   description: 'description',
   avatar: 'avatar',
+  file: 'file',
 }
 export const genderDropdown = [
   {
@@ -27,6 +29,7 @@ export const genderDropdown = [
 ]
 
 const defaultValues = {
+  id: '',
   fullName: '',
   email: '',
   gender: true,
@@ -35,6 +38,7 @@ const defaultValues = {
   address: '',
   description: '',
   avatar: '',
+  file: null,
 }
 
 const service = new Service()
@@ -50,6 +54,7 @@ const useAccountInfoForm = () => {
   }, [])
 
   useEffect(() => {
+    console.log("check user", user);
     if (!user) return
     resetUserInfoForm(user, reset)
   }, [user, reset])
@@ -63,6 +68,7 @@ const useAccountInfoForm = () => {
   const resetUserInfoForm = (user, reset) => {
     const birthDay =new Date(user?.dateOfBirth).getTime()
     reset({
+      id: user?.id ?? '',
       fullName: user?.fullName ?? '',
       email: user?.email ?? '',
       gender: user?.sex ?? '',
@@ -71,8 +77,15 @@ const useAccountInfoForm = () => {
       address: user?.address ?? '',
       description: user?.description ?? '',
       avatar: user?.avatar ?? '',
+      file: user?.file ?? null,
     })
   }
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    console.log("cascacascascascas", selectedFile);
+    setUser({...user, file: selectedFile})
+  };
 
   return {
     handleSubmit,
@@ -80,7 +93,9 @@ const useAccountInfoForm = () => {
     register,
     errors,
     setValue,
-    resetScreen: getUserAccountDetailData
+    resetScreen: getUserAccountDetailData,
+    userInfo: user,
+    handleFileChange
   }
 }
 

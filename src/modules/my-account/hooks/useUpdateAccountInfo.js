@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Service from '../../../api/api-service'
 import { ApiUrl } from '../../../api/api-url'
 import NotificationService from '../../../common/notification-service'
+import { APIUrlDefault } from '../../../utils/configuration'
 
 const service = new Service()
 const useUpdateAccountInfo = ({ files = [], resetScreen }) => {
@@ -9,6 +10,7 @@ const useUpdateAccountInfo = ({ files = [], resetScreen }) => {
 
   const handleUpdateAccountInfo = async (data) => {
     if (!data) return
+    console.log("datadatadatadatadata",data);
     const formData = generateFormData(data, files)
 
     setIsLoading(true)
@@ -37,6 +39,7 @@ const useUpdateAccountInfo = ({ files = [], resetScreen }) => {
 const generateFormData = (data, files) => {
   const birthDay = new Date(data.birthDay).toISOString()
   let formData = new FormData()
+  formData.append('Id', data.id)
   formData.append('FullName', data.fullName)
   formData.append('Email', data.email)
   formData.append('DateOfBirth', birthDay)
@@ -44,13 +47,15 @@ const generateFormData = (data, files) => {
   formData.append('Address', data.address)
   formData.append('Description', data.description)
   formData.append('PhoneNumber', data.phone)
+  formData.append('File', data.file);
 
-  files &&
-    files.length > 0 &&
-    files.map(
-      (file) =>
-        file && file.fileId && formData.append('DocumentUploadId', file.fileId),
-    )
+  // files &&
+  //   files.length > 0 &&
+  //   files.map(
+  //     (file) =>
+  //       file && file.fileId && formData.append('File', data.file);
+  //   )
+  console.log('formDataformData',formData);
   return formData
 }
 

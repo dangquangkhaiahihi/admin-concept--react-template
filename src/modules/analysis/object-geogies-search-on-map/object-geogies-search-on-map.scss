@@ -1,0 +1,8 @@
+.init-map-data-container {
+    #content-child {
+        // height: calc(100vh - 128px)!important;
+        .transition-smooth {
+            transition: max-width 0.5s ease-out;
+        }
+    }
+}

@@ -107,6 +107,10 @@ const LockScreen = () => {
                   : process.env.PUBLIC_URL + "/user-default.png"
               }
               alt=""
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = require('../../assets/icon/logo.png');
+              }}
               style={{
                 display:'flex',
                 margin:'auto',

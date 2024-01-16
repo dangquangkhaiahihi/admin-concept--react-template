@@ -58,6 +58,10 @@ const AddAnalysis = ({
   rowsPerPage,
   setOrder,
   setOrderBy,
+  setAnalysisId,
+  setOpenEditDialog,
+  openCreatMapModal,
+  groupParentList
 }) => {
   const classes = useStyles();
   const { register, handleSubmit, errors, setValue } = useForm({
@@ -65,6 +69,8 @@ const AddAnalysis = ({
     reValidateMode: "onBlur",
   });
   const [planningId, setPlanningId] = useState();
+  const [parentId, setParentId] = useState();
+  
   const [planningLookUpModel, setPlanningLookUpModel] = useState(null);
   useEffect(() => {
     onGetData();
@@ -93,17 +99,27 @@ const AddAnalysis = ({
     let formData = new FormData();
     data.name && formData.append("name", data.name);
     planningId && formData.append("planningId", planningId?.id);
+    parentId && formData.append("parentId", parentId?.id);
 
     analysisAction
       .CreateAnalysis(formData)
       .then((result) => {
+        console.log(result)
         if (result) {
           setOrder("desc");
           setOrderBy("modifiedDate");
           GetListAll(1, rowsPerPage);
+          setAnalysisId(result.content.id)
+          openCreatMapModal(
+            result.content.id,
+            result.content.mapId,
+            result.content.planningId,
+            result.content.planningName,
+            false,
+          )
           onSuccess();
           ShowNotification(
-            viVN.Success.NewsAddSuccess,
+            viVN.Success.CreateSuccess,
             NotificationMessageType.Success
           );
         }
@@ -118,7 +134,7 @@ const AddAnalysis = ({
     <div>
       <Dialog open={isOpen} onClose={onClose} fullWidth={true} maxWidth="md">
         <DialogTitle disableTypography className="border-bottom">
-          <Typography variant="h6">Thêm phân tích</Typography>
+          <Typography variant="h6">Thêm chuyên mục</Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -130,7 +146,7 @@ const AddAnalysis = ({
 
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <DialogContent className="pt-4 pb-2">
-          <div className="form-group">
+            <div className="form-group">
               <label className="text-dark">
                 Quy hoạch phân tích<span className="required"></span>
               </label>
@@ -178,7 +194,38 @@ const AddAnalysis = ({
                 <span className="error">Trường này là bắt buộc</span>
               )}
             </div>
-
+            <div className="form-group">
+                <label className="text-dark">
+                  Nhóm chuyên mục<span className="required"></span>
+                </label>
+                <Autocomplete
+                  options={groupParentList}
+                  getOptionLabel={(option) =>
+                    typeof option === "string" ? option : option.name
+                  }
+                  onChange={(event, newValue) => {
+                    setParentId(newValue);
+                  }}
+                  disableClearable={true}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="parentId"
+                      inputRef={register({ required: true })}
+                      error={
+                        errors.parentId &&
+                        errors.parentId.type === "required"
+                      }
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                />
+                {errors.parentId &&
+                  errors.parentId.type === "required" && (
+                    <span className="error">Trường này là bắt buộc</span>
+                  )}
+              </div>
           </DialogContent>
 
           <DialogActions className="border-top">

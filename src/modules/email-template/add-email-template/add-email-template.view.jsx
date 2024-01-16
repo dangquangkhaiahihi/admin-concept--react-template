@@ -45,6 +45,7 @@ function AddEmailTemplate(props) {
     rowsPerPageCommon,
     setOrderBy,
     setOrder,
+    setPage
   } = props;
   const {
     register,
@@ -65,6 +66,7 @@ function AddEmailTemplate(props) {
           setOrderBy("modifiedDate");
           setOrder("desc");
           getListEmailModels(1, rowsPerPageCommon);
+          setPage(0);
           onHideModal();
           ShowNotification(
             viVN.Success.EmailAddSuccess,

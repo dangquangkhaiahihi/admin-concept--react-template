@@ -76,8 +76,8 @@ const ListAnalysisNote = ({
   }) => {
   const classes = useStyles();
   useEffect(() => {
-    document.querySelector(".right-content").style.removeProperty("overflow-y");
-    document.querySelector(".right-content").style.overflow = "visible";
+    // document.querySelector(".right-content").style.removeProperty("overflow-y");
+    // document.querySelector(".right-content").style.overflow = "visible";
   }, []);
   useEffect(() => {
     GetListAll();
@@ -110,7 +110,7 @@ const ListAnalysisNote = ({
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <TableContainer className={classes.tableContainer}>
-          <Table className={classes.table} size="small" stickyHeader>
+          <Table className={classes.table} size="small" >
             <EnhancedTableHead
               classes={classes}
               order={order}
@@ -184,6 +184,7 @@ const ListAnalysisNote = ({
 
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={page + 1}
             rowsPerPage={rowsPerPage}
             handleChangeRowsPerPage={handleChangeRowsPerPage}

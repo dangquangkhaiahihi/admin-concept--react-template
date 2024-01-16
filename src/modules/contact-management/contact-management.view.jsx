@@ -73,7 +73,6 @@ function ContactManagement(props) {
 
   const onHideModal = () => {
     setOpenAddDialog(false);
-    getListContactModels(1, config.Configs.DefaultPageSize, "sentDate desc");
   };
 
   return (

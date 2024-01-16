@@ -43,6 +43,12 @@ const DocumentSettings = (props) => {
       },
 
       {
+        id: "isCheckDocument",
+        hideSortIcon: true,
+        label: "Kiểm tra hồ sơ",
+        visibleColumn: true,
+      },
+      {
         id: 'documentSettings',
         hideSortIcon: true,
         label: 'Hồ sơ',
@@ -57,6 +63,7 @@ const DocumentSettings = (props) => {
       isQHHTKT={isQHHTKT}
       headCell={!isQHHTKT ? headCell : headCell.filter((x) => x.id !== 'planningTypeName')}
       hiddenAddButton={true}
+      isHideButtonShowChart
     />
   );
 };

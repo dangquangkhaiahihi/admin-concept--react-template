@@ -54,8 +54,8 @@ const useStyles = makeStyles((theme) => ({
 const headCells = [
   { id: 'name', hideSortIcon: false, label: 'Tên xã - phường' },
   { id: 'administrativeUnitCode', hideSortIcon: false, label: 'Mã hành chính' },
-  { id: 'latitude', hideSortIcon: false, label: 'Vĩ độ' },
   { id: 'longitude', hideSortIcon: false, label: 'Kinh độ' },
+  { id: 'latitude', hideSortIcon: false, label: 'Vĩ độ' },
   { id: 'districtName', hideSortIcon: false, label: 'Huyện - thị xã' },
   { id: 'provinceName', hideSortIcon: false, label: 'Tỉnh - thành phố' },
   { id: 'createdBy', hideSortIcon: false, label: 'người tạo' },
@@ -174,8 +174,8 @@ export default function ListCommuneManagement(props) {
                     <TableRow hover tabIndex={-1} key={row.id}>
                       <TableCell>{row.name}</TableCell>
                       <TableCell>{row.administrativeUnitCode}</TableCell>
-                      <TableCell>{row.latitude}</TableCell>
                       <TableCell>{row.longitude}</TableCell>
+                      <TableCell>{row.latitude}</TableCell>
                       <TableCell>{row.districtName}</TableCell>
                       <TableCell>{row.provinceName}</TableCell>
                       <TableCell>{row.createdBy}</TableCell>
@@ -230,6 +230,7 @@ export default function ListCommuneManagement(props) {
 
         {totalItemCount && totalItemCount > 0 ? (
           <FooterPagination
+            totalItemCount={totalItemCount}
             currentPage={page + 1}
             rowsPerPage={rowsPerPage}
             handleChangeRowsPerPage={handleChangeRowsPerPage}

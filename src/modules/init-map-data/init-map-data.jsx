@@ -21,7 +21,11 @@ function InitMapDataView(props) {
 
   useEffect(() => {
     if (props.planningId) {
-      if (props.mapId) props.GetMapDetailById(props.mapId, props.planningId);
+      if (props.mapId) props.GetMapDetailById(props.mapId, props.planningId).then((data)=>{
+        if(data && data.content) {
+          props.setIsActive(data.content.is_active);
+        }
+      });
       else props.UpdateDefaultMapData(props.planningId);
     } else props.GetMapDetailById(21, 1);
     props.GetAllBaseMapDefault();

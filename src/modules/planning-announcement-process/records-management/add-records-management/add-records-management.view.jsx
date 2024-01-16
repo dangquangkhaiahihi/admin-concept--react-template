@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { useForm } from "react-hook-form";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import {
   DialogActions,
   Button,
@@ -46,6 +46,7 @@ const orderDefault = 1;
 function AddRecordsManagement(props) {
   const classes = useStyles();
   const history = useHistory();
+  const location = useLocation();
   const { onClose, onSuccess, showLoading, isOtherPlanning, isQHCC, isQHHTKT } = props;
   const cgisId = localStorage.getItem("cgisId");
 
@@ -312,6 +313,8 @@ function AddRecordsManagement(props) {
         LandForConstruction: parseDecimal(data?.landForConstruction) || null,
         Report: data?.report || null,
         Note: data?.note || null,
+        Presentation: data?.presentation || null,
+        Regulation: data?.regulation || null,
         DocumentTypeId: documentType.id || null,
         PlanningDistrictIds:
           (lookupCommune &&
@@ -323,6 +326,8 @@ function AddRecordsManagement(props) {
         ApprovalAgencyLevelId: isQHCC ? (approvalAgency?.id || null) : 2,
         PlanningAdjustedId: !valueRadio ? planningAdjusted?.id : null,
         isNew: !isOtherPlanning ? valueRadio : true,
+        Field: data?.field || null,
+        ConstructionGroup: data?.constructionGroup || null,
       };
 
       if (files && files.length > 0) {
@@ -1070,7 +1075,7 @@ function AddRecordsManagement(props) {
                   {planningLevelModel && planningLevelModel.length > 0 && (
                     <div className="col-4">
                       <label className="text-dark text-dark-for-longer-label">
-                        Cấp quy hoạch hoho<span className="required"></span>
+                        Cấp quy hoạch<span className="required"></span>
                       </label>
 
                       <Autocomplete
@@ -2494,6 +2499,58 @@ function AddRecordsManagement(props) {
                         )}
                     </div>
                   )}
+                  <div className="col-lg-6 mb-3">
+                    <label className="text-dark text-dark-for-long-label">
+                      Lĩnh vực
+                    </label>
+
+                    <TextField
+                      fullWidth
+                      inputRef={register({
+                        maxLength: 300,
+                      })}
+                      type="text"
+                      name="field"
+                      error={
+                        (errors.field &&
+                          errors.field.type === "maxLength")
+                      }
+                      variant="outlined"
+                      size="small"
+                      inputProps={{ maxLength: 300 }}
+                    />
+                    {errors.field &&
+                      errors.field.type === "maxLength" && (
+                        <span className="error">Tối đa 300 ký tự</span>
+                      )}
+                  </div>
+                </div>
+                <div className="form-group row">
+                  <div className="col-lg-6 mb-3">
+                    <label className="text-dark text-dark-for-long-label">
+                      Nhóm công trình
+                    </label>
+
+                    <TextField
+                      fullWidth
+                      inputRef={register({
+                        maxLength: 300,
+                      })}
+                      type="text"
+                      name="constructionGroup"
+                      error={
+                        (errors.constructionGroup &&
+                          errors.constructionGroup.type === "maxLength")
+                      }
+                      variant="outlined"
+                      size="small"
+                      inputProps={{ maxLength: 300 }}
+                    />
+                    {errors.constructionGroup &&
+                      errors.constructionGroup.type === "maxLength" && (
+                        <span className="error">Tối đa 300 ký tự</span>
+                      )}
+                  </div>
                 </div>
                 <div className="form-group row">
                   <div
@@ -2616,13 +2673,32 @@ function AddRecordsManagement(props) {
               <label className="text-dark text-dark-for-long-label">Ghi chú</label>
               <textarea
                 name="note"
-                rows="5"
+                rows="3"
                 className="form-control"
                 ref={register}
               ></textarea>
             </div>
           </div>
+          <div className="form-group">
+            <label className="text-dark text-dark-for-long-label">Thuyết minh</label>
 
+            <textarea
+              name="presentation"
+              rows="3"
+              className="form-control"
+              ref={register}
+            ></textarea>
+          </div>
+          <div className="form-group">
+            <label className="text-dark text-dark-for-long-label">Quy định quản lý theo đồ án</label>
+
+            <textarea
+              name="regulation"
+              rows="3"
+              className="form-control"
+              ref={register}
+            ></textarea>
+          </div>
           <div className="form-group row">
             <div className="col-12">
               <label className="text-dark text-dark-for-long-label">
@@ -2675,6 +2751,18 @@ function AddRecordsManagement(props) {
                   isQHCC? UrlCollection.PlanningCC :
                   isQHHTKT? UrlCollection.QH_HTKT:
                   UrlCollection.PlanningAnnouncementProcess,
+                  state: {
+                    currentPage: location.state?.currentPage,
+                    pageSizeDefault: location.state?.pageSizeDefault,
+                    title: location.state?.title,
+                    typeSelected: location.state?.typeSelected,
+                    levelSelected: location.state?.levelSelected,
+                    statusIdSelected: location.state?.statusIdSelected,
+                    planningUnitSelected: location.state?.planningUnitSelected,
+                    investorSelected: location.state?.investorSelected,
+                    approvalAgencySelected: location.state?.approvalAgencySelected,
+                    districtSelected: location.state?.districtSelected
+                  }
                 })
               }
               style={{ margin: "20px 10px 50px 10px" }}

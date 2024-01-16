@@ -52,6 +52,10 @@ export default function EditDistrictManagement(props) {
     GetListDistrict,
     rowsPerPage,
     showLoading,
+    orderBy,
+    order,
+    searchCriteria,
+    isSyncSetting
   } = props;
 
   const [districtModel, setDistrictModel] = useState();
@@ -92,17 +96,27 @@ export default function EditDistrictManagement(props) {
   });
 
   const onSubmit = (data) => {
+    console.log('data',data);
     if (!data) {
       return;
     }
     districtAction
-      .UpdateDistrict({ ...data, provinceId: provinceId, id: districtId })
+      .UpdateDistrict({ 
+        administrativeUnitCode: data.administrativeUnitCode || districtModel.administrativeUnitCode,
+        area: data.area || districtModel.area,
+        latitude: data.latitude || districtModel.latitude,
+        longitude: data.longitude || districtModel.longitude,
+        name: data.name || districtModel.name,
+        provinceId: provinceId, id: districtId,
+        csdlqG_Id: data.csdlqG_Id === undefined ? districtModel.csdlqG_Id : data.csdlqG_Id
+      })
       .then((result) => {
         districtAction.UpdateDistrictPaht({ ...data, provinceId: provinceId, id: districtId })
         if (result) {
-          setOrder("desc");
-          setOrderBy("modifiedDate");
-          GetListDistrict(1, rowsPerPage);
+          // setOrder("desc");
+          // setOrderBy("modifiedDate");
+          // GetListDistrict(1, rowsPerPage);
+          GetListDistrict(searchCriteria.page + 1, rowsPerPage, orderBy + " " + order, searchCriteria.name);
           onSuccess();
           ShowNotification(
             viVN.Success.EditDistrict,
@@ -153,6 +167,7 @@ export default function EditDistrictManagement(props) {
                       inputRef={register({ required: true })}
                       defaultValue={districtModel.name}
                       error={errors.name && errors.name.type === "required"}
+                      disabled={isSyncSetting}
                     />
                     {errors.fullName && errors.fullName.type === "required" && (
                       <span className="error">Trường này là bắt buộc</span>
@@ -170,6 +185,7 @@ export default function EditDistrictManagement(props) {
                         errors.administrativeUnitCode &&
                         errors.administrativeUnitCode.type === "required"
                       }
+                      disabled={isSyncSetting}
                     />
                     {errors.administrativeUnitCode &&
                       errors.administrativeUnitCode.type === "required" && (
@@ -199,6 +215,7 @@ export default function EditDistrictManagement(props) {
                         (errors.longitude.type === "required" ||
                           errors.longitude.type === "pattern")
                       }
+                      disabled={isSyncSetting}
                     />
                     {errors.longitude &&
                       errors.longitude.type === "required" && (
@@ -229,6 +246,7 @@ export default function EditDistrictManagement(props) {
                         (errors.latitude.type === "required" ||
                           errors.latitude.type === "pattern")
                       }
+                      disabled={isSyncSetting}
                     />
                     {errors.latitude && errors.latitude.type === "required" && (
                       <span className="error">Trường này là bắt buộc</span>
@@ -255,6 +273,7 @@ export default function EditDistrictManagement(props) {
                       onChange={(e) => {
                         handleChangeSelect(e);
                       }}
+                      disabled={isSyncSetting}
                     >
                       {proviceSelect && proviceSelect.length > 0 ? (
                         proviceSelect.map((item, index) => (
@@ -281,10 +300,43 @@ export default function EditDistrictManagement(props) {
                     placeholder="Đơn vị km2"
                     className="w-100"
                     inputRef={register}
+                    disabled={isSyncSetting}
                   />
                 </div>
                 </div>
               </div>
+
+              {
+                isSyncSetting && 
+                <div className="form-group">
+                  <div className="row">
+                    <div className="col-12 col-md-6 col-lg-6 mb-3">
+                      <label className="text-dark">
+                        ID tương ứng của CSDL Quốc Gia
+                      </label>
+                      <TextField
+                        type="text"
+                        name="csdlqG_Id"
+                        className="w-100"
+                        defaultValue={districtModel.csdlqG_Id}
+                        inputRef={register({
+                          pattern: /^\d+(\.\d{1,9})?$/,
+                        })}
+                        error={
+                          errors.csdlqG_Id &&
+                          ( errors.csdlqG_Id.type === "pattern")
+                        }
+                      />
+                        {errors.csdlqG_Id &&
+                          errors.csdlqG_Id.type === "pattern" && (
+                            <span className="error">
+                              Trường này chỉ điền số
+                            </span>
+                        )}
+                    </div>
+                  </div>
+                </div>
+              }
             </DialogContent>
           )}
 

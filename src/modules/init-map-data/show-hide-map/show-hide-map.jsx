@@ -7,7 +7,8 @@ import * as appActions from "../../../core/app.store";
 import * as ShowMap from '../../../redux/store/init-map/show-hide-map.store';
 
 function ShowHideMap(props) {
-    const [isActive, setIsActive] = useState(false);
+    // const [isActive, setIsActive] = useState(false);
+    const {isActive, setIsActive} = {...props};
 
     const ActiveMap = (id = props.mapId) => {
         ShowMap.ActiveMapById(id).then((res) => {
@@ -20,16 +21,16 @@ function ShowHideMap(props) {
     }
     const setActiveMap = () => {
         ActiveMap();
-        setIsActive(!isActive)
+        setIsActive((prev) => !prev);
     }
     const setDeactiveMap = () => {
         DeactiveMap();
-        setIsActive(!isActive)
+        setIsActive((prev) => !prev);
     }
 
     return (
 
-        !isActive ? (<Button color="inherit" onClick={() => setDeactiveMap()}>
+        isActive ? (<Button color="inherit" onClick={() => setDeactiveMap()}>
             Ẩn bản đồ
         </Button>) : (<Button color="inherit" onClick={() => setActiveMap()}>
             Hiện bản đồ

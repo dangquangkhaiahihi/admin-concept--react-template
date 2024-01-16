@@ -153,6 +153,8 @@ export const CreatePlanning = (data) => {
     formData.append("LandForConstruction", data.LandForConstruction);
   data.Report && formData.append("Report", data.Report);
   data.Note && formData.append("Note", data.Note);
+  data.Presentation && formData.append("Presentation", data.Presentation);
+  data.Regulation && formData.append("Regulation", data.Regulation);
   data.DocumentTypeId && formData.append("DocumentTypeId", data.DocumentTypeId);
   data.PlanningDistrictIds.length > 0 &&
     data.PlanningDistrictIds.map((item) =>
@@ -165,6 +167,10 @@ export const CreatePlanning = (data) => {
   data.isNew && formData.append("IsNew", data.isNew);
   data.PlanningAdjustedId &&
     formData.append("PlanningAdjustedId", data.PlanningAdjustedId);
+  data.Field &&
+    formData.append("Field", data.Field);
+  data.ConstructionGroup &&
+    formData.append("ConstructionGroup", data.ConstructionGroup);
 
   return service
     .post(ApiUrl.CreatePlanning, formData)
@@ -201,6 +207,8 @@ export const UpdatePlanning = (data) => {
   data.LandForConstruction &&
     formData.append("LandForConstruction", data.LandForConstruction);
   data.Report && formData.append("Report", data.Report);
+  data.Presentation && formData.append("Presentation", data.Presentation);
+  data.Regulation && formData.append("Regulation", data.Regulation);
   data.Note && formData.append("Note", data.Note);
   data.DocumentTypeId && formData.append("DocumentTypeId", data.DocumentTypeId);
   data.PlanningDistrictIds &&
@@ -215,7 +223,13 @@ export const UpdatePlanning = (data) => {
   data.isNew && formData.append("IsNew", data.isNew);
   data.PlanningAdjustedId &&
     formData.append("PlanningAdjustedId", data.PlanningAdjustedId);
-
+  data.Field &&
+    formData.append("Field", data.Field);
+  formData.append("IsCheck", data.IsCheck);
+  formData.append("IsCheckDocument", data.IsCheckDocument);
+  data.ConstructionGroup &&
+    formData.append("ConstructionGroup", data.ConstructionGroup);
+    
   return service
     .post(ApiUrl.UpdatePlanning, formData)
     .then((res) => {

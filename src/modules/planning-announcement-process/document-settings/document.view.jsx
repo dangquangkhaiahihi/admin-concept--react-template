@@ -16,6 +16,8 @@ import {
   AppBar,
   Toolbar,
   Button,
+  FormControlLabel,
+  Checkbox,
 } from '@material-ui/core';
 import { TreeItem } from '@material-ui/lab';
 
@@ -30,6 +32,8 @@ import { useEffect } from 'react';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { UrlCollection } from '../../../common/url-collection';
+import CheckboxCheckDocument from './document-check/document-check.view';
+import ModalReportDocument from './document-planning-statistic/document-planning-statistic.view';
 
 // import FileViewer from "react-file-viewer";
 
@@ -172,6 +176,7 @@ function DocumentSettingsPage(props) {
   const { showLoading, settings, isQHHTKT, isQHCC } = props;
 
   const history = useHistory();
+  const location = useLocation();
   const { id } = useParams();
   const planningId = id;
   const { name } = history.location.state || "";
@@ -180,6 +185,7 @@ function DocumentSettingsPage(props) {
   const [folderList, setFolderList] = useState([]);
   const [files, setFiles] = useState([]);
   const [document, setDocument] = useState(null);
+  const [openModalReport, setOpenModalReport] = useState(false);
 
   useEffect(() => {
     setClientSetting(settings);
@@ -195,7 +201,19 @@ function DocumentSettingsPage(props) {
 
   const onCloseDialog = () => {
     history.push({
-      pathname: pushToListDocumentSetting(isQHHTKT, isQHCC)
+      pathname: pushToListDocumentSetting(isQHHTKT, isQHCC),
+      state: {
+        currentPage: location.state?.currentPage,
+        pageSizeDefault: location.state?.pageSizeDefault,
+        title: location.state?.title,
+        typeSelected: location.state?.typeSelected,
+        levelSelected: location.state?.levelSelected,
+        statusIdSelected: location.state?.statusIdSelected,
+        planningUnitSelected: location.state?.planningUnitSelected,
+        investorSelected: location.state?.investorSelected,
+        approvalAgencySelected: location.state?.approvalAgencySelected,
+        districtSelected: location.state?.districtSelected
+      }
     });
   };
 
@@ -263,7 +281,7 @@ function DocumentSettingsPage(props) {
         //   style={{ background: clientSetting.color }}>
         <Toolbar>
           <Typography variant='h6' className={classes.title}>
-            Thiết lập hồ sơ ({planningName})
+            Quản lý hồ sơ ({planningName})
           </Typography>
           <Button color='inherit' onClick={onCloseDialog}>
             <CloseIcon />
@@ -271,14 +289,48 @@ function DocumentSettingsPage(props) {
         </Toolbar>
         // </AppBar>
       }
+      <div className="form-row">
+        <div
+          class={`form-group col-2 col-lg-2 'd-flex flex-column'}`}
+        >
+          <CheckboxCheckDocument planningId={planningId}/>
+        </div>
+        <div
+          class={`form-group col-6 col-lg-6 'd-flex flex-column'}`}
+          style={{ display: "flex" }}
+        >
+          <div style={{ paddingLeft: "0px" }}>
+            <button
+              class="btn btn-ct btn-primary-ct"
+              onClick={() => {
+                setOpenModalReport(true);
+              }}
+              style={{ color: "white", margin: "0px 0px" }}
+            >
+              Bảng biểu thống kê hồ sơ đồ án
+            </button>
+          </div>
+        </div>
+      </div>
       <FileManagement
         planningId={planningId}
         showLoading={showLoading}
         files={files}
         isLock={isLock}
         setFiles={setFiles}
-        acceptedFiles={['.doc', '.docx', '.txt', '.pdf', '.zip', '.rar']}
+        acceptedFiles={['.doc', '.docx', '.txt', '.pdf', '.zip', '.rar'
+            ,'.gif', '.cad', '.mdb', '.shp'
+        ]}
       />
+
+      {openModalReport && (
+        <ModalReportDocument
+          isOpen={openModalReport}
+          onClose={() => setOpenModalReport(false)}
+          // data = {dataStatistic}
+          planningId={planningId}
+        />
+      )}
     </>
   ) : (
     <div>

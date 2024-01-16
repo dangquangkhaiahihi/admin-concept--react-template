@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import * as appActions from "../../../../../core/app.store";
 import * as InitMapStore from "../../../../../redux/store/init-map/init-map.store";
 import * as mappingData from "../../../../../redux/store/init-map/mapping-data";
 import * as InitmapConfig from "../../../config/config";
+import * as planningAction from '../../../../../redux/store/planning/planning.store';
+
 import "./select-data-source.scss";
 import NotificationService from "../../../../../common/notification-service";
 import { WmsBaseLink } from "../../../../../utils/configuration";
@@ -33,6 +36,13 @@ function SelectDataSourceLayer(props) {
     setTooltip,
     setInput,
     setOutput,
+    layerId,
+    isLayerRela,
+    isCreateBaseOnExistLayer,
+    setIsCreateBaseOnExistLayer,
+    layerSelected,
+    setLayerSelected,
+    showLoading,
   } = props;
 
   const [wmsParameters, setWmsParameter] = useState(
@@ -44,26 +54,50 @@ function SelectDataSourceLayer(props) {
   const [isWmsOutSystem, setIsWmsOutSystem] = useState(false);
   const [showWmsWrong, setShowWmsWrong] = useState(false);
   const [hasShowTableNameWarning, setShowTableNameWarning] = useState(false);
-
+  const [allPlanning, setAllPlanning] = useState([]);
+  const [planningSelected, setPlanningSelected] = useState();
+  const [listLayer, setListLayer] = useState([]);
   useEffect(() => {
     if (isCompleteImportShapeFile) {
       handleChangeWmsInSystem();
     }
   }, [isCompleteImportShapeFile]);
 
+  const getLookupAllPlanning = () => {
+    showLoading(true)
+    planningAction.GetLookUpPlanning().then((res) => {
+      setAllPlanning(
+        res.content && res.content.length > 0 ?
+          res.content : []
+      );
+      showLoading(false);
+    }).catch(err => { showLoading(false) })
+  }
+
+  const getLookupLayerByPlanningId = (id) => {
+    showLoading(true)
+    planningAction.GetLookupLayerByPlanningId(id).then((res) => {
+      setListLayer(
+        res.content && res.content.length > 0 ?
+          res.content : []
+      );
+      showLoading(false);
+    }).catch(err => { showLoading(false) })
+  }
+
   const handleCreateWmsLink = () => {
     let newDataSource = null;
 
     if (isWmsOutSystem && wmsLink) {
-      const tableName = InitmapConfig.getTableNameFormUrl(wmsLink);
+      const tableName = InitmapConfig.getTableNameFormUrl(wmsParameters);
       let colsOfTable = null;
-      props.listDataSource.map((data) => {
-        if (data.tableName === tableName) {
-          colsOfTable = data.cols;
-          return;
-        }
-      });
-      if (!colsOfTable) return setShowWmsWrong(true);
+      // props.listDataSource.map((data) => {
+      //   if (data.tableName === tableName) {
+      //     colsOfTable = data.cols;
+      //     return;
+      //   }
+      // });
+      //if (!colsOfTable) return setShowWmsWrong(true);
       setShowWmsWrong(false);
       newDataSource = new InitmapConfig.CreateDataSourceObject(
         tableName,
@@ -73,6 +107,9 @@ function SelectDataSourceLayer(props) {
         wmsParameters,
         isWmsOutSystem
       );
+      if (newDataSource) {
+        setDataSource(newDataSource)
+      };
     } else {
       const tableSelected = props.listDataSource.filter(
         (data) => data.tableName === tableName
@@ -135,10 +172,24 @@ function SelectDataSourceLayer(props) {
   };
 
   useEffect(() => {
+    getLookupAllPlanning();
     setTableName(props.dataSource.tableName);
     props.GetListDataSource();
     if (props.dataSource.wms_external) setIsWmsOutSystem(true);
   }, []);
+
+  useEffect(() => {
+    setListLayer([])
+    if (planningSelected) {
+      getLookupLayerByPlanningId(planningSelected.id);
+    }
+  }, [planningSelected])
+  useEffect(() => {
+    console.log('dsadasdsadsa',valueTiffFile_2)
+  },[valueTiffFile_2])
+  useEffect(() => {
+    setLayerSelected(null)
+  }, [planningSelected])
 
   useEffect(() => {
     if (tableName || wmsLink) {
@@ -169,25 +220,36 @@ function SelectDataSourceLayer(props) {
     setIsImportShapeFile(true);
     setIsWmsOutSystem(false);
     setIsImportTifFile(false);
+    setIsCreateBaseOnExistLayer(false);
   };
 
   const handleChangeWmsInSystem = () => {
     setIsImportShapeFile(false);
     setIsWmsOutSystem(false);
     setIsImportTifFile(false);
+    setIsCreateBaseOnExistLayer(false);
   };
 
   const handleChangeWmsOutSystem = () => {
     setIsImportShapeFile(false);
     setIsWmsOutSystem(true);
     setIsImportTifFile(false);
+    setIsCreateBaseOnExistLayer(false);
   };
 
   const handleChangeImportTifFile = () => {
     setIsImportShapeFile(false);
     setIsWmsOutSystem(false);
     setIsImportTifFile(true);
+    setIsCreateBaseOnExistLayer(false);
   };
+
+  const handleChangeBaseOnExistLayer = () => {
+    setIsImportShapeFile(false);
+    setIsWmsOutSystem(false);
+    setIsImportTifFile(false);
+    setIsCreateBaseOnExistLayer(true);
+  }
   const handleChangeFile = (e) => {
     var files = e.target.files;
     var filesArr = Array.prototype.slice.call(files);
@@ -199,15 +261,19 @@ function SelectDataSourceLayer(props) {
     <div className="select-data-source-container">
       <div className="container-fluid">
         <div className="row">
-          <div className="col-9 mx-auto text-center">
+          {/* <div className="col-11 mx-auto text-center"> */}
+          <div className={`${isLayerRela ? "col-11" : "col-9"} mx-auto text-center`}>
             <div className="container-select-wms row no-gutters">
-              <div className="col-3">
+              <div className={`${isLayerRela ? "col-2dot4" : "col-3"}`}>
                 <FormControlLabel
                   control={
                     <Radio
                       color="primary"
                       checked={
-                        isImportShapeFile && !isWmsOutSystem && !isImportTifFile
+                        isImportShapeFile &&
+                        !isWmsOutSystem &&
+                        !isImportTifFile &&
+                        !isCreateBaseOnExistLayer
                       }
                       onChange={handleChangeImportShapeFile}
                     />
@@ -217,13 +283,16 @@ function SelectDataSourceLayer(props) {
                 />
               </div>
 
-              <div className="col-3">
+              <div className={`${isLayerRela ? "col-2dot4" : "col-3"}`}>
                 <FormControlLabel
                   control={
                     <Radio
                       color="primary"
                       checked={
-                        isImportTifFile && !isWmsOutSystem && !isImportShapeFile
+                        isImportTifFile &&
+                        !isWmsOutSystem &&
+                        !isImportShapeFile &&
+                        !isCreateBaseOnExistLayer
                       }
                       onChange={handleChangeImportTifFile}
                     />
@@ -233,7 +302,7 @@ function SelectDataSourceLayer(props) {
                 />
               </div>
 
-              <div className="col-3">
+              <div className={`${isLayerRela ? "col-2dot4" : "col-3"}`}>
                 <FormControlLabel
                   control={
                     <Radio
@@ -241,7 +310,8 @@ function SelectDataSourceLayer(props) {
                       checked={
                         !isWmsOutSystem &&
                         !isImportShapeFile &&
-                        !isImportTifFile
+                        !isImportTifFile &&
+                        !isCreateBaseOnExistLayer
                       }
                       onChange={handleChangeWmsInSystem}
                     />
@@ -250,13 +320,16 @@ function SelectDataSourceLayer(props) {
                 />
               </div>
 
-              <div className="col-3">
+              <div className={`${isLayerRela ? "col-2dot4" : "col-3"}`}>
                 <FormControlLabel
                   control={
                     <Radio
                       color="primary"
                       checked={
-                        isWmsOutSystem && !isImportShapeFile && !isImportTifFile
+                        isWmsOutSystem &&
+                        !isImportShapeFile &&
+                        !isImportTifFile &&
+                        !isCreateBaseOnExistLayer
                       }
                       onChange={handleChangeWmsOutSystem}
                     />
@@ -264,6 +337,27 @@ function SelectDataSourceLayer(props) {
                   label="Wms ngoài hệ thống"
                 />
               </div>
+
+              {isLayerRela && (
+                <div className="col-2dot4">
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        color="primary"
+                        checked={
+                          isCreateBaseOnExistLayer &&
+                          !isWmsOutSystem &&
+                          !isImportShapeFile &&
+                          !isImportTifFile &&
+                          !isWmsOutSystem
+                        }
+                        onChange={handleChangeBaseOnExistLayer}
+                      />
+                    }
+                    label="Layer đã có"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -320,6 +414,44 @@ function SelectDataSourceLayer(props) {
                   />
                   {props.error && <span className="error">{props.error}</span>}
                 </div>
+                {isLayerRela && (
+                  <>
+                    <div className="form-group">
+                      <TextField
+                        fullWidth
+                        onChange={(event) =>
+                          setValueTiffFile2({
+                            ...valueTiffFile_2,
+                            year: event.target.value,
+                            layerRealationshipId: layerId,
+                          })
+                        }
+                        variant="outlined"
+                        size="small"
+                        label="Năm điều chỉnh"
+                        // error={props.error}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="inputLayerContent">Nội dung điều chỉnh</label>
+                      <textarea
+                        rows="3"
+                        cols="50"
+                        type="text"
+                        className="form-control"
+                        //value={this.state.contentChange}
+                        onChange={(event) => {
+                          setValueTiffFile2({
+                            ...valueTiffFile_2,
+                            contentChange: event.target.value,
+                          })
+                        }}
+                        id="inputLayerContent"
+                        placeholder="Nhập nội dung"
+                      />
+                    </div>
+                  </>
+                )}
                 <div>
                   <input
                     type="file"
@@ -381,7 +513,7 @@ function SelectDataSourceLayer(props) {
           </div>
         )}
 
-        {!isWmsOutSystem && !isImportShapeFile && !isImportTifFile && (
+        {!isWmsOutSystem && !isImportShapeFile && !isImportTifFile && !isCreateBaseOnExistLayer && (
           <div className="row mt-3">
             <div className="col-6 mx-auto">
               <Paper className="p-3" elevation={3}>
@@ -429,6 +561,102 @@ function SelectDataSourceLayer(props) {
             </div>
           </div>
         )}
+        {isCreateBaseOnExistLayer && (
+          <div className="row mt-3">
+            <div className="col-6 mx-auto">
+              <Paper className="p-3" elevation={3}>
+                <div className="wms-in-system-container mb-3">
+                  <Autocomplete
+                    id="selectPlanning"
+                    blurOnSelect={true}
+                    fullWidth={true}
+                    disableClearable={true}
+                    onChange={(event, newValue) => {
+                      setPlanningSelected(newValue)
+                      console.log(newValue)
+                    }
+                      // setTableName(newValue.tableName)
+                    }
+                    //inputValue={tableName}
+                    //onInputChange={(event, newValue) => setTableName(newValue)}
+                    options={allPlanning}
+                    getOptionLabel={(option) => option.name}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Chọn tên Quy hoạch từ danh sách"
+                        variant="outlined"
+                        size="small"
+                      />
+                    )}
+                  />
+                  <p
+                    className="mt-1 mb-0 text-danger"
+                    hidden={!hasShowTableNameWarning}
+                  >
+                    Trường này không được bỏ trống
+                  </p>
+                  <div className="form-group" hidden>
+                    <label htmlFor="selectStyle">Style:</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="selectStyle"
+                      value={style}
+                      onChange={(event) => setStyle(event.target.value)}
+                      placeholder="Nhập style"
+                    />
+                  </div>
+                </div>
+                {listLayer && listLayer.length > 0 && (
+                  <div className="wms-in-system-container">
+                    <Autocomplete
+                      id="selectLayer"
+                      blurOnSelect={true}
+                      fullWidth={true}
+                      disableClearable={true}
+                      onChange={(event, newValue) => {
+                        setLayerSelected(newValue)
+                      }
+                        // setTableName(newValue.tableName)
+                      }
+                      //inputValue={layerSelected?.name}
+                      //onInputChange={(event, newValue) => setTableName(newValue)}
+                      options={listLayer}
+                      getOptionLabel={(option) => option.name}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Chọn Lớp layer từ danh sách"
+                          variant="outlined"
+                          size="small"
+                        />
+                      )}
+                    />
+                    <p
+                      className="mt-1 mb-0 text-danger"
+                      hidden={!hasShowTableNameWarning}
+                    >
+                      Trường này không được bỏ trống
+                    </p>
+                    <div className="form-group" hidden>
+                      <label htmlFor="selectStyle">Style:</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="selectStyle"
+                        value={style}
+                        onChange={(event) => setStyle(event.target.value)}
+                        placeholder="Nhập style"
+                      />
+                    </div>
+                  </div>
+                )}
+              </Paper>
+            </div>
+          </div>
+
+        )}
       </div>
     </div>
   );
@@ -442,6 +670,7 @@ const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
       GetListDataSource: InitMapStore.GetListDataSource,
+      showLoading: appActions.ShowLoading,
     },
     dispatch
   );

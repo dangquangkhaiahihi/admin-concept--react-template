@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { useForm } from "react-hook-form";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import { Button } from "@material-ui/core";
 //--- Material Icon
@@ -30,6 +30,7 @@ import * as mapAction from "../../../redux/store/init-map/base-map.store";
 //--- Material Icon
 import { UrlCollection } from "../../../common/url-collection";
 import { disable } from "ol/rotationconstraint";
+import ChartPlanningModal from "./chart-record-modal/chart-record-modal";
 
 const useStyles = makeStyles((theme) => ({
   popover: {
@@ -68,10 +69,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function RecordsManagement(props) {
-  const { headCell, showLoading, isQHHTKT, isOtherPlanning, isQHT, isQHCC } = props;
+  const { headCell, showLoading, isQHHTKT, isOtherPlanning, isQHT, isQHCC, 
+    isHideButtonShowChart } = props;
 
   const classes = useStyles();
   const history = useHistory();
+  const location = useLocation();
 
   const [mapIdSelected, setMapIdSelected] = useState(null);
   const [planningIdSelected, setPlanningIdSelected] = useState(null);
@@ -97,7 +100,7 @@ function RecordsManagement(props) {
   const [dataModel, setDataModel] = useState(null);
   const [planningName, setPlanningName] = useState("");
   const [cgisId, setCgisId] = useState(0);
-  const [title, setTitle] = React.useState("");
+  const [title, setTitle] = useState("");
   const [planningUnitSelected, setPlanningUnitSelected] = useState(null);
   const [approvalAgencySelected, setApprovalAgencySelected] = useState(null);
   const [investorSelected, setInvestorSelected] = useState(null);
@@ -110,9 +113,27 @@ function RecordsManagement(props) {
     mode: "all",
     reValidateMode: "onBlur",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
+  const [dataStatistic, setDataStatistic] = useState([]);
+  const [openShowChartDialog, setOpenShowChartDialog] = useState(false);
+  
+  console.log("currentPagecurrentPagecurrentPage",currentPage);
   useEffect(() => {
-    onGetListPlanning();
+    onGetListPlanning(
+      location.state?.currentPage,
+      location.state?.pageSizeDefault,
+      Configs.DefaultSortExpression,
+      location.state?.title,
+      location.state?.typeSelected?.id,
+      location.state?.levelSelected?.id,
+      location.state?.statusIdSelected?.id,
+      location.state?.planningUnitSelected?.id,
+      location.state?.investorSelected?.id,
+      location.state?.approvalAgencySelected?.id,
+      location.state?.districtSelected?.id,
+    );
     const showConsult = new URLSearchParams(props?.location?.search).get(
       "showConsult"
     );
@@ -127,7 +148,25 @@ function RecordsManagement(props) {
       setShowConsult(true);
       setPlanningName(planningNameURL);
     }
+    if(location.state?.currentPage) setCurrentPage(location.state?.currentPage);
+    if(location.state?.pageSizeDefault) setPageSize(location.state?.pageSizeDefault);
+    if(location.state?.title) setTitle(location.state?.title);
+    if(location.state?.typeSelected) setTypeSelected(location.state?.typeSelected);
+    if(location.state?.levelSelected) setLevelSelected(location.state?.levelSelected);
+    if(location.state?.statusIdSelected) setStatusIdSelected(location.state?.statusIdSelected);
+    if(location.state?.planningUnitSelected) setPlanningUnitSelected(location.state?.planningUnitSelected);
+    if(location.state?.investorSelected) setInvestorSelected(location.state?.investorSelected);
+    if(location.state?.approvalAgencySelected) setApprovalAgencySelected(location.state?.approvalAgencySelected);
+    if(location.state?.districtSelected) setDistrictSelected(location.state?.districtSelected);
+    
+    setIsFirstLoad(false);
+    onGetStatisticPlanning();
   }, []);
+
+  useEffect(() => {
+    if(isFirstLoad) return;
+    setCurrentPage(page);
+  }, [page])
 
   const onGetListPlanning = (
     pageIndex = page,
@@ -187,7 +226,19 @@ function RecordsManagement(props) {
     history.push({
       pathname: isOtherPlanning ? UrlCollection.AddOtherPlanning : 
       isQHCC ? UrlCollection.AddPlanningCC : 
-      UrlCollection.AddPlanningAnnouncementProcess 
+      UrlCollection.AddPlanningAnnouncementProcess,
+      state: { 
+        currentPage: page,
+        pageSizeDefault: pageSizeDefault,
+        title: title,
+        typeSelected: typeSelected,
+        levelSelected: levelSelected,
+        statusIdSelected: statusIdSelected,
+        planningUnitSelected: planningUnitSelected,
+        investorSelected: investorSelected,
+        approvalAgencySelected: approvalAgencySelected,
+        districtSelected: districtSelected
+      }
     });
   };
 
@@ -219,7 +270,18 @@ function RecordsManagement(props) {
           ":id",
           id
         ),
-        state: { planningId: id },
+        state: { 
+          currentPage: page,
+          pageSizeDefault: pageSizeDefault,
+          title: title,
+          typeSelected: typeSelected,
+          levelSelected: levelSelected,
+          statusIdSelected: statusIdSelected,
+          planningUnitSelected: planningUnitSelected,
+          investorSelected: investorSelected,
+          approvalAgencySelected: approvalAgencySelected,
+          districtSelected: districtSelected
+        }
       });
     }
   };
@@ -266,9 +328,17 @@ function RecordsManagement(props) {
     planningAction.DeletePlanning(planningId).then(
       (res) => {
         onGetListPlanning(
-          1,
+          currentPage,
           pageSizeDefault,
-          orderBy ? orderBy + " " + order : ""
+          orderBy ? orderBy + " " + order : "",
+          title,
+          typeSelected?.id,
+          levelSelected?.id,
+          statusIdSelected?.id,
+          planningUnitSelected?.id,
+          investorSelected?.id,
+          approvalAgencySelected?.id,
+          districtSelected?.id
         );
         handleCloseDeleteDialog();
         ShowNotification(
@@ -293,10 +363,23 @@ function RecordsManagement(props) {
     showLoading(true);
     planningAction.LockPlanning(planningId).then(
       (res) => {
+        // onGetListPlanning(
+        //   currentPage,
+        //   pageSizeDefault,
+        //   orderBy ? orderBy + " " + order : ""
+        // );
         onGetListPlanning(
-          1,
+          currentPage,
           pageSizeDefault,
-          orderBy ? orderBy + " " + order : ""
+          orderBy ? orderBy + " " + order : "",
+          title,
+          typeSelected?.id,
+          levelSelected?.id,
+          statusIdSelected?.id,
+          planningUnitSelected?.id,
+          investorSelected?.id,
+          approvalAgencySelected?.id,
+          districtSelected?.id
         );
         handleCloseLockDialog();
         ShowNotification(
@@ -321,10 +404,23 @@ function RecordsManagement(props) {
     showLoading(true);
     planningAction.UnLockPlanning(planningId).then(
       (res) => {
+        // onGetListPlanning(
+        //   currentPage,
+        //   pageSizeDefault,
+        //   orderBy ? orderBy + " " + order : ""
+        // );
         onGetListPlanning(
-          1,
+          currentPage,
           pageSizeDefault,
-          orderBy ? orderBy + " " + order : ""
+          orderBy ? orderBy + " " + order : "",
+          title,
+          typeSelected?.id,
+          levelSelected?.id,
+          statusIdSelected?.id,
+          planningUnitSelected?.id,
+          investorSelected?.id,
+          approvalAgencySelected?.id,
+          districtSelected?.id
         );
         handleCloseUnLockDialog();
         ShowNotification(
@@ -400,7 +496,19 @@ function RecordsManagement(props) {
   };
 
   const handleCloseCreatMapModal = () => {
-    onGetListPlanning();
+    onGetListPlanning(
+      currentPage,
+      pageSizeDefault,
+      orderBy ? orderBy + " " + order : "",
+      title,
+      typeSelected?.id,
+      levelSelected?.id,
+      statusIdSelected?.id,
+      planningUnitSelected?.id,
+      investorSelected?.id,
+      approvalAgencySelected?.id,
+      districtSelected?.id
+    );
     setOpenCreatMapModal(false);
   };
 
@@ -493,6 +601,18 @@ function RecordsManagement(props) {
         visibleColumn: true,
       },
       {
+        id: "createdDate",
+        hideSortIcon: false,
+        label: "Ngày tạo",
+        visibleColumn: true,
+      },
+      {
+        id: "createdBy",
+        hideSortIcon: false,
+        label: "Tạo bởi",
+        visibleColumn: true,
+      },
+      {
         id: "consultTheCommunity",
         hideSortIcon: false,
         label: "Xin ý kiến",
@@ -502,6 +622,18 @@ function RecordsManagement(props) {
         id: "announced",
         hideSortIcon: false,
         label: "Công bố",
+        visibleColumn: true,
+      },
+      {
+        id: "isCheck",
+        hideSortIcon: true,
+        label: "Kiểm tra",
+        visibleColumn: true,
+      },
+      {
+        id: "isCheckDocument",
+        hideSortIcon: true,
+        label: "Kiểm tra hồ sơ",
         visibleColumn: true,
       },
       {
@@ -636,6 +768,127 @@ function RecordsManagement(props) {
     }
     return headCells;
   }, [headCell]);
+  
+  const onGetStatisticPlanning = (
+    pageIndex = page,
+    pageSize = 10000,
+    sortExpression = Configs.DefaultSortExpression,
+    name = planningName || "",
+
+    //     pageIndex,
+    //     pageSize,
+    //     sortExpression,
+    //     name.trim(),
+    //     type,
+    //     level,
+    //     status,
+    //     planningunit,
+    //     investor,
+    //     approvalAgency,
+    //     district,
+    //     isQHHTKT,
+    //     isOtherPlanning,
+    //     isQHT,
+    //     isQHCC,
+  ) => {
+    showLoading(true);
+    planningAction
+      .GetListPlanning(
+        pageIndex,
+        pageSize,
+        sortExpression,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        isQHHTKT, 
+        isOtherPlanning,
+        isQHT,
+        isQHCC,
+      )
+      .then(
+        (res) => {
+          if (res && res.content) {
+            function groupByMonth(data) {
+              const grouped = {};
+            
+              data.forEach(item => {
+                  const date = new Date(item.created_date);
+                  const year = date.getFullYear();
+                  const month = date.getMonth() + 1; // Adding 1 because months are zero-indexed
+          
+                  const key = `${month}-${year}`;
+                  if (!grouped[key]) {
+                      grouped[key] = {
+                          month: `${month}-${year}`,
+                          items: []
+                      };
+                  }
+          
+                  grouped[key].items.push(item);
+              });
+          
+              return Object.values(grouped);
+            }
+
+            const listPlanningTypeName =["Quy hoạch vùng", "Quy hoạch phân khu", "Quy hoạch chức năng đặc thù", "Quy hoạch chi tiết", "Quy hoạch chung"];
+
+            function countByPlanningType(data) {
+              const counts = {};
+
+              const filteredPlanningTypeNames = listPlanningTypeName.filter(planningTypeName => {
+                  return !data.some(item => item.planningTypeName === planningTypeName);
+              });
+          
+              data.forEach((item,index) => {
+                const { planningTypeName } = item;
+        
+                if (!counts[planningTypeName]) {
+                  counts[planningTypeName] = {
+                      planningTypeName: planningTypeName,
+                      count: 0
+                  };
+                }
+                counts[planningTypeName].count++;
+              });
+          
+              filteredPlanningTypeNames.forEach(planningTypeName => {
+                counts[planningTypeName] = {
+                  planningTypeName: planningTypeName,
+                  count: 0
+                };
+              })
+
+              return Object.values(counts);
+            }
+
+            
+            const dataGroupedByMonth = groupByMonth(res.content.items);
+            dataGroupedByMonth.sort((a, b) => {
+              const [aMonth, aYear] = a.month.split('-');
+              const [bMonth, bYear] = b.month.split('-');
+              return aYear === bYear ? aMonth - bMonth : aYear - bYear;
+            })
+            
+            dataGroupedByMonth.map((item) => {
+              const temp = countByPlanningType(item.items);
+              item['groupedByPlanningType'] = temp;
+              delete item.items;
+            })
+            
+            
+            setDataStatistic(dataGroupedByMonth);
+          }
+        },
+        (err) => {
+          showLoading(false);
+        }
+      );
+  };
 
   return (
     <div className={`consult-the-community ${classes.positionRelative}`}>
@@ -690,6 +943,25 @@ function RecordsManagement(props) {
           Thêm quy hoạch
         </div>
       )} */}
+      {
+        !isHideButtonShowChart && 
+        <div className="form-row">
+          <div
+            class={`form-group col-12 col-lg-12 'd-flex flex-column'}`}
+            style={{ display: "flex" }}
+          >
+            <div style={{ paddingLeft: "0px" }}>
+              <button
+                class="btn btn-ct btn-primary-ct"
+                onClick={() => {setOpenShowChartDialog(true)}}
+                style={{ color: "white", margin: "0px 0px" }}
+              >
+                Biểu đồ thống kê
+              </button>
+            </div>
+          </div>
+        </div>
+      }
 
       <ListRecordsManagement
         openCreatMapModal={handleOpenCreatMapModal}
@@ -699,7 +971,8 @@ function RecordsManagement(props) {
         setOrder={setOrder}
         orderBy={orderBy}
         setOrderBy={setOrderBy}
-        page={page}
+        // page={page}
+        page={currentPage}
         setPage={setPage}
         pageSize={pageSizeDefault}
         setPageSize={setPageSize}
@@ -728,7 +1001,29 @@ function RecordsManagement(props) {
         levelSelected={levelSelected}
         statusIdSelected={statusIdSelected}
         districtSelected={districtSelected}
+        getLocationState={()=>{
+          return { 
+            currentPage: page,
+            pageSizeDefault: pageSizeDefault,
+            title: title,
+            typeSelected: typeSelected,
+            levelSelected: levelSelected,
+            statusIdSelected: statusIdSelected,
+            planningUnitSelected: planningUnitSelected,
+            investorSelected: investorSelected,
+            approvalAgencySelected: approvalAgencySelected,
+            districtSelected: districtSelected
+          }
+        }}
       />
+
+      {openShowChartDialog && (
+        <ChartPlanningModal
+          isOpen={openShowChartDialog}
+          onClose={() => setOpenShowChartDialog(false)}
+          data = {dataStatistic}
+        />
+      )}
 
       {openAddDialog && (
         <AddRecordsManagement

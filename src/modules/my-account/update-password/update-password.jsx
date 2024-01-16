@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 import SaveIcon from '@material-ui/icons/Save'
 import useUpdateAccountPassword from '../hooks/useUpdateAccountPassword'
+import { useUserInfo } from '../context/BottomPanelContext'
 
 const formFields = {
   currentPassword: 'currentPassword',
@@ -17,10 +18,17 @@ const formFields = {
 const UpdatePassword = () => {
   const { handleSubmit, register, errors, setError, reset } = useForm()
 
+  const userInfo = useUserInfo();
+
+  useEffect(()=>{
+    console.log("userInfouserInfo",userInfo);
+  }, [userInfo])
+  
   const { handleUpdateAccountPassword, isUpdating } = useUpdateAccountPassword({
     resetScreen: reset,
   })
   const onSubmit = (data) => {
+    data.id = userInfo;
     if (data.newPassword !== data.confirmNewPassword)
       return setError(formFields.confirmNewPassword, {
         type: 'manual',

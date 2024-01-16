@@ -10,7 +10,7 @@ function PageTitle(props) {
   const { expandSidebar, collapseSidebar, isCollapsed, setToggle, title,reactMediaQuery } = props;
 
   return (
-    <div className="sticky">
+    <div className="sticky" id="sticky-title">
       <div className="page-title">
         <span>{title}</span>
       </div>

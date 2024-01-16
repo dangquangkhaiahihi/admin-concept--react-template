@@ -100,7 +100,7 @@ function AnalysisNote(props) {
         ) : (
           <>
             <div>
-              <b className="head__title">Danh sách ghi chú</b>
+              <b className="head__title">Danh sách thuyết minh</b>
               <button
                 onClick={() => setIsHide(!isHide)}
                 title="Ẩn"
@@ -117,7 +117,7 @@ function AnalysisNote(props) {
                 onClick={handleOpenAddDialog}
                 startIcon={<AddCircle />}
               >
-                Thêm ghi chú
+                Thêm thuyết minh
               </Button>
             </div>
             <ListAnalysisNote

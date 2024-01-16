@@ -50,7 +50,6 @@ function SearchRoleManagement(props) {
     setPage(0);
     let sortExpression = "modifiedDate desc"
     getListRoleManagement(1, rowsPerPageCommon, sortExpression, "", "");
-    document.getElementById("formSearch").reset()
   }
 
   const handleClearAllField = () => {
