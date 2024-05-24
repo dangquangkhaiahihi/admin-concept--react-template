@@ -1,7 +1,7 @@
 import React from 'react';
 import './layout.scss';
 import Sidebar from '../sidebar/sidebar.view.jsx';
-import TopBar from '../topbar/topbar.view.jsx';
+// import TopBar from '../topbar/topbar.view.jsx';
 import LoadingScreen from '../loading-with-queue/loading-with-queue';
 import PageTitle from '../page-title/page-title.view';
 import { connect } from 'react-redux';
@@ -29,7 +29,7 @@ class LayoutView extends React.Component<any, IState> {
     return (
       <div id='dashboard-main-wrapper'>
         <LoadingScreen />
-        <TopBar setToggle={this.setToggle} reactMediaQuery={reactMediaQuery}/>
+        {/* <TopBar setToggle={this.setToggle} reactMediaQuery={reactMediaQuery}/> */}
 
         <div
           id='content-wrapper'
