@@ -1,0 +1,106 @@
+.dx-scrollable-container {
+  overflow: auto;
+}
+
+.dx-menu-search {
+  #formSearchDocument {
+    input {
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.pg-viewer-wrapper {
+  position: relative;
+  left: 130px;
+}
+
+.document-manager-container {
+  .dx-filemanager {
+    .dx-filemanager-files-view.dx-filemanager-details {
+      .dx-datagrid {
+        .dx-datagrid-content {
+          .dx-datagrid-table {
+            th {
+              padding: 5px 0;
+
+              &.dx-filemanager-details-item-is-directory {
+                width: 43px;
+                min-width: 43px;
+                max-width: 43px;
+              }
+
+              &.dx-documentmanagement-name {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+              }
+
+              &.dx-documentmanagement-modifiedDate {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+              }
+
+              &.dx-documentmanagement-status {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+              }
+
+              &.dx-documentmanagement-fileSize {
+                width: 100px;
+                min-width: 100px;
+                max-width: 100px;
+              }
+            }
+
+            td {
+              padding: 5px;
+
+              &.dx-documentmanagement-typeName {
+                width: 43px;
+                min-width: 43px;
+                max-width: 43px;
+              }
+
+              &.dx-documentmanagement-name {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+              }
+              
+              &.dx-documentmanagement-modifiedDate {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+              }
+
+              &.dx-documentmanagement-status {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+              }
+
+              &.dx-documentmanagement-fileSize {
+                width: 100px;
+                min-width: 100px;
+                max-width: 100px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .dx-filemanager-container {
+      .dx-drawer-panel-content.dx-drawer-panel-content-initial {
+        min-width: 400px;
+        max-width: 400px;
+      }
+    }
+  }
+}

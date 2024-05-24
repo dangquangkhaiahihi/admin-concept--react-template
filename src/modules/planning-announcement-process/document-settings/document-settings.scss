@@ -1,0 +1,53 @@
+.document-settings {
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .react-contextmenu-wrapper {
+        min-height: 100%;
+
+        li {
+            p {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+
+    nav {
+        &.react-contextmenu {
+            box-shadow: 0 0.125rem 0.25rem 0 rgba(58, 59, 69, 0.2);
+            border-radius: 4px;
+            background-color: #00923F;
+            color: #ffffff;
+            border: 1px solid #00923F;
+
+            .react-contextmenu-item {
+                padding: 0.5rem 1rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+
+                &:hover {
+                    cursor: pointer;
+                    background-color: #ffffff;
+                    color: #00923F;
+                    border-radius: 4px;
+                }
+
+                &.react-contextmenu-item--divider {
+                    padding: 0;
+                }
+            }
+        }
+    }
+}
+
+.pg-viewer-wrapper {
+    .pg-viewer {
+        .pdf-viewer-container {
+            .pdf-viewer {
+                text-align: center;
+            }
+        }
+    }
+}

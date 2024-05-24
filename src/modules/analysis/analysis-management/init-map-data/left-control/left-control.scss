@@ -1,0 +1,60 @@
+.left-control-container {
+    overflow-y: hidden;
+
+    .left-control-map-title-container {
+        color: white;
+        background-color: #00923F;
+
+        img {
+            width: 20px;
+        }
+
+        .setting {
+            cursor: pointer;
+        }
+    }
+
+    .MuiPaper-root.MuiDialog-paper.MuiDialog-paperScrollPaper.MuiDialog-paperWidthSm.MuiPaper-elevation24.MuiPaper-rounded {
+        background-color: red;
+        width: 600px;
+        display: none !important;
+    }
+    .position-absolute{
+        top:180px;
+        right:15px;
+    }
+
+}
+.construction_title {
+    h2 {
+        text-align: center;
+        font-size: 1.4em;
+        font-weight: 700;
+        font-family: "Roboto";
+        color: #0055ab;
+        position: relative;
+        margin-bottom: 0;
+    }
+
+}
+
+
+.tab_ {
+    margin: 1rem 0;
+    background-color: aliceblue;
+
+    // .col-6 {
+    //     border-bottom: 1px solid gray;
+    // }
+
+    p {
+        text-align: center;
+        font-weight: 700;
+        margin-top: 1rem;
+    }
+
+    .active {
+        border-bottom: 3px solid #11998e;
+    }
+}
+

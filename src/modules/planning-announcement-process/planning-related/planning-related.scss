@@ -1,0 +1,19 @@
+.button-add-click{
+    &:hover{
+        cursor: pointer;
+    }
+}
+
+@media (max-width: 1224px) {
+    .mobile-buttons-wrapper {
+        flex-direction: column;
+        .mobile-button {
+            width: 100%;
+            margin: 0 0 8px 0 !important;
+        }
+    }
+
+    .mobile-buttons-wrapper :last-child {
+        margin: 0 !important;
+    }
+}

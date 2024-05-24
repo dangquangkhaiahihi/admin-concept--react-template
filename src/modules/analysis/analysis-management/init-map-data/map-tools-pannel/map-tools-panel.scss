@@ -1,0 +1,31 @@
+.map-tool-panel-container {
+    flex-wrap: wrap;
+    width: 95px;
+    justify-content: space-around;
+    background-color: rgba(255, 255, 255, 0.473);
+    top: 40px;
+    right: -10px;
+    z-index: 50;
+    div {
+        width: 40px;
+        text-align: center;
+
+        .active {
+            background-color: #bf0707 !important;
+        }
+
+        .tool-button {
+            background-color: #666666;
+            width: 30px;
+            border: 0;
+            width: 30px;
+            margin: 5px;
+            padding-bottom: 4px;
+
+            img {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    }
+}

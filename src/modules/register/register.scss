@@ -1,0 +1,71 @@
+.register-page {
+    -ms-flex-align: center;
+    align-items: center;
+    background: #ffffff;
+    display: -ms-flexbox;
+    display: flex;
+    height: 100vh;
+    -ms-flex-pack: center;
+    justify-content: center;
+
+    .register-form {
+        max-width: 30rem;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 10px #999;
+        padding: 3rem;
+
+        .icon-title {
+            font-size: 3rem;
+            color: #ff0000;
+        }
+
+        .title {
+            color: #ff0000;
+        }
+
+        .form-group {
+            .icon-input {
+                position: absolute;
+                top: .7rem;
+                left: 1.75rem;
+            }
+
+            .form-control {
+                padding-left: 2.75rem;
+                color: #000000;
+                outline: none;
+                border-radius: 0px;
+
+                &.no-icon {
+                    padding-left: .375rem;
+                }
+            }
+        }
+
+        .arrow-back {
+            color: #ff0000;
+
+            &:hover {
+                color: #ff0000;
+            }
+
+            .icon-link {
+                font-size: 1rem;
+            }
+        }
+
+        .btn {
+            outline: none;
+        }
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .register-page {
+        align-items: unset;
+
+        .register-form {
+            max-width: 100%;
+        }
+    }
+}

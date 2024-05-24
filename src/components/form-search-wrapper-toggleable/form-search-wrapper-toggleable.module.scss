@@ -1,0 +1,29 @@
+.search_section {
+    bottom: 0;
+    z-index: 1;
+
+    &._open {
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, .5);
+
+        .form_search_wrapper {
+            // height: auto;
+            max-height: 70vh;
+        }
+    }
+
+    .form_search_wrapper {
+        // max-height: 70vh;
+        // height: 0;
+        max-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        // transition: height 0.7s;
+        transition: max-height 0.7s;
+
+        .function_buttons_wrapper {
+            position: sticky;
+            bottom: 0;
+            background: white;
+        }
+    }
+}

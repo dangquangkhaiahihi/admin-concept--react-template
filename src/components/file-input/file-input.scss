@@ -1,0 +1,52 @@
+/*!
+ * ReactJS File Input
+ *
+ * NCH default styling for ReactJS File Input
+ *
+ * Author: NCH
+ */
+
+.file-drop-zone-title {
+  color: #000;
+  padding: 30px 10px;
+}
+
+.kv-file-content {
+  img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.kv-file-content-custom {
+  justify-content: center;
+  display: flex;
+
+  img {
+    width: 90px;
+  }
+}
+
+.file-drop-zone {
+  .file-preview-thumbnails {
+    &.one-file-preview {
+      display: flex;
+      justify-content: center;
+    }
+
+    &.multi-file-preview {
+      padding-left: calc(100% - 94%);
+    }
+  }
+}
+
+.input-file {
+  display: none;
+}
+
+.file-error-message {
+  float: left;
+  width: 100%;
+}

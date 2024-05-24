@@ -1,0 +1,50 @@
+.left-control-base-map-container {
+
+    label {
+        cursor: move;
+    }
+
+    .MuiAccordionSummary-expandIcon {
+        position: absolute;
+        left: 0px
+    }
+
+    .add-button-icon {
+        right: 14px;
+    }
+
+    .group-icon-container {
+        right: 0px;
+        cursor: pointer;
+    }
+
+    .smooth-dnd-container.vertical {
+        width: 100%;
+    }
+
+    .icon-base-map {
+        color: green;
+    }
+
+    .MuiAccordionSummary-root {
+        &.Mui-expanded {
+            min-height: 40px;
+        }
+    }
+
+    .MuiAccordionSummary-content {
+        margin: 0;
+
+        &.Mui-expanded {
+            margin: 0;
+        }
+    }
+
+    input {
+        cursor: pointer;
+    }
+}
+.font-base-map {
+    font-size: 18px;
+    font-weight: 600;
+}

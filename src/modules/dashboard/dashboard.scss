@@ -1,0 +1,28 @@
+.wrap__planning {
+  border-radius: 3px;
+  background-color: #fff;
+  width: 100%;
+  padding: 15px;
+  .highcharts-credits {
+    display: none;
+  }
+}
+
+.MuiFormControl-root .MuiInput-formControl {
+  background-color: white;
+  border-radius: 5px;
+
+  .MuiInputBase-input {
+    margin-left: 13px;
+    padding-top: 12px !important;
+  }
+}
+
+.wrap__planning-loading {
+  height: 100%;
+  border-radius: 3px;
+  background-color: #fff;
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+}

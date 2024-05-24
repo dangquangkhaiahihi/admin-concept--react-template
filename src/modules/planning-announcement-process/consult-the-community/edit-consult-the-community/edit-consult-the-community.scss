@@ -1,0 +1,26 @@
+.dialog-preview-form {
+    .MuiDialog-paperWidthSm {
+        max-width: 750px;
+    }
+
+    .MuiAccordionSummary-content {
+        width: 90%;
+    }
+}
+.file_item{
+    position: relative;
+    .file_name {
+        padding-left: 5px;
+        font-size: 0.6rem;
+    }
+    .close_x {
+        position: absolute;
+        top: -6px;
+        right: 4px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        color: red;
+        background: blue;
+    }
+}

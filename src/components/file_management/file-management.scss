@@ -1,0 +1,80 @@
+.dx-scrollable-container {
+  overflow: auto;
+}
+
+.dx-menu-search {
+  #formSearchDocument {
+    input {
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.dx-filemanager {
+  .dx-filemanager-files-view.dx-filemanager-details {
+    .dx-datagrid {
+      .dx-datagrid-content {
+        .dx-datagrid-table {
+          th {
+            padding: 5px 0;
+            
+            &.dx-filemanager-details-item-is-directory {
+              width: 43px;
+              min-width: 43px;
+              max-width: 43px;
+            }
+
+            &.dx-filemanager-name {
+              width: 100px;
+              min-width: 100px;
+              max-width: 100px;
+            }
+
+            &.dx-filemanager-modifiedDate {
+              width: 100px;
+              min-width: 100px;
+              max-width: 100px;
+            }
+
+            &.dx-filemanager-size {
+              width: 100px;
+              min-width: 100px;
+              max-width: 100px;
+            }
+          }
+
+          td {
+            padding: 5px;
+
+            &.dx-filemanager-typeName {
+              width: 43px;
+              min-width: 43px;
+              max-width: 43px;
+            }
+
+            &.dx-filemanager-name {
+              width: 100px;
+              min-width: 100px;
+              max-width: 100px;
+            }
+            
+            &.dx-filemanager-modifiedDate {
+              width: 100px;
+              min-width: 100px;
+              max-width: 100px;
+            }
+
+            &.dx-filemanager-size {
+              width: 100px;
+              min-width: 100px;
+              max-width: 100px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
