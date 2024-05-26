@@ -20,6 +20,7 @@ import ModalConfirm from '../../components/custom-modal/modal-confirm/modal-conf
 import FormAddEditAccount from './components/form-add-edit-account';
 import DataTableCustom from '../../components/datatable-custom';
 import { mediaUrl } from '../../api/api-service-custom';
+import FormResetPassword from './components/form-reset-password';
 
 const configLocal = {
     defaultPageSize: config.Configs.DefaultPageSize,
@@ -180,6 +181,30 @@ export default function AccountManagement() {
             );
         }
     }
+
+    const handleSubmitResetPassword = async (data) => {
+        showLoading(true);
+
+        try {
+            let res = await userManagementAction.ResetPasswordUserManagement(data.id, data.password);
+
+            if (res && res.content) {
+                ShowNotification(
+                    "Đổi mật khẩu người dùng thành công.",
+                    NotificationMessageType.Success
+                );
+                let sortExpression = orderBy + ' ' + order;
+                getListAccountManagement(page + 1, rowsPerPage, sortExpression, searchData);
+            }
+        } catch (err) {
+            showLoading(false);
+            err && err.errorType &&
+            ShowNotification(
+                viVN.Errors[err.errorType],
+                NotificationMessageType.Error
+            );
+        }
+    }
      
     const buttonOpenAddEditRef = useRef();
     const buttonOpenConfirmRef = useRef();
@@ -187,6 +212,7 @@ export default function AccountManagement() {
     const [isOpenDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [isOpenActiveDialog, setOpenActiveDialog] = useState(false);
     const [isOpenDeactiveDialog, setOpenDeactiveDialog] = useState(false);
+    const [isOpenResetPasswordDialog, setOpenResetPasswordDialog] = useState(false);
 
     const [selectedItem, setSelectedItem] = useState(null);
     const openAddDialog = () => {
@@ -202,6 +228,17 @@ export default function AccountManagement() {
         setOpenAddEditDialog(false);
         setSelectedItem(null);
     }
+
+    const openResetPasswordDialog = (item) => {
+        setOpenResetPasswordDialog(true);
+        setSelectedItem(item);
+        buttonOpenAddEditRef.current.click();
+    }
+    const closeResetPasswordDialog = () => {
+        setOpenResetPasswordDialog(false);
+        setSelectedItem(null);
+    }
+
     const openConfirmDialog = (item) => {
         setSelectedItem(item);
         buttonOpenConfirmRef.current.click();
@@ -210,6 +247,7 @@ export default function AccountManagement() {
         setOpenDeleteDialog(false);
         setOpenActiveDialog(false);
         setOpenDeactiveDialog(false);
+        setOpenResetPasswordDialog(false);
         setSelectedItem(null);
     }
     const handleConfirm = async () => {
@@ -319,15 +357,16 @@ export default function AccountManagement() {
                             data.length > 0 ?
                             data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    <td><span>{row.fullName}</span></td>
-                                    <td><span>{row.email}</span></td>
-                                    <td><span>{row.roleNames.join() == ''? 'Người dùng' : row.roleNames.join(', ')}</span></td>
-                                    <td><span>{row.dateOfBirth ? dayjs(row.dateOfBirth).format("DD/MM/YYYY") : ''}</span></td>
-                                    <td><span>{row.sex ? "Nam" : "Nữ"}</span></td>
-                                    <td><span>{row.phoneNumber}</span></td>
-                                    <td><span>{row.address}</span></td>
-                                    {/* <td><span>{row.avatar ? <img src={`${mediaUrl}/${row.avatar}`}/> : <></>}</span></td> */}
-                                    <td><span>{row.modifiedDate ? dayjs(row.modifiedDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{rowIndex + 1}</span></td>
+                                    <td className='text-center'><span>{row.fullName}</span></td>
+                                    <td className='text-center'><span>{row.email}</span></td>
+                                    <td className='text-center'><span>{row.roleNames.join() == ''? 'Người dùng' : row.roleNames.join(', ')}</span></td>
+                                    <td className='text-center'><span>{row.dateOfBirth ? dayjs(row.dateOfBirth).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{row.sex ? "Nam" : "Nữ"}</span></td>
+                                    <td className='text-center'><span>{row.phoneNumber}</span></td>
+                                    <td className='text-center'><span>{row.address}</span></td>
+                                    {/* <td className='text-center'><span>{row.avatar ? <img src={`${mediaUrl}/${row.avatar}`}/> : <></>}</span></td> */}
+                                    <td className='text-center'><span>{row.modifiedDate ? dayjs(row.modifiedDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
                                     <td align="center">
                                         <span>
                                             {row.status ? (
@@ -348,7 +387,7 @@ export default function AccountManagement() {
                                         </span>
                                     </td>
 
-                                    <td>
+                                    <td className='text-center'>
                                         <div className='d-flex'>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table edit" data-toggle="tooltip" data-placement="top"
                                                 title="Sửa"
@@ -383,6 +422,14 @@ export default function AccountManagement() {
                                                     <i className="fas fa-lock-open"></i>
                                                 )}
                                             </button>
+                                            <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table change-pass-account" data-toggle="tooltip" data-placement="top"
+                                                title="Đặt lại mật khẩu"
+                                                onClick={() => {
+                                                    openResetPasswordDialog(row);
+                                                }}
+                                            >
+                                                <i className="fas fa-key"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -399,16 +446,32 @@ export default function AccountManagement() {
                 Launch modal confirm
             </button>
             <ModalSubmitForm
-                title={!selectedItem ? "Thêm mới tài khoản" : "Chỉnh sửa tài khoản"}
-                open={isOpenAddEditDialog}
-                onClose={closeAddEditDialog}
+                title={!isOpenResetPasswordDialog ? (!selectedItem ? "Thêm mới tài khoản" : "Chỉnh sửa tài khoản") : "Đổi mật khẩu tài khoản"}
+                open={isOpenAddEditDialog || isOpenResetPasswordDialog}
+                onClose={() => {
+                    if ( !isOpenResetPasswordDialog ) {
+                        closeAddEditDialog();
+                    } else {
+                        closeResetPasswordDialog();
+                    }
+                }}
             >
-                <FormAddEditAccount
-                    rolesLookup={rolesLookup}
-                    // ===
-                    updateItem={selectedItem}
-                    onSubmitAddEdit={handleSubmitAddEditAccount}
-                />
+                {
+                    !isOpenResetPasswordDialog ? (
+                        <FormAddEditAccount
+                            rolesLookup={rolesLookup}
+                            // ===
+                            updateItem={selectedItem}
+                            onSubmitAddEdit={handleSubmitAddEditAccount}
+                        />
+                    ) : (
+                        <FormResetPassword
+                            updateItem={selectedItem}
+                            onSubmitAddEdit={handleSubmitResetPassword}
+                        />
+                    )
+                }
+                
             </ModalSubmitForm>
 
             <ModalConfirm 

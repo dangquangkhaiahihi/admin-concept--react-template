@@ -153,7 +153,7 @@ export default function ClientNoteManagement() {
         getListPlanManagement(1, event.target.value, sortExpression, searchData);
     };
 
-    const handleSubmitAddEditAccount = async (data) => {
+    const handleSubmitAddEditClientNote = async (data) => {
         showLoading(true);
 
         try {
@@ -346,13 +346,14 @@ export default function ClientNoteManagement() {
                             data.length > 0 ?
                             data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    <td><span>{row.clientName || client.find(item => item.id === row.clientId)?.name}</span></td>
-                                    <td><span>{row.note}</span></td>
-                                    <td><span>{row.userName || users.find(item => item.id === row.userId)?.fullName}</span></td>
-                                    <td><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
-                                    <td><span>{row.modified_date ? dayjs(row.modified_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{rowIndex + 1}</span></td>
+                                    <td className='text-center'><span>{row.clientName || client.find(item => item.id === row.clientId)?.name}</span></td>
+                                    <td className='text-center'><span>{row.note}</span></td>
+                                    <td className='text-center'><span>{row.userName || users.find(item => item.id === row.userId)?.fullName}</span></td>
+                                    <td className='text-center'><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{row.modified_date ? dayjs(row.modified_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
 
-                                    <td>
+                                    <td className='text-center'>
                                         <div className='d-flex'>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table edit" data-toggle="tooltip" data-placement="top"
                                                 title="Sửa"
@@ -394,7 +395,7 @@ export default function ClientNoteManagement() {
                     users={users}
                     // ===
                     updateItem={selectedItem}
-                    onSubmitAddEdit={handleSubmitAddEditAccount}
+                    onSubmitAddEdit={handleSubmitAddEditClientNote}
                 />
             </ModalSubmitForm>
 

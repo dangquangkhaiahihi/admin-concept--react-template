@@ -74,7 +74,7 @@ export default function FormAddEditClient(props) {
           return;
         }
         
-        const dataSubmit = { ...data,  id: updateItem?.id }
+        const dataSubmit = { ...data,  id: updateItem?.id, totalMoney: updateItem?.totalMoney }
         if ( selectedProvinces.length > 0 ) {
             dataSubmit.provinceIds = selectedProvinces.map( item => item.value )
         }
@@ -166,7 +166,7 @@ export default function FormAddEditClient(props) {
                     <input
                         className="form-control"
                         type="number"
-                        name="name"
+                        name="totalMoney"
                         value={updateItem?.totalMoney}
                         disabled
                     />

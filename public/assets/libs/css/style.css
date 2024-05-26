@@ -202,6 +202,10 @@
     background-color: #ffc108;
 }
 
+.custom-button-table.change-pass-account, .custom-button-table.create-client-note {
+    background-color: #ffc108;
+}
+
 .custom-button-table.create-calendar-customer {
     background-color: #ffc108;
 }

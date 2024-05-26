@@ -15,6 +15,7 @@ import * as userManagementAction from "../../redux/store/user-management/user-ma
 import * as provinceManagementAction from "../../redux/store/province-management/province.store"
 import * as planManagementAction from "../../redux/store/plan-management/plan-management.store";
 import * as clientManagementAction from "../../redux/store/client-management/client-management.store";
+import * as clientNoteManagementAction from "../../redux/store/client-note-management/client-note-management.store";
 
 import ModalSubmitForm from '../../components/custom-modal/modal-submit-form/modal-submit-form';
 import dayjs from 'dayjs';
@@ -29,6 +30,7 @@ import Select from "react-select";
 import FormAddMoneyClient from './components/form-add-money-client';
 import ModalCustom from '../../components/custom-modal/modal-custom/modal-cutom';
 import FormAddEditOrder from '../list-order/components/form-add-edit-order';
+import FormAddEditClientNote from '../list-client-note/components/form-add-edit-client-note';
 
 const configLocal = {
     defaultPageSize: config.Configs.DefaultPageSize,
@@ -45,8 +47,7 @@ export default function ClientManagement() {
     const dispatch = useDispatch();
     const showLoading = (data) => dispatch(appActions.ShowLoading(data));
 
-    // START GET LOOK UP
-
+    const now = new Date();
     // START GET LOOK UP
 
     const [province, setProvince] = useState([]);
@@ -186,7 +187,7 @@ export default function ClientManagement() {
         GetListClientManagement(1, event.target.value, sortExpression, searchData);
     };
 
-    const handleSubmitAddEditAccount = async (data) => {
+    const handleSubmitAddEditClient = async (data) => {
         showLoading(true);
 
         try {
@@ -221,15 +222,40 @@ export default function ClientManagement() {
             );
         }
     }
-     
+    
+    const handleSubmitAddEditClientNote = async (data) => {
+        showLoading(true);
+
+        try {
+            let res = await clientNoteManagementAction.CreateClientNoteManagement(data);
+
+            ShowNotification(
+                "Thêm ghi chú thành công",
+                NotificationMessageType.Success
+            );
+            
+        } catch (err) {
+            showLoading(false);
+            err && err.errorType &&
+            ShowNotification(
+                viVN.Errors[err.errorType],
+                NotificationMessageType.Error
+            );
+        } finally {
+            showLoading(false);
+        }
+    }
+
     const buttonOpenAddEditRef = useRef();
     const buttonOpenConfirmRef = useRef();
-    const buttonOpenCustomRef = useRef();
+    const buttonOpenOrderRef = useRef();
+    const buttonOpenClientNoteRef = useRef();
     const [isOpenAddEditDialog, setOpenAddEditDialog] = useState(false);
     const [isOpenDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [isOpenActiveDialog, setOpenActiveDialog] = useState(false);
     const [isOpenDeactiveDialog, setOpenDeactiveDialog] = useState(false);
     const [isOpenAddMoney, setOpenAddMoney] = useState(false);
+    const [isOpenAddClientNote, setOpenAddClientNote] = useState(false);
     const [isOpenCustom, setOpenCustom] = useState(false);
 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -257,6 +283,16 @@ export default function ClientManagement() {
         setSelectedItem(null);
     }
 
+    const openAddClientNoteDialog = (item) => {
+        setOpenAddClientNote(true);
+        setSelectedItem(item);
+        buttonOpenClientNoteRef.current.click();
+    }
+    const closeAddClientNoteDialog = () => {
+        setOpenAddClientNote(false);
+        setSelectedItem(null);
+    }
+
     const openConfirmDialog = (item) => {
         setSelectedItem(item);
         buttonOpenConfirmRef.current.click();
@@ -270,7 +306,7 @@ export default function ClientManagement() {
     const openCustomDialog = (item) => {
         setOpenCustom(true);
         setSelectedItem(item);
-        buttonOpenCustomRef.current.click();
+        buttonOpenOrderRef.current.click();
     }
     const closeCustomDialog = () => {
         setOpenCustom(false);
@@ -476,31 +512,58 @@ export default function ClientManagement() {
                             data.length > 0 ?
                             data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    <td><span>{row.name}</span></td>
-                                    <td>
+                                    <td className='text-center'>{rowIndex + 1}</td>
+                                    <td className='text-center'>
+                                        <div>{row.name}</div>
+                                        <div>{row.phoneNumber}</div>
+                                    </td>
+                                    <td className='text-center'>
                                         <span>
                                             {row.provinceIds.map(item => province.filter(x => x.id === item).map((pv, index) => {
                                                 return <div key={index}>- {pv.name}</div>
                                             }))}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td className='text-center'>
                                         <span>
                                             {row.clientType.map(item => optionsClientTypes.filter(x => x.value === item).map((ct, index) => {
                                                 return <div key={index}>- {ct.label}</div>
                                             }))}
                                         </span>
                                     </td>
-                                    <td><span>{row.totalMoney} VNĐ</span></td>
-                                    <td><span>{row.userId ? users.find(x => x.id === row.userId)?.fullName : ''}</span></td>
-                                    <td>
+                                    <td className='text-center'><span>{row.totalMoney} VNĐ</span></td>
+                                    <td className='text-center'><div className="badge mb-1">{row.start_date ? dayjs(row.start_date).format("DD/MM/YYYY hh:mm:ss") : ''}</div></td>
+                                    <td className='text-center'>
+                                        {
+                                            row.end_date ? <>
+                                                {
+                                                    // Hết hạn => đen
+                                                    dayjs(row.end_date).isBefore(dayjs(now)) ? (
+                                                        <div className="badge mb-1 badge-dark">{dayjs(row.end_date).format("DD/MM/YYYY hh:mm:ss")}</div>
+                                                    ) : <>
+                                                        {
+                                                            // Còn hạn < 3 ngày => đỏ
+                                                            dayjs(row.end_date).diff(dayjs(now), 'days') <= 3 ? (
+                                                                <div className="badge mb-1 badge-danger">{dayjs(row.end_date).format("DD/MM/YYYY hh:mm:ss")}</div>
+                                                            ) : 
+                                                            
+                                                            // Còn hạn => xanh dương
+                                                            <div className="badge mb-1 badge-primary">{dayjs(row.end_date).format("DD/MM/YYYY hh:mm:ss")}</div>
+                                                        }
+                                                    </>
+                                                }
+                                            </> : <></>
+                                        }
+                                    </td>
+                                    <td className='text-center'><span>{row.userId ? users.find(x => x.id === row.userId)?.fullName : ''}</span></td>
+                                    <td className='text-center'>
                                         <div className={`badge mb-1 ${row.isActive ? 'badge-primary' : 'badge-secondary'}`}>{row.isActive ? "Hoạt động" : "Không hoạt động"}</div>
                                         
                                         <div className={`badge ${row.isConfirm ? 'badge-success' : 'badge-warning'}`}>{row.isConfirm ? "Đã xác thực" : "Chưa xác thực"}</div>
                                     </td>
-                                    <td><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY") : ''}</span></td>
 
-                                    <td>
+                                    <td className='text-center'>
                                         <div className='d-flex'>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table edit" data-toggle="tooltip" data-placement="top"
                                                 title="Sửa"
@@ -523,8 +586,14 @@ export default function ClientManagement() {
                                             >
                                                 <i className="far fa-money-bill-alt"></i>
                                             </button>
+                                            <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table create-client-note" data-toggle="tooltip" data-placement="top"
+                                                title="Thêm ghi chú"
+                                                onClick={() => {openAddClientNoteDialog(row)}}
+                                            >
+                                                <i className="icon-doc"></i>
+                                            </button>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table cart" data-toggle="tooltip" data-placement="top"
-                                                title="Nạp tiền"
+                                                title="Gia hạn gói"
                                                 onClick={() => {openCustomDialog(row)}}
                                             >
                                                 <i className="fas fa-cart-plus"></i>
@@ -544,9 +613,13 @@ export default function ClientManagement() {
             <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target="#modalConfirm">
                 Launch modal confirm
             </button>
-            <button ref={buttonOpenCustomRef} type="button" className="d-none" data-toggle="modal" data-target="#modalCustom">
+            <button ref={buttonOpenOrderRef} type="button" className="d-none" data-toggle="modal" data-target="#modalCustom-order">
                 Launch modal confirm
             </button>
+            <button ref={buttonOpenClientNoteRef} type="button" className="d-none" data-toggle="modal" data-target="#modalCustom-client-note">
+                Launch modal confirm
+            </button>
+            
             <ModalSubmitForm
                 title={!isOpenAddMoney ? (!selectedItem ? "Thêm mới tài khoản khách hàng" : "Chỉnh sửa tài khoản khách hàng") : "Nạp tiền"}
                 open={isOpenAddEditDialog || isOpenAddMoney}
@@ -565,19 +638,20 @@ export default function ClientManagement() {
                             users={users}
                             // ===
                             updateItem={selectedItem}
-                            onSubmitAddEdit={handleSubmitAddEditAccount}
+                            onSubmitAddEdit={handleSubmitAddEditClient}
                         />
                     ) : (
                         <FormAddMoneyClient
                             // ===
                             updateItem={selectedItem}
-                            onSubmitAddEdit={handleSubmitAddEditAccount}
+                            onSubmitAddEdit={handleSubmitAddEditClient}
                         />
                     )
                 }
             </ModalSubmitForm>
 
             <ModalCustom
+                id={'order'}
                 title={"Đăng ký gói mới"}
                 open={isOpenCustom}
                 onClose={closeCustomDialog}
@@ -588,6 +662,20 @@ export default function ClientManagement() {
                     plan={plan}
                     // ===
                     updateItem={selectedItem}
+                />
+            </ModalCustom>
+
+            <ModalCustom
+                id={'client-note'}
+                title={"Thêm ghi chú"}
+                open={isOpenAddClientNote}
+                onClose={closeAddClientNoteDialog}
+            >
+                <FormAddEditClientNote
+                    fromClient
+                    // ===
+                    updateItem={selectedItem}
+                    onSubmitAddEdit={handleSubmitAddEditClientNote}
                 />
             </ModalCustom>
 

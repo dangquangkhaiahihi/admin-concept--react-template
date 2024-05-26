@@ -79,25 +79,31 @@ export default function FormAddEditOrder(props) {
 
     useEffect(() => {
         try {
-            console.log(inputDiscount, parseInt(inputDiscount));
-            if ( Number.isNaN(parseInt(inputDiscount)) ) throw new Error('');
-            if ( selectedDiscountType.value === 1 && inputDiscount ) {
-                setDisplayPrice( parseInt(selectedPlan?.price) - parseInt(inputDiscount) );
+            if ( !selectedPlan ) throw new Error("No plan selected");
+
+            let newPrice = selectedPlan.price;
+            if ( selectedMonth ) {
+                newPrice *= selectedMonth.value;
             }
-            else if ( selectedDiscountType.value === 2 && inputDiscount ) {
-                setDisplayPrice( parseInt(selectedPlan?.price) * (100 - parseInt(inputDiscount)) / 100 );
-            } else {
-                throw new Error('');
+
+            if (/^[0-9]+$/.test(inputDiscount) && selectedDiscountType) {
+                if ( selectedDiscountType.value === 1 && !Number.isNaN(parseInt(inputDiscount)) ) {
+                    newPrice = newPrice - parseInt(inputDiscount);
+                }  else if ( selectedDiscountType.value === 2 && !Number.isNaN(parseInt(inputDiscount)) ) {
+                    newPrice = newPrice * (100 - parseInt(inputDiscount)) / 100;
+                }
             }
+            setDisplayPrice(newPrice);
         } catch (err) {
+            console.log("errerrerrerr", err);
             setDisplayPrice(selectedPlan?.price || 0);
         }
         
-    }, [selectedDiscountType, inputDiscount, getValues]);
+    }, [selectedDiscountType, inputDiscount, selectedPlan, selectedMonth, getValues]);
 
-    useEffect(() => {
-        setDisplayPrice(selectedPlan?.price || 0);
-    }, [selectedPlan])
+    // useEffect(() => {
+    //     setDisplayPrice(selectedPlan?.price || 0);
+    // }, [selectedPlan])
 
     const onSubmit = (data) => {
         console.log(data);
@@ -125,15 +131,13 @@ export default function FormAddEditOrder(props) {
     const handleAddNewOrder = async (data) => {
         showLoading(true);
         try {
-            const res = orderManagementAction.CreateOrderManagement(data);
+            const res = await orderManagementAction.CreateOrderManagement(data);
 
-            if (res && res.content) {
-                ShowNotification(
-                    viVN.Success["CreateSuccess"],
-                    NotificationMessageType.Success
-                );
-                onCloseModal();
-            }
+            ShowNotification(
+                "Gia hạn gói thành công",
+                NotificationMessageType.Success
+            );
+            onCloseModal();
         } catch (err) {
             showLoading(false);
             err && err.errorType &&

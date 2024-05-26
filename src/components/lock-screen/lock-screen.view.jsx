@@ -127,7 +127,7 @@ const LockScreen = () => {
             </h3>
           </div>
 
-          <div className="col-12 form-group">
+          {/* <div className="col-12 form-group">
             <FontAwesomeIcon
               icon={faKey}
               style={{
@@ -145,8 +145,6 @@ const LockScreen = () => {
               ref={register({
                 required: true,
                 minLength: 8,
-                // pattern:
-                //   /^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[~`!-@#$%^&*()_+=[{},<.>/?'";:|]).*$/,
               })}
               style={{ paddingLeft: "2rem" }}
             />
@@ -156,24 +154,19 @@ const LockScreen = () => {
             {errors.password && errors.password.type === "minLength" && (
               <span className="error">Mật khẩu tối thiểu 8 ký tự</span>
             )}
-            {/* {errors.password && errors.password.type === "pattern" && (
-              <span className="error">
-                Có it nhất 1 ký tự viết thường, hoa và ký tự đặc biệt
-              </span>
-            )} */}
-          </div>
-                  <div className="col-12 text-center mb-4">
-            <button
+          </div> */}
+          <div className="col-12 text-center mb-4 justify-content-center d-flex">
+            {/* <button
               type="submit"
               className="col-6 btn btn-danger"
               style={{ maxWidth: "45%", marginRight: 5 }}
             >
               Mở khóa
-            </button>
+            </button> */}
             <button
-              className="col-6 btn btn-default-ct btn-inliner"
+              className="btn btn-default-ct btn-inliner col-6 d-flex justify-content-center"
               onClick={onLogout}
-              style={{ maxWidth: "45%", marginRight: 5 }}
+              style={{ maxWidth: "45%", marginRight: 5, color: 'black' }}
             >
               Đăng xuất
             </button>

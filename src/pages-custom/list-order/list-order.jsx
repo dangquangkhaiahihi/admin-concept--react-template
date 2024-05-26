@@ -411,17 +411,18 @@ export default function OrderManagement() {
                             data.length > 0 ?
                             data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    <td><span>{client.find(x => x.id === row.clientId)?.name}</span></td>
-                                    <td><span>{plan.find(x => x.id === row.planId)?.name}</span></td>
-                                    <td><span>{plan.find(x => x.id === row.planId)?.price} VNĐ</span></td>
+                                    <td className='text-center'><span>{rowIndex + 1}</span></td>
+                                    <td className='text-center'><span>{client.find(x => x.id === row.clientId)?.name}</span></td>
+                                    <td className='text-center'><span>{plan.find(x => x.id === row.planId)?.name}</span></td>
+                                    <td className='text-center'><span>{plan.find(x => x.id === row.planId)?.price || 0} VNĐ</span></td>
 
-                                    <td><span>{row.startDate ? dayjs(row.startDate).format("DD/MM/YYYY") : ''}</span></td>
-                                    <td><span>{row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{row.startDate ? dayjs(row.startDate).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY") : ''}</span></td>
 
-                                    <td><span>{row.created_by}</span></td>
-                                    <td><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{row.created_by}</span></td>
+                                    <td className='text-center'><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY") : ''}</span></td>
                                     
-                                    <td>
+                                    <td className='text-center'>
                                         <div className='d-flex'>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table delete" data-toggle="tooltip" data-placement="top"
                                                 title="Xóa"

@@ -1,5 +1,13 @@
 const headCellsListAccount = [
     {
+        id: 'index',
+        numeric: false,
+        disablePadding: true,
+        label: 'STT',
+        className: 'pt-3 pb-3',
+        style: { minWidth: "150px" }
+    },
+    {
         id: 'fullName',
         numeric: false,
         disablePadding: false,

@@ -343,14 +343,15 @@ export default function RoleManagement() {
                             data.length > 0 ?
                             data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    <td><span>{row.code}</span></td>
-                                    <td><span>{row.name}</span></td>
-                                    <td><span>{row.created_by}</span></td>
-                                    <td><span>{row.created_date ? dayjs(row.createdDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
-                                    <td><span>{row.modified_by}</span></td>
-                                    <td><span>{row.modified_date ? dayjs(row.modifiedDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{rowIndex + 1}</span></td>
+                                    <td className='text-center'><span>{row.code}</span></td>
+                                    <td className='text-center'><span>{row.name}</span></td>
+                                    <td className='text-center'><span>{row.created_by}</span></td>
+                                    <td className='text-center'><span>{row.created_date ? dayjs(row.createdDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{row.modified_by}</span></td>
+                                    <td className='text-center'><span>{row.modified_date ? dayjs(row.modifiedDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
 
-                                    <td>
+                                    <td className='text-center'>
                                         <div className='d-flex'>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table edit" data-toggle="tooltip" data-placement="top"
                                                 title="Sửa"

@@ -1,5 +1,13 @@
 const headCellsListClient = [
     {
+        id: 'index',
+        numeric: false,
+        disablePadding: true,
+        label: 'STT',
+        className: 'pt-3 pb-3',
+        style: { minWidth: "150px" }
+    },
+    {
         id: 'name',
         numeric: false,
         disablePadding: false,
@@ -31,22 +39,22 @@ const headCellsListClient = [
         className: 'pt-3 pb-3',
         style: { width: "70px" }
     },
-    // {
-    //     id: 'endDate',
-    //     numeric: false,
-    //     disablePadding: false,
-    //     label: 'Ngày KH',
-    //     className: 'pt-3 pb-3',
-    //     style: { width: "70px" }
-    // },
-    // {
-    //     id: 'created_date',
-    //     numeric: false,
-    //     disablePadding: false,
-    //     label: 'Ngày HH',
-    //     className: 'pt-3 pb-3',
-    //     style: { width: "70px" }
-    // },
+    {
+        id: 'endDate',
+        numeric: false,
+        disablePadding: false,
+        label: 'Ngày kích hoạt',
+        className: 'pt-3 pb-3',
+        style: { width: "70px" }
+    },
+    {
+        id: 'created_date',
+        numeric: false,
+        disablePadding: false,
+        label: 'Ngày hết hạn',
+        className: 'pt-3 pb-3',
+        style: { width: "70px" }
+    },
     {
         id: 'employeeName',
         numeric: false,

@@ -1,5 +1,13 @@
 const headCellsListPlan = [
     {
+        id: 'index',
+        numeric: false,
+        disablePadding: true,
+        label: 'STT',
+        className: 'pt-3 pb-3',
+        style: { minWidth: "150px" }
+    },
+    {
         id: 'name',
         numeric: false,
         disablePadding: false,

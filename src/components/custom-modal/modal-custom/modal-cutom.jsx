@@ -1,7 +1,7 @@
 import React, { cloneElement, useRef, useState } from 'react';
 
 export default function ModalCustom(props) {
-  const { open, onClose, children, title, customClassname } = props;
+  const { id = "", open, onClose, children, title, customClassname } = props;
 
   const [triggerSubmit, setTriggerSubmit] = useState(false);
 
@@ -17,12 +17,12 @@ export default function ModalCustom(props) {
       style={{ display: open ? 'block' : 'none' }}
       tabIndex="-1"
       role="dialog" data-backdrop="static" data-keyboard="false"
-      id="modalCustom" aria-labelledby="modalCustomLabel" aria-hidden="true"
+      id={`modalCustom-${id}`} aria-labelledby={`modalCustomLabel-${id}`} aria-hidden="true"
     >
       <div className={`modal-dialog modal-lg modal-dialog-centered ${customClassname ? customClassname : ''}`} role="document" onClick={(e) => e.stopPropagation()}>
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title" id="modalCustomLabel">
+            <h5 className="modal-title" id={`modalCustomLabel-${id}`}>
                 {title}
             </h5>
             <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={onClose}>

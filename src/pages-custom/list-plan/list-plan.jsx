@@ -317,13 +317,14 @@ export default function PlanManagement() {
                             data.length > 0 ?
                             data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    <td><span>{row.name}</span></td>
-                                    <td><span>{row.price} VNĐ</span></td>
-                                    <td><span>{optionsPromotions.find(x => x.value == row.promotion)?.label}</span></td>
-                                    <td><span>{row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY") : ''}</span></td>
-                                    <td><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{rowIndex + 1}</span></td>
+                                    <td className='text-center'><span>{row.name}</span></td>
+                                    <td className='text-center'><span>{row.price} VNĐ</span></td>
+                                    <td className='text-center'><span>{optionsPromotions.find(x => x.value == row.promotion)?.label}</span></td>
+                                    <td className='text-center'><span>{row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY") : ''}</span></td>
 
-                                    <td>
+                                    <td className='text-center'>
                                         <div className='d-flex'>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table edit" data-toggle="tooltip" data-placement="top"
                                                 title="Sửa"

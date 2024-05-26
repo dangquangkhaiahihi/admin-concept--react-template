@@ -451,17 +451,18 @@ export default function DepositManagement(props) {
                             data.length > 0 ?
                             data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                    {/* <td><span>{row.clientName}</span></td> */}
-                                    <td><span>{client.find(x => x.id === row.clientId)?.name}</span></td>
-                                    <td><span>{row.depositAmount} VNĐ</span></td>
-                                    {/* <td><span>{row.userName}</span></td> */}
-                                    <td><span>{users.find(x => x.id === row.userId)?.fullName}</span></td>
-                                    <td>
+                                    {/* <td className='text-center'><span>{row.clientName}</span></td> */}
+                                    <td className='text-center'><span>{rowIndex + 1}</span></td>
+                                    <td className='text-center'><span>{client.find(x => x.id === row.clientId)?.name}</span></td>
+                                    <td className='text-center'><span>{row.depositAmount} VNĐ</span></td>
+                                    {/* <td className='text-center'><span>{row.userName}</span></td> */}
+                                    <td className='text-center'><span>{users.find(x => x.id === row.userId)?.fullName}</span></td>
+                                    <td className='text-center'>
                                         <span className={`badge mb-1 ${row.status === "success" ? 'badge-primary' : 'badge-secondary'}`}>{row.status === "success" ? "Thành công" : "Thất bại"}</span>
                                     </td>
 
-                                    <td><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
-                                    <td>
+                                    <td className='text-center'><span className='badge'>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'>
                                         <div className='d-flex'>
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table delete" data-toggle="tooltip" data-placement="top"
                                                 title="Xóa"

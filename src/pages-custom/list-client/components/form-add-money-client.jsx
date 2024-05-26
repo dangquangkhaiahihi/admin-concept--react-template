@@ -19,7 +19,7 @@ export default function FormAddMoneyClient(props) {
     const { triggerSubmit, setTriggerSubmit, onCloseModal, updateItem, onSubmitAddEdit } = props;
     const buttonSubmitRef = useRef(null);
 
-    const { register, handleSubmit, errors, setValue, control, getValues } = useForm({
+    const { register, handleSubmit, errors, setValue, control, getValues, reset } = useForm({
         mode: "all",
         reValidateMode: "onBlur",
     });
@@ -56,12 +56,12 @@ export default function FormAddMoneyClient(props) {
 
             const res = await depositManagementAction.CreateDepositManagement(data);
 
-            if (res && res.content) {
-                ShowNotification(
-                    viVN.Success["CreateSuccess"],
-                    NotificationMessageType.Success
-                );
-            }
+            // if (res && res.content) {
+            //     ShowNotification(
+            //         viVN.Success["CreateSuccess"],
+            //         NotificationMessageType.Success
+            //     );
+            // }
         } catch (err) {
             err && err.errorType &&
             ShowNotification(
@@ -71,6 +71,7 @@ export default function FormAddMoneyClient(props) {
         } finally {
             showLoading(false);
             setReloadDeposit(prev => !prev);
+            reset();
         }
     }
 
@@ -82,6 +83,9 @@ export default function FormAddMoneyClient(props) {
 
     return (
         <>
+            <div className="text-center" style={{marginBottom: '12px'}}>
+                <p className='h5'>Nạp tiền cho khách hàng: {updateItem?.name}</p>
+            </div>
             <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
                 <div className="row">
                     <div className="form-group col-md-12">
@@ -107,6 +111,9 @@ export default function FormAddMoneyClient(props) {
                     Nạp tiền
                 </button>
             </form>
+            <div className="text-center" style={{marginBottom: '12px'}}>
+                <p className='h5'>Lịch sử nạp tiền</p>
+            </div>
             {
                 updateItem ? (
                     <DepositManagement
