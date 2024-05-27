@@ -3,12 +3,25 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import * as accountManagementAction from "../../../redux/store/account/account.store";
 import {
-    getCookies, setCookies, getUserInfo
+    getCookies, setCookies, getUserInfo,
+    removeCookies,
+    TokenKey,
+    DomainAdminSide
 } from "../../../utils/configuration";
 import { UrlCollectionCustom } from '../../../common/url-collection-custom';
 
 export default function SideBarCustom() {
     const currentLocation = useLocation();
+
+    const onLogout = () => {
+        removeCookies("isShowDialog");
+        removeCookies("isLockScreen");
+        removeCookies("screenAllow");
+        removeCookies(TokenKey.token);
+        removeCookies(TokenKey.refreshToken);
+        removeCookies(TokenKey.returnUrl);
+        window.location.replace(DomainAdminSide + "/dang-nhap");
+    }
 
     const isDashboardHome = currentLocation.pathname === UrlCollectionCustom.Home;
 
@@ -90,7 +103,7 @@ export default function SideBarCustom() {
                                     </ul>
                                 </div>
                             </li>
-                            <li className={`nav-item`}>
+                            <li className={`nav-item`} onClick={onLogout}>
                                 <Link className={`nav-link`} to={'#'}><i className="fas fa-fw fa-home"></i>Đăng xuất</Link>
                             </li>
                         </ul>
