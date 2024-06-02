@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -27,6 +28,7 @@ import { mediaUrl } from '../../api/api-service-custom';
 import { optionsClientTypes } from '../constant';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Select from "react-select";
+import { uuidv4 } from '../../common/tools';
 
 const configLocal = {
     defaultPageSize: config.Configs.DefaultPageSize,
@@ -37,11 +39,14 @@ const configLocal = {
 
 export default function DepositManagement(props) {
     const {
+        toggleFromClient,
         clientId,
-        endDateDayjs,
-        startDateDayjs,
-        reloadDeposit
+        // endDateDayjs,
+        // startDateDayjs,
+        reload
     } = {...props};
+    const uuidv4ModalSubmitForm = uuidv4();
+    const uuidv4ModalConfirm = uuidv4();
 
     const { register, handleSubmit, setValue } = useForm({
         mode: "all",
@@ -139,20 +144,20 @@ export default function DepositManagement(props) {
         GetListOrderManagement();
         fetchData();
 
-        if (clientId) {
-            setValue("ClientId", clientId)
-        }
-        if (startDateDayjs) {
-            setValue("StartDate", startDateDayjs)
-        }
-        if (endDateDayjs) {
-            setValue("EndDate", endDateDayjs)
-        }
+        // if (clientId) {
+        //     setValue("ClientId", clientId)
+        // }
+        // if (startDateDayjs) {
+        //     setValue("StartDate", startDateDayjs)
+        // }
+        // if (endDateDayjs) {
+        //     setValue("EndDate", endDateDayjs)
+        // }
     }, []);
 
     useEffect(() => {
         GetListOrderManagement();
-    }, [reloadDeposit]);
+    }, [reload]);
 
     const GetListOrderManagement = (pageIndex = 1, pageSize = configLocal.defaultPageSize, sortExpression = configLocal.sortExpression, search=undefined) => {
         showLoading(true);
@@ -160,8 +165,8 @@ export default function DepositManagement(props) {
         if ( !search && clientId) {
             search = {
                 "ClientId": clientId,
-                "StartDate": startDateDayjs.format(),
-                "EndDate": endDateDayjs.format()
+                // "StartDate": startDateDayjs.format(),
+                // "EndDate": endDateDayjs.format()
             }
         }
 
@@ -342,7 +347,7 @@ export default function DepositManagement(props) {
                         <div className="card-body">
                             <form>
                                 <div className="row">
-                                    <div className="form-group  col-md-6">
+                                    {/* <div className="form-group  col-md-6">
                                         <label>Từ ngày</label>
                                         <DatePicker
                                             defaultValue={startDateDayjs}
@@ -366,7 +371,7 @@ export default function DepositManagement(props) {
                                             slotProps={{ textField: { size: 'small' } }}
                                         //label={"Nhập Ngày nhận"}
                                         />
-                                    </div>
+                                    </div> */}
                                     {
                                         !clientId ? (
                                             <div className="form-group col-md-6">
@@ -385,7 +390,19 @@ export default function DepositManagement(props) {
                                             </div>
                                         ) : <></>
                                     }
-                                    <div className="form-group col-md-6">
+                                    <div className="form-group col-md-4">
+                                        <label>Tên nhân viên</label>
+                                        <input
+                                            id="Name"
+                                            className="form-control"
+                                            type="text"
+                                            name="Name"
+                                            defaultValue={searchData?.Name}
+                                            placeholder="Nhập tên nhân viên để tìm kiếm"
+                                            ref={register()}
+                                        />
+                                    </div>
+                                    {/* <div className="form-group col-md-6">
                                         <label>Chọn nhân viên</label>
                                         <Select
                                             {...register("UserId")}
@@ -398,8 +415,8 @@ export default function DepositManagement(props) {
                                             options={users.map(item => {return {label: item.fullName, value: item.id}})}
                                             noOptionsMessage={() => "Không tồn tại"}
                                         />
-                                    </div>
-                                    {
+                                    </div> */}
+                                    {/* {
                                         !clientId ? (
                                             <div className="form-group col-md-6">
                                                 <label>Chọn Tỉnh/ Thành phố</label>
@@ -417,7 +434,7 @@ export default function DepositManagement(props) {
                                                 />
                                             </div>
                                         ) : <></>
-                                    }
+                                    } */}
                                 </div>
                                 <div className='row'>
                                     <div className="col-md-12 pl-0 d-flex justify-content-center">
@@ -432,6 +449,7 @@ export default function DepositManagement(props) {
                     </div>
                 </form>
                 <DataTableCustom
+                    toggleFromClient={toggleFromClient}
                     // button functions
                     rowsPerPage={rowsPerPage}
                     handleChangeRowsPerPage={handleChangeRowsPerPage}
@@ -454,7 +472,7 @@ export default function DepositManagement(props) {
                                     {/* <td className='text-center'><span>{row.clientName}</span></td> */}
                                     <td className='text-center'><span>{rowIndex + 1}</span></td>
                                     <td className='text-center'><span>{client.find(x => x.id === row.clientId)?.name}</span></td>
-                                    <td className='text-center'><span>{row.depositAmount} VNĐ</span></td>
+                                    <td className='text-center'><span>{(row.depositAmount).toLocaleString()} VNĐ</span></td>
                                     {/* <td className='text-center'><span>{row.userName}</span></td> */}
                                     <td className='text-center'><span>{users.find(x => x.id === row.userId)?.fullName}</span></td>
                                     <td className='text-center'>
@@ -482,13 +500,14 @@ export default function DepositManagement(props) {
                     </tbody>
                 </DataTableCustom>
             </div>
-            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target="#modalSubmitForm">
+            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalSubmitForm-${uuidv4ModalSubmitForm}`}>
                 Launch modal add edit
             </button>
-            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target="#modalConfirm">
+            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalConfirm-${uuidv4ModalConfirm}`}>
                 Launch modal confirm
             </button>
             <ModalSubmitForm
+                id={uuidv4ModalSubmitForm}
                 title={!selectedItem ? "Thêm mới tài khoản khách hàng" : "Chỉnh sửa tài khoản khách hàng"}
                 open={isOpenAddEditDialog}
                 onClose={closeAddEditDialog}
@@ -504,6 +523,7 @@ export default function DepositManagement(props) {
             </ModalSubmitForm>
 
             <ModalConfirm 
+                id={uuidv4ModalConfirm}
                 title={"Xác nhận"}
                 prompt={
                     isOpenDeleteDialog ? "Bạn có chắc chắn muốn xóa bản ghi này không?":

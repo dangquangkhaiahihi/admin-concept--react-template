@@ -11,10 +11,11 @@ export const GetListDepositManagement = (pageIndex = 1, pageSize = config.Config
     params.append("pageSize", pageSize);
     sortExpression && params.append("sortExpression", sortExpression);
     search.ClientId && params.append("ClientId", search.ClientId);
-    search.UserId && params.append("UserId", search.UserId);
-    search.ProvinceId && params.append("ProvinceId", search.ProvinceId);
-    search.StartDate && params.append("StartDate", search.StartDate);
-    search.EndDate && params.append("EndDate", search.EndDate);
+    search.Name && params.append("Name", search.Name);
+    // search.UserId && params.append("UserId", search.UserId);
+    // search.ProvinceId && params.append("ProvinceId", search.ProvinceId);
+    // search.StartDate && params.append("StartDate", search.StartDate);
+    // search.EndDate && params.append("EndDate", search.EndDate);
 
     return service.get(ApiUrl.GetListDepositManagement, params).then(res => { return res }).catch(err => { throw err });
 }

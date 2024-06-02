@@ -4,6 +4,7 @@ export const UrlCollectionCustom = {
     Plan: '/goi-dang-ky',
     Client: '/khach-hang',
     ClientNote: '/lich-su-ghi-chu',
+    Group: '/danh-muc',
     Order: '/don-hang',
     DepositHistory: '/lich-su-nap-tien',
     

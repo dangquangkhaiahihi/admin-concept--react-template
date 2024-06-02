@@ -420,7 +420,7 @@ export const ApiUrl = {
     DeleteClientManagement: "api/admin/Client/Delete/{id}",
     GetLookupClient: 'api/admin/Client/GetLookup',
 
-    // Client
+    // Client Note
     GetListClientNoteManagement: "api/admin/ClientNote/GetAll", // form
     GetDetailClientNoteManagement: "api/admin/ClientNote/GetDetail/{id}",
     CreateClientNoteManagement: "api/admin/ClientNote/Create", //json
@@ -441,4 +441,14 @@ export const ApiUrl = {
     CreateDepositManagement: "api/admin/DepositHistory/Create", //json
     UpdateDepositManagement:"api/admin/DepositHistory/Update", //json
     DeleteDepositManagement: "api/admin/DepositHistory/Delete/{id}",
+
+    // Group
+    GetListGroupManagement: "api/admin/Group/GetAll", // form
+    GetDetailGroupManagement: "api/admin/Group/GetDetail/{id}",
+    CreateGroupManagement: "api/admin/Group/Create", //json
+    UpdateGroupManagement:"api/admin/Group/Update", //json
+    DeleteGroupManagement: "api/admin/Group/Delete/{id}",
+    GetLookupGroup: "api/admin/Group/GetLookup",
+    // Get Menu
+    GetMenu: '/api/Account/GetMenu'
 };

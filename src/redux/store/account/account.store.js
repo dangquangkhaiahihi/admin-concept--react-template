@@ -59,6 +59,17 @@ export const GetDetailAcc = () => {
     });
 };
 
+export const GetMenu = () => {
+  return service
+    .get(ApiUrl.GetMenu)
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
 export const GetScreenAllow = () => {
   return service
     .get(ApiUrl.GetScreenAllow)

@@ -4437,7 +4437,7 @@
     };
     var ClassName = {
       SCROLLBAR_MEASURER: 'modal-scrollbar-measure',
-      BACKDROP: 'modal-backdrop',
+      BACKDROP: 'modal-backdrop-notusethisshitanymore',
       OPEN: 'modal-open',
       FADE: 'fade',
       SHOW: 'show'

@@ -1,25 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import "./datatable.scss"
+import { uuidv4 } from '../../common/tools';
 
 export default function DataTableHeader(props) {
-    const { headCells, children, handleRequestSort, order, orderBy, listData, totalItemCount } = props;
+    const { toggleFromClient, headCells, children, handleRequestSort, order, orderBy, listData, totalItemCount } = props;
     
     const [scrollTableWidth, setScrollTableWidth] = useState(0);
 
     const scrollRoot = useRef(null);
     const scrollTable = useRef(null);
-
+    
     useEffect(() => {
         if (totalItemCount > 0 && scrollTable.current) {
             setScrollTableWidth(scrollTable.current.clientWidth)
         }
-    }, [totalItemCount]);
-
+    }, [totalItemCount, toggleFromClient]);
+    
     return (
         <>
             <div className="row">
                 <div className="col-sm-12 mb-2 dataTables" ref={scrollRoot}>
-                    <table className="table table-bordered table-hover dataTable" ref={scrollTable} id="datatable">
+                    <table className="table table-bordered table-hover dataTable" ref={scrollTable} id={`datatable-${uuidv4()}`}>
                         <EnhancedTableHead
                             headCells={headCells}
                             order={order}

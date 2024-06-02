@@ -6,7 +6,7 @@ import Select from "react-select";
 
 export default function FormAddEditAccount(props) {
     const { triggerSubmit, setTriggerSubmit, onCloseModal, updateItem, onSubmitAddEdit,
-        rolesLookup
+        rolesLookup, groupLookup
      } = props;
     const buttonSubmitRef = useRef(null);
 
@@ -17,6 +17,13 @@ export default function FormAddEditAccount(props) {
 
     const [optionsRole] = useState(rolesLookup.map(item => {return {label: item.name, value: item.id}}));
     const [selectedRoles, setSelectedRoles] = useState([]);
+
+    const [optionsGroup] = useState(groupLookup.map(item => {return {label: item.name, value: item.id}}));
+    const [selectedGroup, setSelectedGroup] = useState(null);
+
+    useEffect(() => {
+        console.log("selectedGroup",selectedGroup, updateItem);
+    }, [selectedGroup])
     
     useEffect(() => {
         setValue("FullName", updateItem?.fullName);
@@ -31,16 +38,30 @@ export default function FormAddEditAccount(props) {
             setSelectedRoles(filtered);
             setValue("Roles", filtered);
         }
+
+        if (updateItem?.groupId) {
+            const foundGroup = optionsGroup.find(item => item.value === updateItem.groupId);
+            if (foundGroup) {
+                setSelectedGroup(foundGroup);
+            }
+            setValue("GroupId", updateItem.groupId);
+        }
     }, [])
 
     const onSubmit = (data) => {
         if (!data) {
           return;
         }
+
+        const dataSubmit = {...data, id: updateItem?.id,
+            Roles: getValues("Roles").map(item => item.label),
+        }
+
+        if ( selectedGroup ) {
+            dataSubmit.GroupId = selectedGroup.value
+        }
         
-        onSubmitAddEdit({...data, id: updateItem?.id,
-            Roles: getValues("Roles").map(item => item.label)
-        });
+        onSubmitAddEdit(dataSubmit);
         onCloseModal();
     }
 
@@ -166,6 +187,21 @@ export default function FormAddEditAccount(props) {
                         maxLength="10"
                         placeholder="Nhập địa chỉ"
                         ref={register()}
+                    />
+                </div>
+                <div className="form-group col-md-6">
+                    <label>Nhóm</label>
+                    <Select
+                        {...register("groupId")}
+                        isClearable
+                        value={selectedGroup}
+                        placeholder="Chọn nhóm"
+                        onChange={(data) => {
+                            setSelectedGroup(data);
+                            setValue("groupId", data?.value);
+                        }}
+                        options={optionsGroup}
+                        noOptionsMessage={() => "Không tồn tại"}
                     />
                 </div>
                 {/* <div className="form-group col-md-6">

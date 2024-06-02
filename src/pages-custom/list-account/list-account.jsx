@@ -12,6 +12,7 @@ import ShowNotification from "../../components/react-notifications/react-notific
 
 import * as userManagementAction from "../../redux/store/user-management/user-management.store";
 import * as roleManagementAction from "../../redux/store/role/role-management.store";
+import * as groupManagementAction from "../../redux/store/group-management/group-management.store";
 
 import ModalSubmitForm from '../../components/custom-modal/modal-submit-form/modal-submit-form';
 import dayjs from 'dayjs';
@@ -38,6 +39,19 @@ export default function AccountManagement() {
     const showLoading = (data) => dispatch(appActions.ShowLoading(data));
 
     // START GET LOOK UP
+    const [groupLookup, setGroupLookup] = useState([]);
+    const getLookupGroup = async () => {
+        try {
+            const res = await groupManagementAction.GetLookupGroup();
+            if (res && res.content) {
+                setGroupLookup(res.content);
+            }
+        } catch (err) {
+            setGroupLookup([]);
+            throw err;
+        }
+    }
+
     const [rolesLookup, setRolesLookup] = useState([]);
     const getLookupRoles = async () => {
         try {
@@ -56,6 +70,7 @@ export default function AccountManagement() {
         try {
             await Promise.allSettled([
                 getLookupRoles(),
+                getLookupGroup()
             ]);
         } catch (err) {
             err && err.errorType &&
@@ -146,6 +161,7 @@ export default function AccountManagement() {
         formData.append("Address", data.Address);
         // formData.append("Description", data.content);
         formData.append("PhoneNumber", data.PhoneNumber);
+        data.GroupId && formData.append("GroupId", data.GroupId);
         // formData.append("reflectionUnitId", reflectionProcessingUnitSelected);
         // formData.append("planningUnitId", planningUnitSelected);
 
@@ -361,6 +377,7 @@ export default function AccountManagement() {
                                     <td className='text-center'><span>{row.fullName}</span></td>
                                     <td className='text-center'><span>{row.email}</span></td>
                                     <td className='text-center'><span>{row.roleNames.join() == ''? 'Người dùng' : row.roleNames.join(', ')}</span></td>
+                                    <td className='text-center'><span>{row.groupName}</span></td>
                                     <td className='text-center'><span>{row.dateOfBirth ? dayjs(row.dateOfBirth).format("DD/MM/YYYY") : ''}</span></td>
                                     <td className='text-center'><span>{row.sex ? "Nam" : "Nữ"}</span></td>
                                     <td className='text-center'><span>{row.phoneNumber}</span></td>
@@ -459,6 +476,7 @@ export default function AccountManagement() {
                 {
                     !isOpenResetPasswordDialog ? (
                         <FormAddEditAccount
+                            groupLookup={groupLookup}
                             rolesLookup={rolesLookup}
                             // ===
                             updateItem={selectedItem}

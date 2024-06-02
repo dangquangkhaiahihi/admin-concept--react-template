@@ -30,7 +30,6 @@ export default function FormAddMoneyClient(props) {
 
     const userInfo = getUserInfo();
 
-    const [reloadDeposit, setReloadDeposit] = useState(true);
     const onSubmit = (data) => {
         if (!data) {
           return;
@@ -70,7 +69,7 @@ export default function FormAddMoneyClient(props) {
             );
         } finally {
             showLoading(false);
-            setReloadDeposit(prev => !prev);
+            setReload(prev => !prev);
             reset();
         }
     }
@@ -80,6 +79,9 @@ export default function FormAddMoneyClient(props) {
         buttonSubmitRef.current.click();
         setTriggerSubmit(false);
     }, [triggerSubmit])
+
+    const [reload, setReload] = useState(true);
+    const [toggleFromClient, setToggleFromClient] = useState(false);
 
     return (
         <>
@@ -111,19 +113,33 @@ export default function FormAddMoneyClient(props) {
                     Nạp tiền
                 </button>
             </form>
-            <div className="text-center" style={{marginBottom: '12px'}}>
-                <p className='h5'>Lịch sử nạp tiền</p>
+
+            <div className="accrodion-regular">
+                <div id="accordion_deposit_history">
+                    <div className="card">
+                        <div className="card-header" id="headingSeven" onClick={() => setToggleFromClient(prev => !prev)}>
+                            <h5 className="mb-0">
+                                <button className={`btn btn-link ${!toggleFromClient ? "collapsed" : ''}`} data-toggle="collapse" data-target="#collapse_deposit_history" aria-expanded="false" aria-controls="collapse_deposit_history">
+                                    <span className="fas fa-angle-down mr-3"></span>Lịch sử nạp tiền
+                                </button>
+                                </h5>
+                        </div>
+                        <div id="collapse_deposit_history" className={`collapse ${!toggleFromClient ? '' : 'show'}`} aria-labelledby="headingSeven" data-parent="#accordion_deposit_history">
+                            {
+                                updateItem ? (
+                                    <DepositManagement
+                                        toggleFromClient={toggleFromClient}
+                                        clientId={updateItem?.id}
+                                        endDateDayjs={dayjs(now)}
+                                        startDateDayjs={dayjs(now).subtract(1, "month")}
+                                        reload={reload}
+                                    />
+                                ) : <></>
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
-            {
-                updateItem ? (
-                    <DepositManagement
-                        clientId={updateItem?.id}
-                        endDateDayjs={dayjs(now)}
-                        startDateDayjs={dayjs(now).subtract(1, "month")}
-                        reloadDeposit={reloadDeposit}
-                    />
-                ) : <></>
-            }
         </>
     )
 }

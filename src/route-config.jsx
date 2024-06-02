@@ -46,7 +46,7 @@ const RouterComponent = ({
             <ActivityDetector 
               activityEvents={customActivityEvents}
               enabled={true}
-              timeout={5 * 60 * 1000}
+              // timeout={5 * 60 * 1000}
               onIdle={onIdle}
               onActive={onActive}
             />

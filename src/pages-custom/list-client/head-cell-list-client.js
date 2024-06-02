@@ -48,7 +48,7 @@ const headCellsListClient = [
         style: { width: "70px" }
     },
     {
-        id: 'created_date',
+        id: 'end_date',
         numeric: false,
         disablePadding: false,
         label: 'Ngày hết hạn',

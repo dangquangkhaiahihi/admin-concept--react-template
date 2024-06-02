@@ -1,7 +1,7 @@
-import React, { cloneElement, useRef, useState } from 'react';
+import React, { cloneElement, useEffect, useRef, useState } from 'react';
 
 export default function ModalSubmitForm(props) {
-  const { open, onClose, children, title, customClassname } = props;
+  const { open, onClose, children, title, customClassname, id } = props;
 
   const [triggerSubmit, setTriggerSubmit] = useState(false);
 
@@ -11,13 +11,39 @@ export default function ModalSubmitForm(props) {
     buttonCloseRef.current.click();
   }
   
+  useEffect(() => {
+    const handleBackdrop = () => {
+      if (open) {
+        // Create and show the backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = `modal-backdrop-${id}`;
+        document.body.appendChild(backdrop);
+      } else {
+        // Remove the backdrop
+        const backdrop = document.getElementById(`modal-backdrop-${id}`);
+        if (backdrop) {
+          document.body.removeChild(backdrop);
+        }
+      }
+    };
+
+    handleBackdrop();
+
+    return () => {
+      // Clean up the backdrop when the component is unmounted
+      const backdrop = document.getElementById(`modal-backdrop-${id}`);
+      if (backdrop) {
+        document.body.removeChild(backdrop);
+      }
+    };
+  }, [id, open]);
+
   return (
     <div
-      className={`modal fade ${open ? 'show' : ''}`}
-      style={{ display: open ? 'block' : 'none' }}
-      tabIndex="-1"
-      role="dialog" data-backdrop="static" data-keyboard="false"
-      id="modalSubmitForm" aria-labelledby="modalSubmitFormLabel" aria-hidden="true"
+      className={`modal fade ${open ? 'show d-block' : 'd-none'}`}
+      id={`modalSubmitForm-${id}`}
+      data-backdrop="static"
     >
       <div className={`modal-dialog modal-lg modal-dialog-centered ${customClassname ? customClassname : ''}`} role="document" onClick={(e) => e.stopPropagation()}>
         <div className="modal-content">
@@ -43,7 +69,7 @@ export default function ModalSubmitForm(props) {
               ref={buttonCloseRef}
               type="button"
               className="btn btn-secondary"
-              data-dismiss="modal"
+       //        data-dismiss="modal"
               onClick={onCloseModal}
             >
               Đóng

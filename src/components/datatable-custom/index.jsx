@@ -6,6 +6,7 @@ import DataTablePagination from "./datatable-pagination";
 
 export default function DataTableCustom(props) {
     const {
+        toggleFromClient,
         listData,
         // button functions
         rowsPerPage,
@@ -33,6 +34,7 @@ export default function DataTableCustom(props) {
                     sumary={sumary }
                 />
                 <DataTableHeader
+                    toggleFromClient={toggleFromClient}
                     headCells={headCells}
                     handleRequestSort={handleRequestSort}
                     order={order}

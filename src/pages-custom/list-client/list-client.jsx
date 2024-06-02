@@ -31,6 +31,7 @@ import FormAddMoneyClient from './components/form-add-money-client';
 import ModalCustom from '../../components/custom-modal/modal-custom/modal-cutom';
 import FormAddEditOrder from '../list-order/components/form-add-edit-order';
 import FormAddEditClientNote from '../list-client-note/components/form-add-edit-client-note';
+import { uuidv4 } from '../../common/tools';
 
 const configLocal = {
     defaultPageSize: config.Configs.DefaultPageSize,
@@ -44,6 +45,9 @@ export default function ClientManagement() {
         mode: "all",
         reValidateMode: "onBlur",
     });
+    const [uuidv4ModalConfirm] = useState(uuidv4());
+    const [uuidv4ModalSubmitForm] = useState(uuidv4());
+
     const dispatch = useDispatch();
     const showLoading = (data) => dispatch(appActions.ShowLoading(data));
 
@@ -300,6 +304,7 @@ export default function ClientManagement() {
     const closeConfirmDialog = () => {
         setOpenActiveDialog(false);
         setOpenDeactiveDialog(false);
+        setOpenDeleteDialog(false);
         setSelectedItem(null);
     }
 
@@ -389,7 +394,7 @@ export default function ClientManagement() {
                                             ref={register()}
                                         />
                                     </div>
-                                    <div className="form-group col-md-6">
+                                    {/* <div className="form-group col-md-6">
                                         <label>Chọn nhân viên</label>
                                         <Select
                                             {...register("userId")}
@@ -401,19 +406,17 @@ export default function ClientManagement() {
                                             options={users.map(item => {return {label: item.fullName, value: item.id}})}
                                             noOptionsMessage={() => "Không tồn tại"}
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="form-group col-md-6">
-                                        <label>Chọn Tỉnh/ Thành phố</label>
-                                        <Select
-                                            {...register("provinceId")}
-                                            isClearable
-                                            placeholder="Chọn Tỉnh/ Thành phố"
-                                            onChange={(data) => {
-                                                console.log(data);
-                                                setValue("provinceId", data);
-                                            }}
-                                            options={province.map(item => {return {label: item.name, value: item.id}})}
-                                            noOptionsMessage={() => "Không tồn tại"}
+                                        <label>Tên nhân viên</label>
+                                        <input
+                                            id="UserName"
+                                            className="form-control"
+                                            type="text"
+                                            name="UserName"
+                                            defaultValue={searchData?.UserName}
+                                            placeholder="Nhập tên nhân viên để tìm kiếm"
+                                            ref={register()}
                                         />
                                     </div>
                                 </div>
@@ -531,7 +534,7 @@ export default function ClientManagement() {
                                             }))}
                                         </span>
                                     </td>
-                                    <td className='text-center'><span>{row.totalMoney} VNĐ</span></td>
+                                    <td className='text-center'><span>{row.totalMoney.toLocaleString()} VNĐ</span></td>
                                     <td className='text-center'><div className="badge mb-1">{row.start_date ? dayjs(row.start_date).format("DD/MM/YYYY hh:mm:ss") : ''}</div></td>
                                     <td className='text-center'>
                                         {
@@ -607,10 +610,10 @@ export default function ClientManagement() {
                     </tbody>
                 </DataTableCustom>
             </div>
-            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target="#modalSubmitForm">
+            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalSubmitForm-${uuidv4ModalSubmitForm}`}>
                 Launch modal add edit
             </button>
-            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target="#modalConfirm">
+            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalConfirm-${uuidv4ModalConfirm}`}>
                 Launch modal confirm
             </button>
             <button ref={buttonOpenOrderRef} type="button" className="d-none" data-toggle="modal" data-target="#modalCustom-order">
@@ -621,6 +624,7 @@ export default function ClientManagement() {
             </button>
             
             <ModalSubmitForm
+                id={uuidv4ModalSubmitForm}
                 title={!isOpenAddMoney ? (!selectedItem ? "Thêm mới tài khoản khách hàng" : "Chỉnh sửa tài khoản khách hàng") : "Nạp tiền"}
                 open={isOpenAddEditDialog || isOpenAddMoney}
                 onClose={() => {
@@ -679,7 +683,8 @@ export default function ClientManagement() {
                 />
             </ModalCustom>
 
-            <ModalConfirm 
+            <ModalConfirm
+                id={uuidv4ModalConfirm}
                 title={"Xác nhận"}
                 prompt={
                     isOpenDeleteDialog ? "Bạn có chắc chắn muốn xóa bản ghi này không?":

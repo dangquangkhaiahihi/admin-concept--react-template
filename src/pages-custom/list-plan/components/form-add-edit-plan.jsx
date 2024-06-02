@@ -144,6 +144,25 @@ export default function FormAddEditPlan(props) {
                 </div>
             </div>
             <div className="row">
+                <div className="form-group col-md-6">
+                    <label>Số lượng tài khoản zalo được dùng:</label>
+                    <input
+                        className="form-control"
+                        type="text"
+                        name="numberOfZaloAccount"
+                        maxLength="10"
+                        placeholder="Số lượng tài khoản zalo được dùng"
+                        ref={register({ required: true, pattern: /^[0-9]+$/, })}
+                    />
+                    {errors.numberOfZaloAccount && errors.numberOfZaloAccount.type === "required" && (
+                        <span className="error">Trường này là bắt buộc</span>
+                    )}
+                    {errors.numberOfZaloAccount && errors.numberOfZaloAccount.type === "pattern" && (
+                        <span className="error">Giá trị không hợp lệ</span>
+                    )}
+                </div>
+            </div>
+            <div className="row">
                 <div className="form-group col-md-12">
                     <label>Thông tin khuyến mãi</label>
                     <textarea

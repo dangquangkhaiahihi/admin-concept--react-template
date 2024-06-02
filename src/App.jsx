@@ -64,6 +64,7 @@ import ClientManagement from "./pages-custom/list-client/list-client.jsx";
 import ClientNoteManagement from "./pages-custom/list-client-note/list-client-note.jsx";
 import OrderManagement from "./pages-custom/list-order/list-order.jsx";
 import DepositManagement from "./pages-custom/list-deposit/list-deposit.jsx";
+import GroupManagement from "./pages-custom/list-group/list-group.jsx";
 
 function App() {
   //media query
@@ -380,6 +381,20 @@ function App() {
             )}
             component={ClientNoteManagement}
             path={UrlCollectionCustom.ClientNote}
+          />
+
+          <RouteComponent
+            layout={() => (
+              <LayoutCustomView
+                title="Quản lý danh mục"
+                breadcrumbList={BreadcrumbConfig.Profile.breadcrumbList}
+                breadcrumbActive={BreadcrumbConfig.Profile.breadcrumbActive}
+              >
+                <GroupManagement/>
+              </LayoutCustomView>
+            )}
+            component={GroupManagement}
+            path={UrlCollectionCustom.Group}
           />
 
           <RouteComponent

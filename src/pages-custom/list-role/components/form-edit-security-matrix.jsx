@@ -117,11 +117,14 @@ export default function FormEditSecurityMatrix(props) {
         }
     };
 
-    const handleOnchangeGroup = (event, newValue, index) => {
+    const handleOnchangeGroup = (newValue, index) => {
         console.log("index", index);
         if (newValue) {
             const list = [...projectList];
-            const action = newValue.length > 0 && newValue.map(item => { return { actionId: item.id, actionName: item.name } })
+            const action = newValue.length > 0 && newValue.map(item => { return { actionId: item.value, actionName: item.label } })
+            // const action = newValue.length > 0 && newValue.map(item => { return { value: item.id, label: item.name } })
+
+            console.log(action, newValue, index);
             if (action.length === 0) {
                 setValue(`combo-box-group-${index}`,"");
                 setError(`combo-box-group-${index}`, { required: true });
@@ -203,37 +206,55 @@ export default function FormEditSecurityMatrix(props) {
                                 <div className="col-lg-5">
                                     {actionLookup &&
                                         actionLookup.length > 0 && (
-                                            <Autocomplete
-                                                id={`combo-box-group-${index}`}
-                                                label="Hành động"
-                                                options={actionLookup}
-                                                limitTags={3}
-                                                getOptionLabel={(option) => option.name}
-                                                fullWidth
-                                                multiple
-                                                disableClearable={true}
-                                                onChange={(event, newValue) =>
-                                                    handleOnchangeGroup(event, newValue, index)
-                                                }
+                                            // <Autocomplete
+                                            //     id={`combo-box-group-${index}`}
+                                            //     label="Hành động"
+                                            //     options={actionLookup}
+                                            //     limitTags={3}
+                                            //     getOptionLabel={(option) => option.name}
+                                            //     fullWidth
+                                            //     multiple
+                                            //     disableClearable={true}
+                                            //     onChange={(event, newValue) =>
+                                            //         handleOnchangeGroup(event, newValue, index)
+                                            //     }
+                                            //     value={item.actions.length > 0 ? item.actions.filter(p => p.actionId !== 0 && p.actionName)?.map(p => {
+                                            //         return {
+                                            //             id: p.actionId,
+                                            //             name: p.actionName
+                                            //         }
+                                            //     }) : []}
+                                            //     renderInput={(params) => (
+                                            //         <TextField
+                                            //             {...params}
+                                            //             label="Hành động"
+                                            //             size="small"
+                                            //             variant="outlined"
+                                            //             error={
+                                            //                 errors[`combo-box-group-${index}`] &&
+                                            //                 errors[`combo-box-group-${index}`].type ===
+                                            //                 "required"
+                                            //             }
+                                            //         />
+                                            //     )}
+                                            // />
+
+                                            <Select
+                                                isClearable
+                                                isMulti
                                                 value={item.actions.length > 0 ? item.actions.filter(p => p.actionId !== 0 && p.actionName)?.map(p => {
                                                     return {
-                                                        id: p.actionId,
-                                                        name: p.actionName
+                                                        value: p.actionId,
+                                                        label: p.actionName
                                                     }
                                                 }) : []}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        label="Hành động"
-                                                        size="small"
-                                                        variant="outlined"
-                                                        error={
-                                                            errors[`combo-box-group-${index}`] &&
-                                                            errors[`combo-box-group-${index}`].type ===
-                                                            "required"
-                                                        }
-                                                    />
-                                                )}
+                                                placeholder="Chọn hành động"
+                                                onChange={(data) => {
+                                                    console.log("data", data);
+                                                    handleOnchangeGroup(data, index)
+                                                }}
+                                                options={actionLookup.map(item => {return {label: item.name, value: item.id}})}
+                                                noOptionsMessage={() => "Không tồn tại"}
                                             />
                                         )}
                                     <TextField
@@ -268,8 +289,7 @@ export default function FormEditSecurityMatrix(props) {
                 
                 <div className="row align-items-center">
                     <div className="col-lg-11">
-                        <a
-                            className="button-add-click align-items-center d-flex justify-content-center"
+                        <a className="button-add-click align-items-center d-flex justify-content-center" href='#'
                             style={{cursor: 'pointer'}}
                             onClick={handleAddClick}
                         >

@@ -4,24 +4,27 @@ import { useDispatch } from 'react-redux';
 import * as appActions from "../../core/app.store";
 import * as config from '../../common/config'
 
-import headCellsListPlan from './head-cell-list-plan';
+import headCellsListGroup from './head-cell-list-group';
 
 import * as viVN from "../../language/vi-VN.json";
 import { NotificationMessageType } from "../../utils/configuration";
 import ShowNotification from "../../components/react-notifications/react-notifications";
 
-import * as planManagementAction from "../../redux/store/plan-management/plan-management.store";
-import * as roleManagementAction from "../../redux/store/role/role-management.store";
+
+import * as clientManagementAction from "../../redux/store/client-management/client-management.store";
+import * as userManagementAction from "../../redux/store/user-management/user-management.store";
+import * as groupManagementAction from "../../redux/store/group-management/group-management.store";
 
 import ModalSubmitForm from '../../components/custom-modal/modal-submit-form/modal-submit-form';
 import dayjs from 'dayjs';
 import ModalConfirm from '../../components/custom-modal/modal-confirm/modal-confirm';
 
-import FormAddEditPlan from './components/form-add-edit-plan';
+import FormAddEditGroup from './components/form-add-edit-group';
 import DataTableCustom from '../../components/datatable-custom';
 import { mediaUrl } from '../../api/api-service-custom';
 import { optionsPromotions } from '../constant';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Select from "react-select";
 
 const configLocal = {
     defaultPageSize: config.Configs.DefaultPageSize,
@@ -30,7 +33,7 @@ const configLocal = {
     order: "desc",
 }
 
-export default function PlanManagement() {
+export default function GroupManagement() {
     const now = new Date();
 
     const { register, handleSubmit, setValue } = useForm({
@@ -40,25 +43,42 @@ export default function PlanManagement() {
     const dispatch = useDispatch();
     const showLoading = (data) => dispatch(appActions.ShowLoading(data));
 
-    // // START GET LOOK UP
-    // const [rolesLookup, setRolesLookup] = useState([]);
-    // const getLookupRoles = async () => {
-    //     try {
-    //         const res = await roleManagementAction.GetLookup();
-    //         if (res && res.content) {
-    //             setRolesLookup(res.content);
+    // START GET LOOK UP
+
+    // const [users, setUsers] = useState([]);
+    // const getLookupUser = () => {
+    //     userManagementAction.GetListUserManagement(1, 500).then(
+    //         (res) => {
+    //             if ( res && res.content && res.content.items ) {
+    //                 setUsers(res.content.items)
+    //             }
+    //         },
+    //         (err) => {
+    //             throw err;
     //         }
-    //     } catch (err) {
-    //         setRolesLookup([]);
-    //         throw err;
-    //     }
+    //     )
+    // }
+
+    // const [client, setClient] = useState([]);
+    // const getLookupClient = () => {
+    //     clientManagementAction.GetLookupClient().then(
+    //         (res) => {
+    //             if ( res && res.content ) {
+    //                 setClient(res.content)
+    //             }
+    //         },
+    //         (err) => {
+    //             throw err;
+    //         }
+    //     )
     // }
 
     // const fetchData = async () => {
     //     showLoading(true);
     //     try {
     //         await Promise.allSettled([
-    //             getLookupRoles(),
+    //             getLookupClient(),
+    //             getLookupUser(),
     //         ]);
     //     } catch (err) {
     //         err && err.errorType &&
@@ -70,7 +90,7 @@ export default function PlanManagement() {
     //     } finally {
     //     }
     // }
-    // // END GET LOOK UP
+    // END GET LOOK UP
 
     const [data, setData] = useState([])
     const [totalItemCount, setTotalItemCount] = useState(0);
@@ -88,7 +108,7 @@ export default function PlanManagement() {
     const getListPlanManagement = (pageIndex = 1, pageSize = configLocal.defaultPageSize, sortExpression = configLocal.sortExpression, search=undefined) => {
         showLoading(true);
         // setPage(pageIndex-1)
-        planManagementAction.GetListPlanManagement(pageIndex, pageSize, sortExpression, search).then(
+        groupManagementAction.GetListGroupManagement(pageIndex, pageSize, sortExpression, search).then(
             (res) => {
                 if (res &&
                     res.content &&
@@ -133,16 +153,16 @@ export default function PlanManagement() {
         getListPlanManagement(1, event.target.value, sortExpression, searchData);
     };
 
-    const handleSubmitAddEditAccount = async (data) => {
+    const handleSubmitAddEditClientNote = async (data) => {
         showLoading(true);
 
         try {
             let res = null;
 
             if( !data.id ) {
-                res = await planManagementAction.CreatePlanManagement(data);
+                res = await groupManagementAction.CreateGroupManagement(data);
             } else {
-                res = await planManagementAction.UpdatePlanManagement(data);
+                res = await groupManagementAction.UpdateGroupManagement(data);
             }
 
             if (res && res.content) {
@@ -205,7 +225,7 @@ export default function PlanManagement() {
             let res = null;
 
             if( isOpenDeleteDialog ) {
-                res = await planManagementAction.DeletePlanManagement(selectedItem.id);
+                res = await groupManagementAction.DeleteGroupManagement(selectedItem.id);
                 if (res)
                 ShowNotification(
                     viVN.Success["DeleteSuccess"],
@@ -231,7 +251,13 @@ export default function PlanManagement() {
         setSearchData(data);
         let sortExpression = orderBy + ' ' + order;
         setPage(0);
-        getListPlanManagement(1, rowsPerPage, sortExpression, data);
+
+        const searchData = {...data};
+
+        if ( searchData.ClientId ) searchData.ClientId = searchData.ClientId.value;
+        if ( searchData.UserId ) searchData.UserId = searchData.UserId.value;
+
+        getListPlanManagement(1, rowsPerPage, sortExpression, searchData);
     }
 
     return (
@@ -242,19 +268,17 @@ export default function PlanManagement() {
                         <div className="card-body">
                             <form>
                                 <div className="row">
-                                    <div className="form-group col-md-12">
-                                        <div className="form-group">
-                                            <label>Tên gói</label>
-                                            <input
-                                                id="name"
-                                                className="form-control"
-                                                type="text"
-                                                name="name"
-                                                defaultValue={searchData?.name}
-                                                placeholder="Nhập tên để tìm kiếm"
-                                                ref={register()}
-                                            />
-                                        </div>
+                                    <div className="form-group col-md-4">
+                                        <label>Tên nhóm</label>
+                                        <input
+                                            id="Name"
+                                            className="form-control"
+                                            type="text"
+                                            name="Name"
+                                            defaultValue={searchData?.note}
+                                            placeholder="Nhập tên nhóm để tìm kiếm"
+                                            ref={register()}
+                                        />
                                     </div>
                                     <div className="col-md-12 pl-0 d-flex justify-content-center">
                                         <button type="submit" className="btn btn-space btn-primary">Tìm kiếm</button>
@@ -279,7 +303,7 @@ export default function PlanManagement() {
                     rowsPerPage={rowsPerPage}
                     handleChangeRowsPerPage={handleChangeRowsPerPage}
                     // head cells
-                    headCells={headCellsListPlan}
+                    headCells={headCellsListGroup}
                     handleRequestSort={handleRequestSort}
                     order={order}
                     orderBy={orderBy}
@@ -296,10 +320,10 @@ export default function PlanManagement() {
                                 <tr key={rowIndex}>
                                     <td className='text-center'><span>{rowIndex + 1}</span></td>
                                     <td className='text-center'><span>{row.name}</span></td>
-                                    <td className='text-center'><span>{(row.price).toLocaleString()} VNĐ</span></td>
-                                    <td className='text-center'><span>{optionsPromotions.find(x => x.value == row.promotion)?.label}</span></td>
-                                    <td className='text-center'><span>{row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY") : ''}</span></td>
-                                    <td className='text-center'><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY") : ''}</span></td>
+                                    <td className='text-center'><span>{row.created_by}</span></td>
+                                    <td className='text-center'><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{row.modified_by}</span></td>
+                                    <td className='text-center'><span>{row.modified_date ? dayjs(row.modified_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
 
                                     <td className='text-center'>
                                         <div className='d-flex'>
@@ -334,15 +358,14 @@ export default function PlanManagement() {
                 Launch modal confirm
             </button>
             <ModalSubmitForm
-                title={!selectedItem ? "Thêm mới gói đăng ký" : "Chỉnh sửa gói đăng ký"}
+                title={!selectedItem ? "Thêm mới ghi chú" : "Chỉnh sửa ghi chú"}
                 open={isOpenAddEditDialog}
                 onClose={closeAddEditDialog}
             >
-                <FormAddEditPlan
-                    // rolesLookup={rolesLookup}
+                <FormAddEditGroup
                     // ===
                     updateItem={selectedItem}
-                    onSubmitAddEdit={handleSubmitAddEditAccount}
+                    onSubmitAddEdit={handleSubmitAddEditClientNote}
                 />
             </ModalSubmitForm>
 

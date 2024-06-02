@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -25,6 +26,7 @@ import { mediaUrl } from '../../api/api-service-custom';
 import { optionsPromotions } from '../constant';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Select from "react-select";
+import { uuidv4 } from '../../common/tools';
 
 const configLocal = {
     defaultPageSize: config.Configs.DefaultPageSize,
@@ -33,8 +35,16 @@ const configLocal = {
     order: "desc",
 }
 
-export default function ClientNoteManagement() {
+export default function ClientNoteManagement(props) {
     const now = new Date();
+    const {
+        toggleFromClient,
+        clientId,
+        reload
+    } = {...props};
+
+    const uuidv4ModalSubmitForm = uuidv4();
+    const uuidv4ModalConfirm = uuidv4();
 
     const { register, handleSubmit, setValue } = useForm({
         mode: "all",
@@ -101,13 +111,23 @@ export default function ClientNoteManagement() {
     const [searchData, setSearchData] = useState();
 
     useEffect(() => {
-        getListPlanManagement();
         fetchData();
     }, []);
+
+    useEffect(() => {
+        getListPlanManagement();
+    }, [reload]);
 
     const getListPlanManagement = (pageIndex = 1, pageSize = configLocal.defaultPageSize, sortExpression = configLocal.sortExpression, search=undefined) => {
         showLoading(true);
         // setPage(pageIndex-1)
+
+        if ( !search && clientId) {
+            search = {
+                "ClientId": clientId,
+            }
+        }
+
         clientNoteManagementAction.GetListClientNoteManagement(pageIndex, pageSize, sortExpression, search).then(
             (res) => {
                 if (res &&
@@ -236,7 +256,7 @@ export default function ClientNoteManagement() {
             if ( res ) {
                 getListPlanManagement();
             }
-            closeConfirmDialog();
+            if (!clientId) closeConfirmDialog();
         } catch (err) {
             showLoading(false);
             err && err.errorType &&
@@ -280,21 +300,26 @@ export default function ClientNoteManagement() {
                                             ref={register()}
                                         />
                                     </div>
-                                    <div className="form-group col-md-4">
-                                        <label>Chọn khách hàng</label>
-                                        <Select
-                                            {...register("ClientId")}
-                                            isClearable
-                                            placeholder="Chọn khách hàng"
-                                            onChange={(data) => {
-                                                console.log(data);
-                                                setValue("ClientId", data);
-                                            }}
-                                            options={client.map(item => {return {label: item.name, value: item.id}})}
-                                            noOptionsMessage={() => "Không tồn tại"}
-                                        />
-                                    </div>
-                                    <div className="form-group col-md-4">
+                                    {
+                                        !clientId ? (
+                                            <div className="form-group col-md-4">
+                                                <label>Chọn khách hàng</label>
+                                                <Select
+                                                    {...register("ClientId")}
+                                                    isClearable
+                                                    placeholder="Chọn khách hàng"
+                                                    onChange={(data) => {
+                                                        console.log(data);
+                                                        setValue("ClientId", data);
+                                                    }}
+                                                    options={client.map(item => {return {label: item.name, value: item.id}})}
+                                                    noOptionsMessage={() => "Không tồn tại"}
+                                                />
+                                            </div>
+                                        ) : <></>
+                                    }
+                                    
+                                    {/* <div className="form-group col-md-4">
                                         <label>Chọn nhân viên</label>
                                         <Select
                                             {...register("UserId")}
@@ -307,19 +332,35 @@ export default function ClientNoteManagement() {
                                             options={users.map(item => {return {label: item.fullName, value: item.id}})}
                                             noOptionsMessage={() => "Không tồn tại"}
                                         />
+                                    </div> */}
+                                    <div className="form-group col-md-4">
+                                        <label>Tên nhân viên</label>
+                                        <input
+                                            id="UserName"
+                                            className="form-control"
+                                            type="text"
+                                            name="UserName"
+                                            defaultValue={searchData?.UserName}
+                                            placeholder="Nhập tên nhân viên để tìm kiếm"
+                                            ref={register()}
+                                        />
                                     </div>
                                     <div className="col-md-12 pl-0 d-flex justify-content-center">
                                         <button type="submit" className="btn btn-space btn-primary">Tìm kiếm</button>
                                         <button className="btn btn-space btn-secondary" onClick={(e) => {
                                             setValue("email","");
                                         }}>Xóa lọc</button>
-                                        <button
-                                            className="btn btn-space btn-warning"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                openAddDialog();
-                                            }}
-                                        >Thêm mới</button>
+                                        {
+                                            !clientId ? (
+                                                <button
+                                                    className="btn btn-space btn-warning"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        openAddDialog();
+                                                    }}
+                                                >Thêm mới</button>
+                                            ) : <></>
+                                        }
                                     </div>
                                 </div>
                             </form>
@@ -327,6 +368,7 @@ export default function ClientNoteManagement() {
                     </div>
                 </form>
                 <DataTableCustom
+                    toggleFromClient={toggleFromClient}
                     // button functions
                     rowsPerPage={rowsPerPage}
                     handleChangeRowsPerPage={handleChangeRowsPerPage}
@@ -355,12 +397,17 @@ export default function ClientNoteManagement() {
 
                                     <td className='text-center'>
                                         <div className='d-flex'>
-                                            <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table edit" data-toggle="tooltip" data-placement="top"
-                                                title="Sửa"
-                                                onClick={() => {openEditDialog(row)}}
-                                            >
-                                                <i className="far fa-edit"></i>
-                                            </button>
+                                            {
+                                                !clientId ? (
+                                                    <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table edit" data-toggle="tooltip" data-placement="top"
+                                                        title="Sửa"
+                                                        onClick={() => {openEditDialog(row)}}
+                                                    >
+                                                        <i className="far fa-edit"></i>
+                                                    </button>
+                                                ) : <></>
+                                            }
+                                            
                                             <button className="d-inline-block btn btn-sm btn-outline-light custom-button-table delete" data-toggle="tooltip" data-placement="top"
                                                 title="Xóa"
                                                 onClick={() => {
@@ -379,13 +426,14 @@ export default function ClientNoteManagement() {
                     </tbody>
                 </DataTableCustom>
             </div>
-            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target="#modalSubmitForm">
+            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalSubmitForm-${uuidv4ModalSubmitForm}`}>
                 Launch modal add edit
             </button>
-            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target="#modalConfirm">
+            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalConfirm-${uuidv4ModalConfirm}`}>
                 Launch modal confirm
             </button>
             <ModalSubmitForm
+                id={uuidv4ModalSubmitForm}
                 title={!selectedItem ? "Thêm mới ghi chú" : "Chỉnh sửa ghi chú"}
                 open={isOpenAddEditDialog}
                 onClose={closeAddEditDialog}
@@ -399,7 +447,8 @@ export default function ClientNoteManagement() {
                 />
             </ModalSubmitForm>
 
-            <ModalConfirm 
+            <ModalConfirm
+                id={uuidv4ModalConfirm}
                 title={"Xác nhận"}
                 prompt={
                     isOpenDeleteDialog ? "Bạn có chắc chắn muốn xóa bản ghi này không?":

@@ -347,9 +347,9 @@ export default function RoleManagement() {
                                     <td className='text-center'><span>{row.code}</span></td>
                                     <td className='text-center'><span>{row.name}</span></td>
                                     <td className='text-center'><span>{row.created_by}</span></td>
-                                    <td className='text-center'><span>{row.created_date ? dayjs(row.createdDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{row.created_date ? dayjs(row.created_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
                                     <td className='text-center'><span>{row.modified_by}</span></td>
-                                    <td className='text-center'><span>{row.modified_date ? dayjs(row.modifiedDate).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
+                                    <td className='text-center'><span>{row.modified_date ? dayjs(row.modified_date).format("DD/MM/YYYY hh:mm:ss") : ''}</span></td>
 
                                     <td className='text-center'>
                                         <div className='d-flex'>

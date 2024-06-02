@@ -32,6 +32,14 @@ const headCellsListAccount = [
         style: { width: "70px" }
     },
     {
+        id: 'groupName',
+        numeric: false,
+        disablePadding: false,
+        label: 'Nhóm',
+        className: 'pt-3 pb-3',
+        style: { width: "70px" }
+    },
+    {
         id: 'DateOfBirth',
         numeric: false,
         disablePadding: false,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -26,6 +27,7 @@ import { mediaUrl } from '../../api/api-service-custom';
 import { optionsClientTypes } from '../constant';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Select from "react-select";
+import { uuidv4 } from '../../common/tools';
 
 const configLocal = {
     defaultPageSize: config.Configs.DefaultPageSize,
@@ -34,7 +36,16 @@ const configLocal = {
     order: "desc",
 }
 
-export default function OrderManagement() {
+export default function OrderManagement(props) {
+    const {
+        toggleFromClient,
+        clientId,
+        reload
+    } = {...props};
+
+    const uuidv4ModalSubmitForm = uuidv4();
+    const uuidv4ModalConfirm = uuidv4();
+
     const { register, handleSubmit, setValue } = useForm({
         mode: "all",
         reValidateMode: "onBlur",
@@ -128,13 +139,22 @@ export default function OrderManagement() {
     const [searchData, setSearchData] = useState();
 
     useEffect(() => {
-        GetListOrderManagement();
         fetchData();
     }, []);
+
+    useEffect(() => {
+        GetListOrderManagement();
+    }, [reload]);
 
     const GetListOrderManagement = (pageIndex = 1, pageSize = configLocal.defaultPageSize, sortExpression = configLocal.sortExpression, search=undefined) => {
         showLoading(true);
         // setPage(pageIndex-1)
+        if ( !search && clientId) {
+            search = {
+                "ClientId": clientId,
+            }
+        }
+
         orderManagementAction.GetListOrderManagement(pageIndex, pageSize, sortExpression, search).then(
             (res) => {
                 if (res &&
@@ -264,7 +284,7 @@ export default function OrderManagement() {
             if ( res ) {
                 GetListOrderManagement();
             }
-            closeConfirmDialog();
+            if (!clientId) closeConfirmDialog();
         } catch (err) {
             showLoading(false);
             err && err.errorType &&
@@ -312,21 +332,50 @@ export default function OrderManagement() {
                         <div className="card-body">
                             <form>
                                 <div className="row">
-                                    <div className="form-group col-md-6">
-                                        <label>Chọn khách hàng</label>
-                                        <Select
-                                            {...register("ClientId")}
-                                            isClearable
-                                            isMulti
-                                            placeholder="Chọn khách hàng"
-                                            onChange={(data) => {
-                                                setValue("ClientId", data);
-                                            }}
-                                            options={client.map(item => {return {label: item.name, value: item.id}})}
-                                            noOptionsMessage={() => "Không tồn tại"}
+                                    {/* <div className="form-group col-md-4">
+                                        <label>Tên gói</label>
+                                        <input
+                                            id="Name"
+                                            className="form-control"
+                                            type="text"
+                                            name="Name"
+                                            defaultValue={searchData?.Name}
+                                            placeholder="Tên gói"
+                                            ref={register()}
+                                        />
+                                    </div> */}
+                                    {
+                                        !clientId ? (
+                                            <div className="form-group col-md-4">
+                                                <label>Chọn khách hàng</label>
+                                                <Select
+                                                    {...register("ClientId")}
+                                                    isClearable
+                                                    isMulti
+                                                    placeholder="Chọn khách hàng"
+                                                    onChange={(data) => {
+                                                        setValue("ClientId", data);
+                                                    }}
+                                                    options={client.map(item => {return {label: item.name, value: item.id}})}
+                                                    noOptionsMessage={() => "Không tồn tại"}
+                                                />
+                                            </div>
+                                        ) : <></>
+                                    }
+
+                                    <div className="form-group col-md-4">
+                                        <label>Tên nhân viên</label>
+                                        <input
+                                            id="UserName"
+                                            className="form-control"
+                                            type="text"
+                                            name="UserName"
+                                            defaultValue={searchData?.UserName}
+                                            placeholder="Nhập tên nhân viên để tìm kiếm"
+                                            ref={register()}
                                         />
                                     </div>
-                                    <div className="form-group col-md-6">
+                                    {/* <div className="form-group col-md-6">
                                         <label>Chọn nhân viên</label>
                                         <Select
                                             {...register("UserId")}
@@ -377,7 +426,7 @@ export default function OrderManagement() {
                                             options={province.map(item => {return {label: item.name, value: item.id}})}
                                             noOptionsMessage={() => "Không tồn tại"}
                                         />
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className='row'>
                                     <div className="col-md-12 pl-0 d-flex justify-content-center">
@@ -392,6 +441,7 @@ export default function OrderManagement() {
                     </div>
                 </form>
                 <DataTableCustom
+                    toggleFromClient={toggleFromClient}
                     // button functions
                     rowsPerPage={rowsPerPage}
                     handleChangeRowsPerPage={handleChangeRowsPerPage}
@@ -414,7 +464,7 @@ export default function OrderManagement() {
                                     <td className='text-center'><span>{rowIndex + 1}</span></td>
                                     <td className='text-center'><span>{client.find(x => x.id === row.clientId)?.name}</span></td>
                                     <td className='text-center'><span>{plan.find(x => x.id === row.planId)?.name}</span></td>
-                                    <td className='text-center'><span>{plan.find(x => x.id === row.planId)?.price || 0} VNĐ</span></td>
+                                    <td className='text-center'><span>{plan.find(x => x.id === row.planId)?.price.toLocaleString() || 0} VNĐ</span></td>
 
                                     <td className='text-center'><span>{row.startDate ? dayjs(row.startDate).format("DD/MM/YYYY") : ''}</span></td>
                                     <td className='text-center'><span>{row.endDate ? dayjs(row.endDate).format("DD/MM/YYYY") : ''}</span></td>
@@ -442,13 +492,14 @@ export default function OrderManagement() {
                     </tbody>
                 </DataTableCustom>
             </div>
-            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target="#modalSubmitForm">
+            <button ref={buttonOpenAddEditRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalSubmitForm-${uuidv4ModalSubmitForm}`}>
                 Launch modal add edit
             </button>
-            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target="#modalConfirm">
+            <button ref={buttonOpenConfirmRef} type="button" className="d-none" data-toggle="modal" data-target={`#modalConfirm-${uuidv4ModalConfirm}`}>
                 Launch modal confirm
             </button>
             <ModalSubmitForm
+                id={uuidv4ModalSubmitForm}
                 title={!selectedItem ? "Thêm mới tài khoản khách hàng" : "Chỉnh sửa tài khoản khách hàng"}
                 open={isOpenAddEditDialog}
                 onClose={closeAddEditDialog}
@@ -464,6 +515,7 @@ export default function OrderManagement() {
             </ModalSubmitForm>
 
             <ModalConfirm 
+                id={uuidv4ModalConfirm}
                 title={"Xác nhận"}
                 prompt={
                     isOpenDeleteDialog ? "Bạn có chắc chắn muốn xóa bản ghi này không?":
