@@ -76,8 +76,7 @@ export default function SideBarCustom() {
                 isClient ||
                 isClientNote ||
                 isOrder ||
-                isDepositHistory || 
-                isGroup;
+                isDepositHistory;
 
     // Profile: '/tai-khoan',
     // AccountManagement: 'quan-ly-tai-khoan',
@@ -85,7 +84,7 @@ export default function SideBarCustom() {
     const isProfile = currentLocation.pathname === UrlCollectionCustom.Profile;
     const isAccountManagement = currentLocation.pathname === UrlCollectionCustom.AccountManagement;
     const isRoleManagement = currentLocation.pathname === UrlCollectionCustom.RoleManagement;
-    const isAdministrative = isProfile ||
+    const isAdministrative = isGroup ||
                 isAccountManagement ||
                 isRoleManagement;
 

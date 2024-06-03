@@ -112,6 +112,10 @@ export default function ClientNoteManagement(props) {
 
     useEffect(() => {
         fetchData();
+
+        if (clientId) {
+            setValue("ClientId", clientId)
+        }
     }, []);
 
     useEffect(() => {
@@ -274,8 +278,8 @@ export default function ClientNoteManagement(props) {
 
         const searchData = {...data};
 
-        if ( searchData.ClientId ) searchData.ClientId = searchData.ClientId.value;
-        if ( searchData.UserId ) searchData.UserId = searchData.UserId.value;
+        // if ( searchData.ClientId ) searchData.ClientId = searchData.ClientId.value;
+        // if ( searchData.UserId ) searchData.UserId = searchData.UserId.value;
 
         getListPlanManagement(1, rowsPerPage, sortExpression, searchData);
     }
@@ -300,25 +304,20 @@ export default function ClientNoteManagement(props) {
                                             ref={register()}
                                         />
                                     </div>
-                                    {
-                                        !clientId ? (
-                                            <div className="form-group col-md-4">
-                                                <label>Chọn khách hàng</label>
-                                                <Select
-                                                    {...register("ClientId")}
-                                                    isClearable
-                                                    placeholder="Chọn khách hàng"
-                                                    onChange={(data) => {
-                                                        console.log(data);
-                                                        setValue("ClientId", data);
-                                                    }}
-                                                    options={client.map(item => {return {label: item.name, value: item.id}})}
-                                                    noOptionsMessage={() => "Không tồn tại"}
-                                                />
-                                            </div>
-                                        ) : <></>
-                                    }
-                                    
+                                    <div className={`form-group col-md-6 ${!clientId ? "d-block" : "d-none"}`}>
+                                        <label>Chọn khách hàng</label>
+                                        <Select
+                                            {...register("ClientId")}
+                                            isClearable
+                                            placeholder="Chọn khách hàng"
+                                            onChange={(data) => {
+                                                console.log(data);
+                                                setValue("ClientId", data);
+                                            }}
+                                            options={client.map(item => {return {label: item.name, value: item.id}})}
+                                            noOptionsMessage={() => "Không tồn tại"}
+                                        />
+                                    </div>
                                     {/* <div className="form-group col-md-4">
                                         <label>Chọn nhân viên</label>
                                         <Select
@@ -348,7 +347,9 @@ export default function ClientNoteManagement(props) {
                                     <div className="col-md-12 pl-0 d-flex justify-content-center">
                                         <button type="submit" className="btn btn-space btn-primary">Tìm kiếm</button>
                                         <button className="btn btn-space btn-secondary" onClick={(e) => {
-                                            setValue("email","");
+                                            setValue("Note", null);
+                                            setValue("UserName", null);
+                                            if (!clientId) setValue("ClientId", null);
                                         }}>Xóa lọc</button>
                                         {
                                             !clientId ? (

@@ -140,6 +140,10 @@ export default function OrderManagement(props) {
 
     useEffect(() => {
         fetchData();
+
+        if (clientId) {
+            setValue("ClientId", clientId)
+        }
     }, []);
 
     useEffect(() => {
@@ -299,28 +303,30 @@ export default function OrderManagement(props) {
         setSearchData(data);
         let sortExpression = orderBy + ' ' + order;
         setPage(0);
-        
-        if ( data.StartDate && data.EndDate ) {
-            if ( !dayjs(data.StartDate).isBefore(dayjs(data.EndDate))) {
-                ShowNotification(
-                    "Từ ngày phải bé hơn đến ngày",
-                    NotificationMessageType.Error
-                );
-                return;
-            }
-        }
-        const searchData = {...data};
-        if ( searchData.ClientId && Array.isArray(searchData.ClientId) && searchData.ClientId.length > 0) {
-            searchData.ClientId = searchData.ClientId.map(x => x.value)
-        };
-        
-        if ( searchData.UserId && Array.isArray(searchData.UserId) && searchData.UserId.length > 0) {
-            searchData.UserId = searchData.UserId.map(x => x.value)
-        };
 
-        if ( searchData.ProvinceId && Array.isArray(searchData.ProvinceId) && searchData.ProvinceId.length > 0) {
-            searchData.ProvinceId = searchData.ProvinceId.map(x => x.value)
-        };
+        console.log("dâttat", data);
+        
+        // if ( data.StartDate && data.EndDate ) {
+        //     if ( !dayjs(data.StartDate).isBefore(dayjs(data.EndDate))) {
+        //         ShowNotification(
+        //             "Từ ngày phải bé hơn đến ngày",
+        //             NotificationMessageType.Error
+        //         );
+        //         return;
+        //     }
+        // }
+        // const searchData = {...data};
+        // if ( searchData.ClientId && Array.isArray(searchData.ClientId) && searchData.ClientId.length > 0) {
+        //     searchData.ClientId = searchData.ClientId.map(x => x.value)
+        // };
+        
+        // if ( searchData.UserId && Array.isArray(searchData.UserId) && searchData.UserId.length > 0) {
+        //     searchData.UserId = searchData.UserId.map(x => x.value)
+        // };
+
+        // if ( searchData.ProvinceId && Array.isArray(searchData.ProvinceId) && searchData.ProvinceId.length > 0) {
+        //     searchData.ProvinceId = searchData.ProvinceId.map(x => x.value)
+        // };
         GetListOrderManagement(1, rowsPerPage, sortExpression, searchData);
     }
 
@@ -344,25 +350,20 @@ export default function OrderManagement(props) {
                                             ref={register()}
                                         />
                                     </div> */}
-                                    {
-                                        !clientId ? (
-                                            <div className="form-group col-md-4">
-                                                <label>Chọn khách hàng</label>
-                                                <Select
-                                                    {...register("ClientId")}
-                                                    isClearable
-                                                    isMulti
-                                                    placeholder="Chọn khách hàng"
-                                                    onChange={(data) => {
-                                                        setValue("ClientId", data);
-                                                    }}
-                                                    options={client.map(item => {return {label: item.name, value: item.id}})}
-                                                    noOptionsMessage={() => "Không tồn tại"}
-                                                />
-                                            </div>
-                                        ) : <></>
-                                    }
-
+                                    <div className={`form-group col-md-4 ${!clientId ? "d-block" : "d-none"}`}>
+                                        <label>Chọn khách hàng</label>
+                                        <Select
+                                            {...register("ClientId")}
+                                            isClearable
+                                            isMulti
+                                            placeholder="Chọn khách hàng"
+                                            onChange={(data) => {
+                                                setValue("ClientId", data);
+                                            }}
+                                            options={client.map(item => {return {label: item.name, value: item.id}})}
+                                            noOptionsMessage={() => "Không tồn tại"}
+                                        />
+                                    </div>
                                     <div className="form-group col-md-4">
                                         <label>Tên nhân viên</label>
                                         <input
@@ -432,7 +433,8 @@ export default function OrderManagement(props) {
                                     <div className="col-md-12 pl-0 d-flex justify-content-center">
                                         <button type="submit" className="btn btn-space btn-primary">Tìm kiếm</button>
                                         <button className="btn btn-space btn-secondary" onClick={(e) => {
-                                            setValue("email","");
+                                            setValue("UserName", null);
+                                            if (!clientId) setValue("ClientId", null);
                                         }}>Xóa lọc</button>
                                     </div>
                                 </div>

@@ -12,7 +12,7 @@ export const GetListClientNoteManagement = (pageIndex = 1, pageSize = config.Con
     sortExpression && params.append("sortExpression", sortExpression);
     search.Note && params.append("Note", search.Note);
     search.ClientId && params.append("ClientId", search.ClientId);
-    search.UserId && params.append("UserId", search.UserId);
+    search.UserName && params.append("UserName", search.UserName);
 
     return service.get(ApiUrl.GetListClientNoteManagement, params).then(res => { return res }).catch(err => { throw err });
 }

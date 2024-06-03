@@ -144,9 +144,9 @@ export default function DepositManagement(props) {
         GetListOrderManagement();
         fetchData();
 
-        // if (clientId) {
-        //     setValue("ClientId", clientId)
-        // }
+        if (clientId) {
+            setValue("ClientId", clientId)
+        }
         // if (startDateDayjs) {
         //     setValue("StartDate", startDateDayjs)
         // }
@@ -372,32 +372,28 @@ export default function DepositManagement(props) {
                                         //label={"Nhập Ngày nhận"}
                                         />
                                     </div> */}
-                                    {
-                                        !clientId ? (
-                                            <div className="form-group col-md-6">
-                                                <label>Chọn khách hàng</label>
-                                                <Select
-                                                    {...register("ClientId")}
-                                                    isClearable
-                                                    isMulti
-                                                    placeholder="Chọn khách hàng"
-                                                    onChange={(data) => {
-                                                        setValue("ClientId", data);
-                                                    }}
-                                                    options={client.map(item => {return {label: item.name, value: item.id}})}
-                                                    noOptionsMessage={() => "Không tồn tại"}
-                                                />
-                                            </div>
-                                        ) : <></>
-                                    }
+                                    <div className={`form-group col-md-6 ${!clientId ? "d-block" : "d-none"}`}>
+                                        <label>Chọn khách hàng</label>
+                                        <Select
+                                            {...register("ClientId")}
+                                            isClearable
+                                            isMulti
+                                            placeholder="Chọn khách hàng"
+                                            onChange={(data) => {
+                                                setValue("ClientId", data);
+                                            }}
+                                            options={client.map(item => {return {label: item.name, value: item.id}})}
+                                            noOptionsMessage={() => "Không tồn tại"}
+                                        />
+                                    </div>
                                     <div className="form-group col-md-4">
                                         <label>Tên nhân viên</label>
                                         <input
-                                            id="Name"
+                                            id="UserName"
                                             className="form-control"
                                             type="text"
-                                            name="Name"
-                                            defaultValue={searchData?.Name}
+                                            name="UserName"
+                                            defaultValue={searchData?.UserName}
                                             placeholder="Nhập tên nhân viên để tìm kiếm"
                                             ref={register()}
                                         />
@@ -440,7 +436,8 @@ export default function DepositManagement(props) {
                                     <div className="col-md-12 pl-0 d-flex justify-content-center">
                                         <button type="submit" className="btn btn-space btn-primary">Tìm kiếm</button>
                                         <button className="btn btn-space btn-secondary" onClick={(e) => {
-                                            
+                                            setValue("UserName", null);
+                                            if (!clientId) setValue("ClientId", null);
                                         }}>Xóa lọc</button>
                                     </div>
                                 </div>

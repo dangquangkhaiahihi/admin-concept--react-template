@@ -11,7 +11,7 @@ export const GetListDepositManagement = (pageIndex = 1, pageSize = config.Config
     params.append("pageSize", pageSize);
     sortExpression && params.append("sortExpression", sortExpression);
     search.ClientId && params.append("ClientId", search.ClientId);
-    search.Name && params.append("Name", search.Name);
+    search.UserName && params.append("UserName", search.UserName);
     // search.UserId && params.append("UserId", search.UserId);
     // search.ProvinceId && params.append("ProvinceId", search.ProvinceId);
     // search.StartDate && params.append("StartDate", search.StartDate);
